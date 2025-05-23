@@ -20,49 +20,66 @@ To contribute to the `integrations/makeswift` branch, you can create a new branc
 
 ### Pulling updates from `canary` into `integrations/makeswift`
 
-We aim to keep `integrations/makeswift` in sync with `canary`. To do this, we frequently pull the latest code from `canary` into `integrations/makeswift`.
+We aim to keep `integrations/makeswift` in sync with `canary`. To do this, we pull the latest code from `canary` into `integrations/makeswift` right after we cut a new release for `canary`.
 
 To pull the latest code from `canary` into `integrations/makeswift`, you can follow these steps:
 
-1. Fetch the latest code from `canary`:
+1. Check [open Pull Requests](https://github.com/bigcommerce/catalyst/pulls?q=is%3Apr+is%3Aopen) for any PR's titled `Version Packages (main)` ([example](https://github.com/bigcommerce/catalyst/pull/1892))
+   a. If you find one, it should be approved and merged before continuing
+   b. If you do not find one, it most likely indicates that `canary` and `integrations/makeswift` are already in sync, and there are no updates to pull into `integrations/makeswift` from `canary`.
+
+> [!TIP]
+> The remaining steps assume you are working locally after having cloned `bigcommerce/catalyst`, and that you have rights to push to the `integrations/makeswift` branch on GitHub.
+
+2. Fetch the latest code from `canary`:
 
    ```bash
    git checkout canary
    git pull
    ```
 
-2. Fetch the latest code from `integrations/makeswift`:
+3. Fetch the latest code from `integrations/makeswift`:
 
    ```bash
    git checkout integrations/makeswift
    git pull
    ```
 
-3. Checkout a new branch from `integrations/makeswift`:
+4. Checkout a new branch from `integrations/makeswift`:
 
    ```bash
    git checkout -b {new-branch-name}
    ```
 
-4. Merge `canary` into the new branch:
+5. Merge `canary` into the new branch:
 
    ```bash
    git merge canary
    ```
 
-5. After resolving any merge conflicts, open a new PR in GitHub to merge your new branch into `integrations/makeswift`. This PR should be code reviewed and approved before the next steps.
+6. Resolve merge conflicts, if necessary.
 
-6. Rebase the changes onto the local `integrations/makeswift` branch in order to make the branches 1-1 and keep a linear commit history.
+> [!WARNING]
+> Ensure that the merge does not inadvertently overwrite the `integrations/makeswift` version of `core/CHANGELOG.md`, or the `name` and `version` fields in `core/package.json`. The `name` field should remain `@bigcommerce/catalyst-makeswift`, the `version` field should remain whatever the latest published `@bigcommerce/catalyst-makeswift` version was, and the `core/CHANGELOG.md` should not include any changelog entries from the `canary` version of `core/CHANGELOG.md`
+
+7. Create a new `.changeset/*.md` file on `integrations/makeswift` by running `pnpm changeset`. The version bump you choose (e.g., `major`, `minor`, or `patch`) should match the version bumped by the original `Version Packages (main)` PR from Step 1 above. For the Changeset description, simply link to the `core/CHANGELOG.md` entry on `canary` that was created by the `Version Packages (main)` PR from Step 1 above. Create another commit containing the Changeset file.
+
+8. Open a new PR in GitHub to merge your new branch into `integrations/makeswift`. This PR should be code reviewed and approved before the next steps.
+
+9. Rebase the changes onto the local `integrations/makeswift` branch in order to make the branches 1-1 and keep a linear commit history.
 
    ```bash
    git checkout integrations/makeswift
    git rebase {new-branch-name}
    ```
 
-7. Push the changes up to GitHub, which will automatically close the open PR from step 6.
-   ```bash
-   git push
-   ```
+10. Push the changes up to GitHub, which will automatically close the open PR from step 6.
+
+    ```bash
+    git push
+    ```
+
+11. This should create or update a PR titled `Version Packages (integrations/makeswift)`. Approving and merging this PR will create a new GitHub release for `@bigcommerce/catalyst-makeswift` based on the version bump you chose in Step 7 above.
 
 ## Other Ways to Contribute
 
