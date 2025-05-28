@@ -17,7 +17,6 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - _vercel (vercel internals, eg: web vitals)
@@ -26,7 +25,9 @@ export const config = {
      * - sitemap.xml (sitemap route)
      * - xmlsitemap.php (legacy sitemap route)
      * - robots.txt (robots route)
+     * - api/makeswift (makeswift API routes)
+     * - api/auth (auth API routes)
      */
-    '/((?!api|admin|_next/static|_next/image|_vercel|favicon.ico|xmlsitemap.php|sitemap.xml|robots.txt).*)',
+    '/((?!_next/static|_next/image|_vercel|favicon.ico|admin|xmlsitemap.php|sitemap.xml|robots.txt|api/makeswift|api/auth).*)',
   ],
 };
