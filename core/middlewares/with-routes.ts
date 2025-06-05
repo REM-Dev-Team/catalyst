@@ -1,3 +1,4 @@
+import { getCache } from '@vercel/functions';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -5,8 +6,6 @@ import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { kvKey, STORE_STATUS_KEY } from '~/lib/kv/keys';
-
-import { kv } from '../lib/kv';
 
 import { type MiddlewareFactory } from './compose-middlewares';
 
@@ -179,12 +178,14 @@ const updateRouteCache = async (
   channelId: string,
   event: NextFetchEvent,
 ): Promise<RouteCache> => {
+  const cache = getCache();
+
   const routeCache: RouteCache = {
     route: await getRoute(pathname, channelId),
     expiryTime: Date.now() + 1000 * 60 * 30, // 30 minutes
   };
 
-  event.waitUntil(kv.set(kvKey(pathname, channelId), routeCache));
+  event.waitUntil(cache.set(kvKey(pathname, channelId), routeCache));
 
   return routeCache;
 };
@@ -193,6 +194,7 @@ const updateStatusCache = async (
   channelId: string,
   event: NextFetchEvent,
 ): Promise<StorefrontStatusCache> => {
+  const cache = getCache();
   const status = await getStoreStatus(channelId);
 
   if (status === undefined) {
@@ -204,7 +206,7 @@ const updateStatusCache = async (
     expiryTime: Date.now() + 1000 * 60 * 5, // 5 minutes
   };
 
-  event.waitUntil(kv.set(kvKey(STORE_STATUS_KEY, channelId), statusCache));
+  event.waitUntil(cache.set(kvKey(STORE_STATUS_KEY, channelId), statusCache));
 
   return statusCache;
 };
@@ -222,6 +224,7 @@ const clearLocaleFromPath = (path: string, locale: string) => {
 };
 
 const getRouteInfo = async (request: NextRequest, event: NextFetchEvent) => {
+  const cache = getCache();
   const locale = request.headers.get('x-bc-locale') ?? '';
   const channelId = request.headers.get('x-bc-channel-id') ?? '';
 
@@ -229,10 +232,10 @@ const getRouteInfo = async (request: NextRequest, event: NextFetchEvent) => {
     // For route resolution parity, we need to also include query params, otherwise certain redirects will not work.
     const pathname = clearLocaleFromPath(request.nextUrl.pathname + request.nextUrl.search, locale);
 
-    let [routeCache, statusCache] = await kv.mget<RouteCache | StorefrontStatusCache>(
-      kvKey(pathname, channelId),
-      kvKey(STORE_STATUS_KEY, channelId),
-    );
+    let [routeCache, statusCache] = await Promise.all<
+      [RouteCache | null, StorefrontStatusCache | null]
+      // @ts-expect-error cache.get returns Promise<unknown | null> but we need a generic to assume the type
+    >([cache.get(kvKey(pathname, channelId)), cache.get(kvKey(STORE_STATUS_KEY, channelId))]);
 
     // If caches are old, update them in the background and return the old data (SWR-like behavior)
     // If cache is missing, update it and return the new data, but write to KV in the background
@@ -241,6 +244,8 @@ const getRouteInfo = async (request: NextRequest, event: NextFetchEvent) => {
     } else if (!statusCache) {
       statusCache = await updateStatusCache(channelId, event);
     }
+
+    console.log(routeCache);
 
     if (routeCache && routeCache.expiryTime < Date.now()) {
       event.waitUntil(updateRouteCache(pathname, channelId, event));

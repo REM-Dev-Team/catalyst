@@ -2,3 +2,5 @@ packages:
   - core
   - packages/*
 neverBuiltDependencies: null
+onlyBuiltDependencies:
+  - '@vercel/speed-insights'
