@@ -316,12 +316,21 @@ const getRouteInfo = async (request: NextRequest, event: NextFetchEvent) => {
 
 export const withRoutes: MiddlewareFactory = () => {
   return async (request, event) => {
+    const middlewareStartTime = getTimeNow();
+    
+    const logMiddlewareTiming = (action: string) => {
+      const middlewareEndTime = getTimeNow();
+      const duration = middlewareEndTime - middlewareStartTime;
+      console.log(`Middleware execution (${action}): ${duration.toFixed(2)}ms`);
+    };
+    
     const locale = request.headers.get('x-bc-locale') ?? '';
 
     const { route, status } = await getRouteInfo(request, event);
 
     if (status === 'MAINTENANCE') {
       // 503 status code not working - https://github.com/vercel/next.js/issues/50155
+      logMiddlewareTiming('maintenance mode');
       return NextResponse.rewrite(new URL(`/${locale}/maintenance`, request.url), { status: 503 });
     }
 
@@ -349,6 +358,7 @@ export const withRoutes: MiddlewareFactory = () => {
           // For dynamic redirects, assume an internal redirect and construct the URL from the path
           const redirectUrl = new URL(route.redirect.to.path + searchParams, request.url);
 
+          logMiddlewareTiming('redirect');
           return NextResponse.redirect(redirectUrl, redirectConfig);
         }
 
@@ -362,11 +372,13 @@ export const withRoutes: MiddlewareFactory = () => {
             redirectUrl.search = searchParams;
           }
 
+          logMiddlewareTiming('manual redirect');
           return NextResponse.redirect(redirectUrl, redirectConfig);
         }
 
         default: {
           // If for some reason the redirect type is not recognized, use the toUrl as a fallback
+          logMiddlewareTiming('fallback redirect');
           return NextResponse.redirect(route.redirect.toUrl, redirectConfig);
         }
       }
@@ -404,6 +416,7 @@ export const withRoutes: MiddlewareFactory = () => {
       case 'RawHtmlPage': {
         const { htmlBody } = await getRawWebPageContent(node.id);
 
+        logMiddlewareTiming('raw HTML page');
         return new NextResponse(htmlBody, {
           headers: { 'content-type': 'text/html' },
         });
@@ -432,6 +445,7 @@ export const withRoutes: MiddlewareFactory = () => {
 
     rewriteUrl.search = request.nextUrl.search;
 
+    logMiddlewareTiming('rewrite');
     return NextResponse.rewrite(rewriteUrl);
   };
 };
