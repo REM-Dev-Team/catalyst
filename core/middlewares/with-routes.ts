@@ -9,6 +9,26 @@ import { kvKey, STORE_STATUS_KEY } from '~/lib/kv/keys';
 
 import { type MiddlewareFactory } from './compose-middlewares';
 
+// Helper function for performance timing with feature detection
+const getTimeNow = (): number => {
+  return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+};
+
+const timedCacheOperation = async <T>(
+  operation: () => Promise<T>,
+  operationType: string,
+  key: string
+): Promise<T> => {
+  const startTime = getTimeNow();
+  const result = await operation();
+  const endTime = getTimeNow();
+  const duration = endTime - startTime;
+  
+  console.log(`Cache ${operationType} for key "${key}": ${duration.toFixed(2)}ms`);
+  
+  return result;
+};
+
 const GetRouteQuery = graphql(`
   query GetRouteQuery($path: String!) {
     site {
@@ -185,7 +205,14 @@ const updateRouteCache = async (
     expiryTime: Date.now() + 1000 * 60 * 30, // 30 minutes
   };
 
-  event.waitUntil(cache.set(kvKey(pathname, channelId), routeCache));
+  const cacheKey = kvKey(pathname, channelId);
+  event.waitUntil(
+    timedCacheOperation(
+      () => cache.set(cacheKey, routeCache),
+      'set',
+      cacheKey
+    )
+  );
 
   return routeCache;
 };
@@ -206,7 +233,14 @@ const updateStatusCache = async (
     expiryTime: Date.now() + 1000 * 60 * 5, // 5 minutes
   };
 
-  event.waitUntil(cache.set(kvKey(STORE_STATUS_KEY, channelId), statusCache));
+  const cacheKey = kvKey(STORE_STATUS_KEY, channelId);
+  event.waitUntil(
+    timedCacheOperation(
+      () => cache.set(cacheKey, statusCache),
+      'set',
+      cacheKey
+    )
+  );
 
   return statusCache;
 };
@@ -232,10 +266,21 @@ const getRouteInfo = async (request: NextRequest, event: NextFetchEvent) => {
     // For route resolution parity, we need to also include query params, otherwise certain redirects will not work.
     const pathname = clearLocaleFromPath(request.nextUrl.pathname + request.nextUrl.search, locale);
 
-    let [routeCache, statusCache] = await Promise.all<
-      [RouteCache | null, StorefrontStatusCache | null]
-      // @ts-expect-error cache.get returns Promise<unknown | null> but we need a generic to assume the type
-    >([cache.get(kvKey(pathname, channelId)), cache.get(kvKey(STORE_STATUS_KEY, channelId))]);
+    const routeCacheKey = kvKey(pathname, channelId);
+    const statusCacheKey = kvKey(STORE_STATUS_KEY, channelId);
+    
+    let [routeCache, statusCache] = await Promise.all([
+      timedCacheOperation(
+        () => cache.get(routeCacheKey) as Promise<RouteCache | null>,
+        'get',
+        routeCacheKey
+      ),
+      timedCacheOperation(
+        () => cache.get(statusCacheKey) as Promise<StorefrontStatusCache | null>,
+        'get',
+        statusCacheKey
+      )
+    ]);
 
     // If caches are old, update them in the background and return the old data (SWR-like behavior)
     // If cache is missing, update it and return the new data, but write to KV in the background
@@ -244,8 +289,6 @@ const getRouteInfo = async (request: NextRequest, event: NextFetchEvent) => {
     } else if (!statusCache) {
       statusCache = await updateStatusCache(channelId, event);
     }
-
-    console.log(routeCache);
 
     if (routeCache && routeCache.expiryTime < Date.now()) {
       event.waitUntil(updateRouteCache(pathname, channelId, event));
