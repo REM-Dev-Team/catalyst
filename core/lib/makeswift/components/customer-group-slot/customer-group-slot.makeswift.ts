@@ -64,7 +64,16 @@ runtime.registerComponent(CustomerGroupSlot, {
         try {
           const data = await getAllCustomerGroups();
 
-          if (!data) return [];
+          if (!data) {
+            // nullish data means we don't have access to the customer groups API
+            return [
+              {
+                id: NO_GROUP_ID,
+                label: 'Setup needed. See docs.',
+                value: NO_GROUP_ID,
+              },
+            ];
+          }
 
           return [
             {
