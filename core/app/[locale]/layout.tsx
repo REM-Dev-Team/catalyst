@@ -104,6 +104,7 @@ export default async function RootLayout({ params, children }: Props) {
     <MakeswiftProvider previewMode={(await draftMode()).isEnabled}>
       <html className={clsx(fonts.map((f) => f.variable))} lang={locale}>
         <head>
+          <link rel="stylesheet" href="https://use.typekit.net/ddi4oux.css" />
           <SiteTheme />
           <DraftModeScript appOrigin={process.env.MAKESWIFT_APP_ORIGIN} />
         </head>

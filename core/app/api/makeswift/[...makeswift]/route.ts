@@ -43,6 +43,24 @@ const handler = MakeswiftApiHandler(process.env.MAKESWIFT_SITE_API_KEY, {
         label: 'Roboto Mono',
         variants: defaultVariants,
       },
+      {
+        family: '"futura-pt", sans-serif',
+        label: 'Futura PT (Adobe Fonts)',
+        variants: [
+          { weight: '300', style: 'normal' },
+          { weight: '300', style: 'italic' },
+          { weight: '400', style: 'normal' },
+          { weight: '400', style: 'italic' },
+          { weight: '500', style: 'normal' },
+          { weight: '500', style: 'italic' },
+          { weight: '600', style: 'normal' },
+          { weight: '600', style: 'italic' },
+          { weight: '700', style: 'normal' },
+          { weight: '700', style: 'italic' },
+          { weight: '800', style: 'normal' },
+          { weight: '800', style: 'italic' },
+        ],
+      },
     ];
   },
 });
