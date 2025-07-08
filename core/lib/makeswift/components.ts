@@ -1,4 +1,6 @@
 import './components/accordions/accordions.makeswift';
+import './components/blog-post-card/blog-post-card.makeswift';
+import './components/blog-post-carousel/blog-post-carousel.makeswift';
 import './components/brand-carousel/brand-carousel.makeswift';
 import './components/button-link/button-link.makeswift';
 import './components/card-carousel/card-carousel.makeswift';
