@@ -27,6 +27,16 @@ const LocaleQuery = graphql(`
 export default async (): Promise<NextConfig> => {
   let nextConfig: NextConfig = {
     reactStrictMode: true,
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'i.ytimg.com',
+          port: '',
+          pathname: '/**',
+        },
+      ],
+    },
     experimental: {
       optimizePackageImports: ['@icons-pack/react-simple-icons'],
       ppr: 'incremental',
