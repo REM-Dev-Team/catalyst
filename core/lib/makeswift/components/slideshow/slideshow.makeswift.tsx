@@ -16,6 +16,7 @@ import { runtime } from '~/lib/makeswift/runtime';
 
 interface Slide {
   title: string;
+  secondTitle: string;
   description: string;
   showDescription: boolean;
   imageSrc?: string;
@@ -24,6 +25,10 @@ interface Slide {
   buttonLink?: { href?: string; target?: string };
   buttonText: string;
   buttonColor: 'primary' | 'secondary' | 'tertiary' | 'ghost';
+  showSecondButton: boolean;
+  secondButtonLink?: { href?: string; target?: string };
+  secondButtonText: string;
+  secondButtonColor: 'primary' | 'secondary' | 'tertiary' | 'ghost';
 }
 
 interface MSAccordionsProps {
@@ -43,6 +48,7 @@ runtime.registerComponent(
         slides={slides.map(
           ({
             title,
+            secondTitle,
             description,
             showDescription,
             imageSrc,
@@ -51,14 +57,33 @@ runtime.registerComponent(
             buttonLink,
             buttonText,
             buttonColor,
+            showSecondButton,
+            secondButtonLink,
+            secondButtonText,
+            secondButtonColor,
           }) => {
             return {
               title,
+              secondTitle,
               description,
               showDescription,
               image: imageSrc ? { alt: imageAlt, src: imageSrc } : undefined,
               showCta: showButton,
-              cta: { label: buttonText, href: buttonLink?.href ?? '#', variant: buttonColor },
+              cta: {
+                label: buttonText,
+                href: buttonLink?.href ?? '#',
+                variant: buttonColor,
+                shape: 'rounded',
+                size: 'x-small',
+              },
+              showSecondCta: showSecondButton,
+              secondCta: {
+                label: secondButtonText,
+                href: secondButtonLink?.href ?? '#',
+                variant: secondButtonColor,
+                shape: 'rounded',
+                size: 'x-small',
+              },
             };
           },
         )}
@@ -76,6 +101,7 @@ runtime.registerComponent(
         type: Group({
           props: {
             title: TextInput({ label: 'Title', defaultValue: 'Slide title' }),
+            secondTitle: TextInput({ label: 'Second Title', defaultValue: 'Second slide title' }),
             showDescription: Checkbox({ label: 'Show description', defaultValue: true }),
             description: TextArea({ label: 'Description', defaultValue: 'Slide description' }),
             imageSrc: Image(),
@@ -92,6 +118,22 @@ runtime.registerComponent(
                 { value: 'ghost', label: 'Ghost' },
               ],
               defaultValue: 'primary',
+            }),
+            showSecondButton: Checkbox({ label: 'Show second button', defaultValue: false }),
+            secondButtonText: TextInput({
+              label: 'Second button text',
+              defaultValue: 'Learn more',
+            }),
+            secondButtonLink: Link({ label: 'Second button link' }),
+            secondButtonColor: Select({
+              label: 'Second button color',
+              options: [
+                { value: 'primary', label: 'Primary' },
+                { value: 'secondary', label: 'Secondary' },
+                { value: 'tertiary', label: 'Tertiary' },
+                { value: 'ghost', label: 'Ghost' },
+              ],
+              defaultValue: 'secondary',
             }),
           },
         }),
