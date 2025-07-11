@@ -1,14 +1,14 @@
 'use client';
 
-import { 
-  Checkbox, 
-  Group, 
-  List, 
-  Select, 
-  Style, 
-  TextInput,
+import {
+  Checkbox,
+  Group,
   Image,
-  Number
+  List,
+  Number,
+  Select,
+  Style,
+  TextInput,
 } from '@makeswift/runtime/controls';
 
 import {
@@ -48,7 +48,6 @@ runtime.registerComponent(
     logoHeightMobile = 60,
     logoHeightDesktop = 60,
   }: MSBrandCarouselProps) {
-    
     const defaultBrands = [
       { name: 'Remington', imageAlt: 'Remington logo', imageSrc: undefined },
       { name: 'Savage', imageAlt: 'Savage logo', imageSrc: undefined },
@@ -56,16 +55,20 @@ runtime.registerComponent(
       { name: 'Tikka', imageAlt: 'Tikka logo', imageSrc: undefined },
       { name: 'Howa', imageAlt: 'Howa logo', imageSrc: undefined },
       { name: 'Ruger', imageAlt: 'Ruger logo', imageSrc: undefined },
-      { name: 'CZ', imageAlt: 'CZ logo', imageSrc: undefined }
+      { name: 'CZ', imageAlt: 'CZ logo', imageSrc: undefined },
     ];
 
     const displayBrands = brands.length > 0 ? brands : defaultBrands;
 
     return (
       <div className={className}>
-        <style jsx>{`
+        <style>{`
           .brand-logo {
             height: ${logoHeightMobile}px;
+            transition: transform 0.2s ease-in-out;
+          }
+          .brand-logo:hover {
+            transform: scale(1.2);
           }
           @media (min-width: 768px) {
             .brand-logo {
@@ -73,25 +76,25 @@ runtime.registerComponent(
             }
           }
         `}</style>
-        {!displayBrands || displayBrands.length < 1 ? (
+        {displayBrands.length < 1 ? (
           <div className="p-4 text-center text-lg text-gray-400">Add brands to the carousel</div>
         ) : (
           <Carousel hideOverflow={hideOverflow}>
             <CarouselContent>
               {displayBrands.map((brand, index) => (
                 <CarouselItem
-                  className="basis-1/2 @md:basis-1/3 @lg:basis-1/4 @2xl:basis-1/6"
+                  className="basis-1/2 p-0 @md:basis-1/3 @lg:basis-1/4 @2xl:basis-1/6"
                   key={index}
                 >
-                  <div className="flex items-center justify-center p-4">
+                  <div className="flex items-center justify-center p-0">
                     {brand.imageSrc ? (
-                      <img 
-                        src={brand.imageSrc} 
+                      <img
                         alt={brand.imageAlt}
-                        className="w-auto object-contain brand-logo"
+                        className="brand-logo w-auto object-contain"
+                        src={brand.imageSrc}
                       />
                     ) : (
-                      <div className="w-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-500 text-sm font-medium brand-logo">
+                      <div className="brand-logo flex w-32 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 text-sm font-medium text-gray-500">
                         {brand.name}
                       </div>
                     )}
@@ -164,4 +167,4 @@ runtime.registerComponent(
       }),
     },
   },
-); 
+);
