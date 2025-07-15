@@ -51,3 +51,8 @@
     padding-right: 80px !important;
   }
 }
+
+/* Prevent horizontal scroll on the page */
+html, body {
+  overflow-x: hidden !important;
+}
