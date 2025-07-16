@@ -1,37 +1,27 @@
 import { clsx } from 'clsx';
 import { Play, Eye, Clock } from 'lucide-react';
-
-import { Image } from '~/components/image';
-import { Link } from '~/components/link';
-import { YouTubeVideo } from '~/lib/youtube/utils';
+import { YouTubeVideo, extractVideoId } from '~/lib/youtube/utils';
 
 interface Props {
   video: YouTubeVideo;
   className?: string;
+  onClick?: () => void;
 }
 
-export function YouTubeVideoCard({ video, className }: Props) {
+export function YouTubeVideoCard({ video, className, onClick }: Props) {
   const { title, description, thumbnail, publishedAt, viewCount, duration, href } = video;
+  const videoId = extractVideoId(href);
 
-  return (
-    <Link
-      className={clsx(
-        'group max-w-full rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2 font-[family-name:var(--card-font-family,var(--font-family-body))]',
-        className,
-      )}
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-2xl bg-contrast-100">
+  const content = (
+    <>
+      <div className="relative mb-4 w-full aspect-video overflow-hidden rounded-2xl bg-contrast-100">
         {thumbnail ? (
           <>
-            <Image
+            <img
               alt={title}
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-              fill
-              sizes="(min-width: 80rem) 25vw, (min-width: 56rem) 33vw, (min-width: 28rem) 50vw, 100vw"
+              className="h-full w-full transition-transform duration-500 ease-out group-hover:scale-110"
               src={thumbnail}
+              style={{ minHeight: '100px', minWidth: '100px', objectFit: 'cover', width: '100%', height: '100%' }}
             />
             {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -50,10 +40,8 @@ export function YouTubeVideoCard({ video, className }: Props) {
           </div>
         )}
       </div>
-
       <div className="text-lg font-medium leading-snug line-clamp-2">{title}</div>
       <p className="mb-3 mt-1.5 line-clamp-2 text-sm font-normal text-contrast-400">{description}</p>
-      
       <div className="flex items-center gap-4 text-sm text-contrast-500">
         <div className="flex items-center gap-1">
           <Eye className="h-3 w-3" />
@@ -70,7 +58,54 @@ export function YouTubeVideoCard({ video, className }: Props) {
           </time>
         </div>
       </div>
-    </Link>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className={clsx(
+          'group w-full text-left rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2 font-[family-name:var(--card-font-family,var(--font-family-body))]',
+          className,
+        )}
+        onClick={onClick}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  // Open in dedicated video page for fullscreen support
+  if (videoId) {
+    return (
+      <a
+        className={clsx(
+          'group max-w-full rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2 font-[family-name:var(--card-font-family,var(--font-family-body))]',
+          className,
+        )}
+        href={`/video/${videoId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {content}
+      </a>
+    );
+  }
+
+  // Fallback: open YouTube directly
+  return (
+    <a
+      className={clsx(
+        'group max-w-full rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2 font-[family-name:var(--card-font-family,var(--font-family-body))]',
+        className,
+      )}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {content}
+    </a>
   );
 }
 
@@ -79,14 +114,11 @@ export function YouTubeVideoCardSkeleton({ className }: { className?: string }) 
     <div className={clsx('flex max-w-md animate-pulse flex-col gap-2 rounded-xl', className)}>
       {/* Thumbnail */}
       <div className="aspect-video overflow-hidden rounded-xl bg-contrast-100" />
-
       {/* Title */}
       <div className="h-4 w-24 rounded-lg bg-contrast-100" />
-
       {/* Description */}
       <div className="h-3 w-full rounded-lg bg-contrast-100" />
       <div className="h-3 w-2/3 rounded-lg bg-contrast-100" />
-
       {/* Meta info */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">

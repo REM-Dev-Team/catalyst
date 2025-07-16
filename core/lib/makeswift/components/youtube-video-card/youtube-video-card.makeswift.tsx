@@ -6,6 +6,7 @@ import { clsx } from 'clsx';
 
 import { runtime } from '~/lib/makeswift/runtime';
 import { YouTubeVideoCard } from '~/vibes/soul/primitives/youtube-video-card';
+
 import { YouTubeVideo } from '~/lib/youtube/utils';
 
 interface MakeswiftYouTubeVideoCardProps {
@@ -20,6 +21,15 @@ function MakeswiftYouTubeVideoCard({
   const [video, setVideo] = useState<YouTubeVideo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Helper function to extract video ID from YouTube URL
+  const extractVideoId = (url: string): string | null => {
+    const regex =
+      /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
+    const match = regex.exec(url);
+
+    return match?.[1] ? String(match[1]) : null;
+  };
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -79,9 +89,13 @@ function MakeswiftYouTubeVideoCard({
     );
   }
 
+  const videoId = extractVideoId(video.href);
+
   return (
     <div className={clsx('w-full', className)}>
       <YouTubeVideoCard video={video} />
+      
+      {/* Videos open in dedicated video page */}
     </div>
   );
 }

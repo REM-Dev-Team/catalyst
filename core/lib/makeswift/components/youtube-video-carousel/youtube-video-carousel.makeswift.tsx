@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { TextInput, Style, Checkbox } from '@makeswift/runtime/controls';
 import { clsx } from 'clsx';
-import { Play, Eye, Clock } from 'lucide-react';
 
 import { runtime } from '~/lib/makeswift/runtime';
 import { YouTubeVideoCard } from '~/vibes/soul/primitives/youtube-video-card';
+
 import { 
   Carousel, 
   CarouselButtons, 
@@ -14,7 +14,9 @@ import {
   CarouselItem, 
   CarouselScrollbar 
 } from '~/vibes/soul/primitives/carousel';
+
 import { useYouTubeVideos } from '../../utils/use-youtube-videos';
+import { Play, Eye, Clock } from 'lucide-react';
 
 interface MakeswiftYouTubeVideoCarouselProps {
   className?: string;
@@ -57,7 +59,7 @@ function YouTubeVideoCarouselSkeleton({ className }: { className?: string }) {
         <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
         <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
       </div>
-      
+
       {isDesktop ? (
         // Desktop: Vertical skeleton
         <div className="space-y-4">
@@ -76,10 +78,7 @@ function YouTubeVideoCarouselSkeleton({ className }: { className?: string }) {
         // Mobile: Horizontal skeleton
         <div className="-ml-4 flex">
           {Array.from({ length: 3 }).map((_, index) => (
-            <div
-              className="min-w-0 shrink-0 grow-0 basis-full pl-4"
-              key={index}
-            >
+            <div className="min-w-0 shrink-0 grow-0 basis-full pl-4" key={index}>
               <div className="animate-pulse">
                 <div className="aspect-video rounded-2xl bg-gray-200 mb-4" />
                 <div className="h-6 bg-gray-200 rounded mb-2" />
@@ -118,12 +117,16 @@ function MakeswiftYouTubeVideoCarousel({
   showScrollbar = true,
   showButtons = true,
 }: MakeswiftYouTubeVideoCarouselProps) {
-  const limitNumber = parseInt(limit) || 6;
+  const limitNumber = parseInt(limit, 10) || 6;
   const isDesktop = useIsDesktop();
   const { videos, isLoading, error } = useYouTubeVideos({
     channelId: channelId || undefined,
     limit: limitNumber,
   });
+
+  // Video cards now handle their own playback
+
+
 
   // Helper function to render header
   const renderHeader = () => (
@@ -145,7 +148,7 @@ function MakeswiftYouTubeVideoCarousel({
     return (
       <div className={clsx('space-y-6', className)}>
         {renderHeader()}
-        <div className="p-6 text-center text-gray-500 bg-gray-50 rounded-xl">
+        <div className="rounded-xl bg-gray-50 p-6 text-center text-gray-500">
           Failed to load YouTube videos. Please check your API key and channel settings.
         </div>
       </div>
@@ -156,7 +159,7 @@ function MakeswiftYouTubeVideoCarousel({
     return (
       <div className={clsx('space-y-6', className)}>
         {renderHeader()}
-        <div className="p-6 text-center text-gray-500 bg-gray-50 rounded-xl">
+        <div className="rounded-xl bg-gray-50 p-6 text-center text-gray-500">
           No YouTube videos found.
         </div>
       </div>
@@ -166,77 +169,74 @@ function MakeswiftYouTubeVideoCarousel({
   return (
     <div className={clsx('space-y-6', className)}>
       {renderHeader()}
-      
+
       {isDesktop ? (
         // Desktop: Vertical list with horizontal layout
         <div className="space-y-4">
-          {videos.map((video) => (
-            <div key={video.id} className="flex gap-4 group">
-              <div className="flex-shrink-0">
-                <a 
-                  href={video.href} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block aspect-video rounded-2xl overflow-hidden relative bg-contrast-100"
-                  style={{ width: '192px' }}
-                >
-                  <img 
-                    src={video.thumbnail} 
-                    alt={video.title}
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                  />
-                  {/* Play button overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/80 text-white transition-transform duration-300 group-hover:scale-110">
-                      <Play className="h-6 w-6 ml-0.5" fill="currentColor" />
+          {videos.map((video) => {
+            const videoId = video.id;
+            return (
+              <div className="group flex gap-4" key={video.id}>
+                {/* Thumbnail */}
+                <div className="flex-shrink-0" style={{ width: '200px' }}>
+                  <a
+                    href={`/video/${videoId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block aspect-video rounded-2xl overflow-hidden relative bg-contrast-100"
+                  >
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                    />
+                    {/* Play button overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/80 text-white transition-transform duration-300 group-hover:scale-110">
+                        <Play className="h-8 w-8 ml-1" fill="currentColor" />
+                      </div>
+                    </div>
+                    {/* Duration badge */}
+                    <div className="absolute bottom-2 right-2 rounded bg-black/80 px-2 py-1 text-xs text-white">
+                      {video.duration}
+                    </div>
+                  </a>
+                </div>
+                {/* Video details */}
+                <div className="flex flex-col justify-between flex-1 font-[family-name:var(--card-font-family,var(--font-family-body))] text-foreground">
+                  <div>
+                    <div className="line-clamp-2 text-lg font-medium leading-snug">{video.title}</div>
+                    <p className="mb-3 mt-1.5 line-clamp-2 text-sm font-normal text-contrast-400">
+                      {video.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-contrast-500">
+                    <div className="flex items-center gap-1">
+                      <Eye className="h-3 w-3" />
+                      <span>{video.viewCount}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      <time dateTime={video.publishedAt}>
+                        {new Date(video.publishedAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </time>
                     </div>
                   </div>
-                  {/* Duration badge */}
-                  <div className="absolute bottom-2 right-2 rounded bg-black/80 px-2 py-1 text-xs text-white">
-                    {video.duration}
-                  </div>
-                </a>
-              </div>
-              <div className="flex-1 min-w-0 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-medium leading-snug mb-2 font-[family-name:var(--card-font-family,var(--font-family-body))]">
-                    <a href={video.href} target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary">
-                      {video.title}
-                    </a>
-                  </h3>
-                  <p className="line-clamp-2 text-sm font-normal text-contrast-400 font-[family-name:var(--card-font-family,var(--font-family-body))]">
-                    {video.description}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-contrast-500 mt-3">
-                  <div className="flex items-center gap-1">
-                    <Eye className="h-3 w-3" />
-                    <span>{video.viewCount}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    <time dateTime={video.publishedAt}>
-                      {new Date(video.publishedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </time>
-                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         // Mobile: Horizontal carousel
-        <Carousel className="group/youtube-video-carousel" hideOverflow={hideOverflow}>
-          <CarouselContent className="mb-10">
+        <Carousel className="group/youtube-video-carousel w-full" hideOverflow={hideOverflow}>
+          <CarouselContent className="mb-10 w-full">
             {videos.map((video) => (
-              <CarouselItem
-                className="basis-full"
-                key={video.id}
-              >
+              <CarouselItem className="basis-full w-full min-w-0" key={video.id}>
                 <YouTubeVideoCard video={video} />
               </CarouselItem>
             ))}
@@ -247,6 +247,8 @@ function MakeswiftYouTubeVideoCarousel({
           </div>
         </Carousel>
       )}
+
+      {/* Video cards now handle their own playback */}
     </div>
   );
 }
@@ -301,4 +303,5 @@ runtime.registerComponent(MakeswiftYouTubeVideoCarousel, {
       defaultValue: true,
     }),
   },
-}); 
+});
+ 
