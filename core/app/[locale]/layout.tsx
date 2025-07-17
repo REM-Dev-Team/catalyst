@@ -105,10 +105,6 @@ export default async function RootLayout({ params, children }: Props) {
       <html className={clsx(fonts.map((f) => f.variable))} lang={locale}>
         <head>
           <link rel="stylesheet" href="https://use.typekit.net/ddi4oux.css" />
-          <meta
-            httpEquiv="Permissions-Policy"
-            content="fullscreen=*, picture-in-picture=*, autoplay=*, encrypted-media=*, accelerometer=*, gyroscope=*, clipboard-write=*, web-share=*"
-          />
           <SiteTheme />
           <DraftModeScript appOrigin={process.env.MAKESWIFT_APP_ORIGIN} />
         </head>
