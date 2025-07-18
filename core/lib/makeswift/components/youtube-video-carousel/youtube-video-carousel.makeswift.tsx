@@ -7,6 +7,7 @@ import { Play, Eye, Clock } from 'lucide-react';
 
 import { runtime } from '~/lib/makeswift/runtime';
 import { YouTubeVideoCard } from '~/vibes/soul/primitives/youtube-video-card';
+import { YouTubeVideoModal } from '~/lib/makeswift/components/youtube-video-modal';
 import { 
   Carousel, 
   CarouselButtons, 
@@ -172,59 +173,61 @@ function MakeswiftYouTubeVideoCarousel({
         <div className="space-y-4">
           {videos.map((video) => (
             <div key={video.id} className="flex gap-4 group">
-              <div className="flex-shrink-0">
-                <a 
-                  href={video.href} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block aspect-video rounded-2xl overflow-hidden relative bg-contrast-100"
-                  style={{ width: '192px' }}
-                >
-                  <img 
-                    src={video.thumbnail} 
-                    alt={video.title}
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                  />
-                  {/* Play button overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/80 text-white transition-transform duration-300 group-hover:scale-110">
-                      <Play className="h-6 w-6 ml-0.5" fill="currentColor" />
+              <YouTubeVideoModal
+                video={video}
+                trigger={
+                  <div className="flex gap-4 group cursor-pointer">
+                    <div className="flex-shrink-0">
+                      <div 
+                        className="block aspect-video rounded-2xl overflow-hidden relative bg-contrast-100"
+                        style={{ width: '192px' }}
+                      >
+                        <img 
+                          src={video.thumbnail} 
+                          alt={video.title}
+                          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                        />
+                        {/* Play button overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/80 text-white transition-transform duration-300 group-hover:scale-110">
+                            <Play className="h-6 w-6 ml-0.5" fill="currentColor" />
+                          </div>
+                        </div>
+                        {/* Duration badge */}
+                        <div className="absolute bottom-2 right-2 rounded bg-black/80 px-2 py-1 text-xs text-white">
+                          {video.duration}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-lg font-medium leading-snug mb-2 font-[family-name:var(--card-font-family,var(--font-family-body))] text-foreground hover:text-primary">
+                          {video.title}
+                        </h3>
+                        <p className="line-clamp-2 text-sm font-normal text-contrast-400 font-[family-name:var(--card-font-family,var(--font-family-body))]">
+                          {video.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-contrast-500 mt-3">
+                        <div className="flex items-center gap-1">
+                          <Eye className="h-3 w-3" />
+                          <span>{video.viewCount}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <time dateTime={video.publishedAt}>
+                            {new Date(video.publishedAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </time>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  {/* Duration badge */}
-                  <div className="absolute bottom-2 right-2 rounded bg-black/80 px-2 py-1 text-xs text-white">
-                    {video.duration}
-                  </div>
-                </a>
-              </div>
-              <div className="flex-1 min-w-0 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-medium leading-snug mb-2 font-[family-name:var(--card-font-family,var(--font-family-body))]">
-                    <a href={video.href} target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary">
-                      {video.title}
-                    </a>
-                  </h3>
-                  <p className="line-clamp-2 text-sm font-normal text-contrast-400 font-[family-name:var(--card-font-family,var(--font-family-body))]">
-                    {video.description}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-contrast-500 mt-3">
-                  <div className="flex items-center gap-1">
-                    <Eye className="h-3 w-3" />
-                    <span>{video.viewCount}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    <time dateTime={video.publishedAt}>
-                      {new Date(video.publishedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </time>
-                  </div>
-                </div>
-              </div>
+                }
+              />
             </div>
           ))}
         </div>

@@ -2,8 +2,8 @@ import { clsx } from 'clsx';
 import { Play, Eye, Clock } from 'lucide-react';
 
 import { Image } from '~/components/image';
-import { Link } from '~/components/link';
 import { YouTubeVideo } from '~/lib/youtube/utils';
+import { YouTubeVideoModal } from '~/lib/makeswift/components/youtube-video-modal';
 
 interface Props {
   video: YouTubeVideo;
@@ -11,17 +11,14 @@ interface Props {
 }
 
 export function YouTubeVideoCard({ video, className }: Props) {
-  const { title, description, thumbnail, publishedAt, viewCount, duration, href } = video;
+  const { title, description, thumbnail, publishedAt, viewCount, duration } = video;
 
-  return (
-    <Link
+  const cardContent = (
+    <div
       className={clsx(
-        'group max-w-full rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2 font-[family-name:var(--card-font-family,var(--font-family-body))]',
+        'group max-w-full rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2 font-[family-name:var(--card-font-family,var(--font-family-body))] cursor-pointer',
         className,
       )}
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
     >
       <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-2xl bg-contrast-100">
         {thumbnail ? (
@@ -70,7 +67,11 @@ export function YouTubeVideoCard({ video, className }: Props) {
           </time>
         </div>
       </div>
-    </Link>
+    </div>
+  );
+
+  return (
+    <YouTubeVideoModal video={video} trigger={cardContent} />
   );
 }
 
