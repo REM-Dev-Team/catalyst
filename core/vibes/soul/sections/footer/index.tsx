@@ -28,6 +28,7 @@ interface SocialMediaLink {
 interface ContactInformation {
   address?: string;
   phone?: string;
+  email?: string;
 }
 
 interface Props {
@@ -72,7 +73,6 @@ export const Footer = forwardRef(function Footer(
     sections: streamableSections,
     contactTitle = 'Contact Us',
     contactInformation: streamableContactInformation,
-    paymentIcons: streamablePaymentIcons,
     socialMediaLinks: streamableSocialMediaLinks,
     copyright: streamableCopyright,
     className,
@@ -86,61 +86,15 @@ export const Footer = forwardRef(function Footer(
   return (
     <footer
       className={clsx(
-        'border-b-4 border-t border-b-[var(--footer-border-bottom,hsl(var(--primary)))] border-t-[var(--footer-border-top,hsl(var(--contrast-100)))] bg-[var(--footer-background,hsl(var(--background)))] @container',
+        'border-b-4 border-t border-b-[var(--footer-border-bottom,hsl(var(--primary)))] border-t-[var(--footer-border-top,hsl(var(--contrast-100)))] bg-[var(--footer-background,hsl(var(--background)))] font-[family-name:var(--font-family-futura)] @container',
         className,
       )}
       ref={ref}
     >
       <div className="mx-auto max-w-screen-2xl px-4 py-6 @xl:px-6 @xl:py-10 @4xl:px-8 @4xl:py-12">
         <div className="flex flex-col justify-between gap-x-8 gap-y-12 @3xl:flex-row">
-          <div className="flex flex-col gap-4 @3xl:w-1/3 @3xl:gap-6">
-            {/* Logo Information */}
-            <Logo
-              height={logoHeight}
-              href={logoHref}
-              label={logoLabel}
-              logo={logo}
-              width={logoWidth}
-            />
-
-            {/* Contact Information */}
-            <Stream
-              fallback={
-                <div className="mb-4 animate-pulse text-lg @lg:text-xl">
-                  <div className="flex h-[1lh] items-center">
-                    <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
-                  </div>
-                  <div className="flex h-[1lh] items-center">
-                    <span className="h-[1ex] w-[15ch] rounded bg-contrast-100" />
-                  </div>
-                  <div className="flex h-[1lh] items-center">
-                    <span className="h-[1ex] w-[12ch] rounded bg-contrast-100" />
-                  </div>
-                </div>
-              }
-              value={streamableContactInformation}
-            >
-              {(contactInformation) => {
-                if (contactInformation?.address != null || contactInformation?.phone != null) {
-                  return (
-                    <div className="mb-4 text-lg font-medium @lg:text-xl">
-                      <h3 className="text-[var(--footer-contact-title,hsl(var(--contrast-300)))]">
-                        {contactTitle}
-                      </h3>
-                      <div className="text-[var(--footer-contact-text,hsl(var(--foreground)))]">
-                        {contactInformation.address != null &&
-                          contactInformation.address !== '' && <p>{contactInformation.address}</p>}
-                        {contactInformation.phone != null && contactInformation.phone !== '' && (
-                          <p>{contactInformation.phone}</p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                }
-              }}
-            </Stream>
-
-            {/* Social Media Links */}
+          {/* Social Media Links - Leftmost */}
+          <div className="flex flex-col gap-4 @3xl:w-1/4 @3xl:gap-6">
             <Stream
               fallback={
                 <div className="flex animate-pulse items-center gap-3">
@@ -155,18 +109,23 @@ export const Footer = forwardRef(function Footer(
               {(socialMediaLinks) => {
                 if (socialMediaLinks != null) {
                   return (
-                    <div className="flex items-center gap-3">
-                      {socialMediaLinks.map(({ href, icon }, i) => {
-                        return (
-                          <Link
-                            className="flex items-center justify-center rounded-lg fill-[var(--footer-social-icon,hsl(var(--contrast-400)))] p-1 ring-[var(--footer-focus,hsl(var(--primary)))] transition-colors duration-300 ease-out hover:fill-[var(--footer-social-icon-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
-                            href={href}
-                            key={i}
-                          >
-                            {icon}
-                          </Link>
-                        );
-                      })}
+                    <div>
+                      <span className="mb-3 block font-semibold text-[var(--footer-section-title,hsl(var(--foreground)))] uppercase">
+                        Follow Our Socials
+                      </span>
+                      <div className="flex items-center gap-3">
+                        {socialMediaLinks.map(({ href, icon }, i) => {
+                          return (
+                            <Link
+                              className="flex items-center justify-center rounded-lg fill-[var(--footer-social-icon,hsl(var(--contrast-400)))] p-1 ring-[var(--footer-focus,hsl(var(--primary)))] transition-colors duration-300 ease-out hover:fill-[var(--footer-social-icon-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
+                              href={href}
+                              key={i}
+                            >
+                              {icon}
+                            </Link>
+                          );
+                        })}
+                      </div>
                     </div>
                   );
                 }
@@ -174,101 +133,102 @@ export const Footer = forwardRef(function Footer(
             </Stream>
           </div>
 
-          {/* Footer Columns of Links */}
-          <Stream
-            fallback={
-              <div className="grid w-full flex-1 animate-pulse gap-y-8 [grid-template-columns:_repeat(auto-fill,_minmax(200px,_1fr))] @xl:gap-y-10">
-                <div className="pr-8">
-                  <div className="mb-3 flex h-[1lh] items-center">
-                    <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
+          {/* Footer Columns of Links - Middle */}
+          <div className="flex-1">
+            <Stream
+              fallback={
+                <div className="grid w-full animate-pulse gap-y-8 [grid-template-columns:_repeat(auto-fill,_minmax(200px,_1fr))] @xl:gap-y-10">
+                  <div className="pr-8">
+                    <div className="mb-3 flex h-[1lh] items-center">
+                      <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
+                    </div>
+
+                    <ul>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                    </ul>
                   </div>
 
-                  <ul>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                  </ul>
-                </div>
+                  <div className="pr-8">
+                    <div className="mb-3 flex h-[1lh] items-center">
+                      <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
+                    </div>
 
-                <div className="pr-8">
-                  <div className="mb-3 flex h-[1lh] items-center">
-                    <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
+                    <ul>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                    </ul>
                   </div>
 
-                  <ul>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                  </ul>
-                </div>
+                  <div className="pr-8">
+                    <div className="mb-3 flex h-[1lh] items-center">
+                      <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
+                    </div>
 
-                <div className="pr-8">
-                  <div className="mb-3 flex h-[1lh] items-center">
-                    <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
+                    <ul>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                      <li className="py-2 text-sm">
+                        <div className="flex h-[1lh] items-center text-sm">
+                          <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
+                        </div>
+                      </li>
+                    </ul>
                   </div>
 
-                  <ul>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                    <li className="py-2 text-sm">
-                      <div className="flex h-[1lh] items-center text-sm">
-                        <span className="h-[1ex] w-[10ch] rounded-sm bg-contrast-100" />
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="pr-8">
-                  <div className="mb-3 flex h-[1lh] items-center">
-                    <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
-                  </div>
+                  <div className="pr-8">
+                    <div className="mb-3 flex h-[1lh] items-center">
+                      <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
+                    </div>
 
                   <ul>
                     <li className="py-2 text-sm">
@@ -304,7 +264,7 @@ export const Footer = forwardRef(function Footer(
                     {sections.map(({ title, links }, i) => (
                       <div className="pr-8" key={i}>
                         {title != null && (
-                          <span className="mb-3 block font-semibold text-[var(--footer-section-title,hsl(var(--foreground)))]">
+                          <span className="mb-3 block font-semibold text-[var(--footer-section-title,hsl(var(--foreground)))] uppercase">
                             {title}
                           </span>
                         )}
@@ -330,13 +290,74 @@ export const Footer = forwardRef(function Footer(
               }
             }}
           </Stream>
+          </div>
+
+          {/* Logo and Contact Information - Rightmost */}
+          <div className="flex flex-col gap-4 @3xl:w-1/4 @3xl:gap-6">
+            {/* Logo Information */}
+            <Logo
+              height={logoHeight}
+              href={logoHref}
+              label={logoLabel}
+              logo={logo}
+              width={logoWidth}
+            />
+
+            {/* Contact Information */}
+            <Stream
+              fallback={
+                <div className="mb-4 animate-pulse text-lg @lg:text-xl">
+                  <div className="flex h-[1lh] items-center">
+                    <span className="h-[1ex] w-[10ch] rounded bg-contrast-100" />
+                  </div>
+                  <div className="flex h-[1lh] items-center">
+                    <span className="h-[1ex] w-[15ch] rounded bg-contrast-100" />
+                  </div>
+                  <div className="flex h-[1lh] items-center">
+                    <span className="h-[1ex] w-[12ch] rounded bg-contrast-100" />
+                  </div>
+                </div>
+              }
+              value={streamableContactInformation}
+            >
+              {(contactInformation) => {
+                if (contactInformation?.address != null || contactInformation?.phone != null || contactInformation?.email != null) {
+                  return (
+                    <div className="mb-4">
+                      <div className="text-[var(--footer-link,hsl(var(--contrast-400)))]">
+                        {contactInformation.address != null &&
+                          contactInformation.address !== '' && <p className="py-2 text-sm font-medium">{contactInformation.address}</p>}
+                        {contactInformation.phone != null && contactInformation.phone !== '' && (
+                          <p className="py-2 text-sm font-medium">
+                            <a href={`tel:${contactInformation.phone}`} className="hover:text-[var(--footer-link-hover,hsl(var(--foreground)))] transition-colors duration-300">
+                              {contactInformation.phone}
+                            </a>
+                          </p>
+                        )}
+                        {contactInformation.email != null && contactInformation.email !== '' && (
+                          <p className="py-2 text-sm font-medium">
+                            <a href={`mailto:${contactInformation.email}`} className="hover:text-[var(--footer-link-hover,hsl(var(--foreground)))] transition-colors duration-300">
+                              {contactInformation.email}
+                            </a>
+                          </p>
+                        )}
+                      </div>
+                      <div className="mt-4 text-[var(--footer-link,hsl(var(--contrast-400)))]">
+                        <p className="py-2 text-sm font-medium italic">Please allow 3-5 days for a response.</p>
+                      </div>
+                    </div>
+                  );
+                }
+              }}
+            </Stream>
+          </div>
         </div>
 
-        <div className="flex flex-col-reverse items-start gap-y-8 pt-16 @3xl:flex-row @3xl:items-center @3xl:pt-20">
+        <div className="flex justify-center pt-16 @3xl:pt-20">
           {/* Copyright */}
           <Stream
             fallback={
-              <div className="flex h-[1lh] flex-1 animate-pulse items-center text-sm">
+              <div className="flex h-[1lh] animate-pulse items-center text-sm">
                 <span className="h-[1ex] w-[40ch] rounded-sm bg-contrast-100" />
               </div>
             }
@@ -345,16 +366,15 @@ export const Footer = forwardRef(function Footer(
             {(copyright) => {
               if (copyright != null) {
                 return (
-                  <p className="flex-1 text-sm text-[var(--footer-copyright,hsl(var(--contrast-400)))]">
+                  <p className="text-sm text-[var(--footer-copyright,hsl(var(--contrast-400)))]">
                     {copyright}
                   </p>
                 );
               }
             }}
           </Stream>
-
-          {/* Payment Icons */}
-          <Stream
+          {/* Payment Icons - Hidden */}
+          {/* <Stream
             fallback={
               <div className="flex animate-pulse flex-wrap gap-2">
                 <div className="h-6 w-[2.1875rem] rounded bg-contrast-100" />
@@ -372,7 +392,7 @@ export const Footer = forwardRef(function Footer(
                 return <div className="flex flex-wrap gap-2">{paymentIcons}</div>;
               }
             }}
-          </Stream>
+          </Stream> */}
         </div>
       </div>
     </footer>

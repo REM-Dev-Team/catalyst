@@ -7,6 +7,7 @@ export const FooterFragment = graphql(`
       contact {
         address
         phone
+        email
       }
       socialMediaLinks {
         name

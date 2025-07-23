@@ -64,6 +64,7 @@ const getContactInformation = async () => {
   return {
     address: data.settings.contact.address,
     phone: data.settings.contact.phone,
+    email: data.settings.contact.email,
   };
 };
 
@@ -92,25 +93,20 @@ const getSections = async () => {
 
   return [
     {
-      title: 'Categories',
+      title: 'Products',
       links: data.categoryTree.map((category) => ({
         label: category.name,
         href: category.path,
       })),
     },
     {
-      title: 'Brands',
-      links: removeEdgesAndNodes(data.brands).map((brand) => ({
-        label: brand.name,
-        href: brand.path,
-      })),
-    },
-    {
       title: 'Navigate',
-      links: removeEdgesAndNodes(data.content.pages).map((page) => ({
-        label: page.name,
-        href: page.__typename === 'ExternalLinkPage' ? page.link : page.path,
-      })),
+      links: removeEdgesAndNodes(data.content.pages)
+        .filter((page) => page.name !== 'Blog')
+        .map((page) => ({
+          label: page.name,
+          href: page.__typename === 'ExternalLinkPage' ? page.link : page.path,
+        })),
     },
   ];
 };
