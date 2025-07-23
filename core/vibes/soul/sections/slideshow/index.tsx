@@ -36,6 +36,14 @@ interface Slide {
   showSecondCta?: boolean;
 }
 
+// Helper function to check if a file is a video
+function isVideoFile(src: string): boolean {
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv'];
+  const lowerSrc = src.toLowerCase();
+
+  return videoExtensions.some((ext) => lowerSrc.includes(ext));
+}
+
 interface Props {
   slides: Slide[];
   playOnInit?: boolean;
@@ -89,7 +97,12 @@ const useProgressButton = (
   };
 };
 
-function SlideButtons({ showCta, showSecondCta, cta, secondCta }: {
+function SlideButtons({
+  showCta,
+  showSecondCta,
+  cta,
+  secondCta,
+}: {
   showCta: boolean;
   showSecondCta: boolean;
   cta?: Slide['cta'];
@@ -136,17 +149,50 @@ function SlideButtons({ showCta, showSecondCta, cta, secondCta }: {
 function SlideImage({ image, idx }: { image?: Slide['image']; idx: number }) {
   if (!image?.src || image.src === '') return null;
 
+  // Check if the uploaded file is a video
+  if (isVideoFile(image.src)) {
+    return (
+      <div className="relative h-full w-full">
+        <video
+          autoPlay
+          className="absolute inset-0 h-full w-full object-cover"
+          loop
+          muted
+          playsInline
+        >
+          <source src={image.src} type="video/mp4" />
+          <source src={image.src} type="video/webm" />
+          <source src={image.src} type="video/ogg" />
+          {/* Fallback to image if video fails to load */}
+          <Image
+            alt={image.alt}
+            blurDataURL={image.blurDataUrl}
+            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            placeholder={image.blurDataUrl != null && image.blurDataUrl !== '' ? 'blur' : 'empty'}
+            priority={idx === 0}
+            sizes="100vw"
+            src={image.src}
+          />
+        </video>
+      </div>
+    );
+  }
+
+  // Regular image handling
   return (
-    <Image
-      alt={image.alt}
-      blurDataURL={image.blurDataUrl}
-      className="block h-20 w-full object-cover"
-      fill
-      placeholder={image.blurDataUrl != null && image.blurDataUrl !== '' ? 'blur' : 'empty'}
-      priority={idx === 0}
-      sizes="100vw"
-      src={image.src}
-    />
+    <div className="relative h-full w-full">
+      <Image
+        alt={image.alt}
+        blurDataURL={image.blurDataUrl}
+        className="absolute inset-0 h-full w-full object-cover"
+        fill
+        placeholder={image.blurDataUrl != null && image.blurDataUrl !== '' ? 'blur' : 'empty'}
+        priority={idx === 0}
+        sizes="100vw"
+        src={image.src}
+      />
+    </div>
   );
 }
 
@@ -165,7 +211,7 @@ function SlideContent({ slide, idx }: { slide: Slide; idx: number }) {
 
   return (
     <div className="relative h-full w-full min-w-0 shrink-0 grow-0 basis-full" key={idx}>
-      <SlideImage image={image} idx={idx} />
+      <SlideImage idx={idx} image={image} />
       <div className="absolute inset-0 z-10">
         <div className="slideshow-content-padding flex h-full w-full items-center text-balance">
           <div className="w-full">
@@ -192,10 +238,10 @@ function SlideContent({ slide, idx }: { slide: Slide; idx: number }) {
               </p>
             ) : null}
             <SlideButtons
-              showCta={showCta}
-              showSecondCta={showSecondCta}
               cta={cta}
               secondCta={secondCta}
+              showCta={showCta}
+              showSecondCta={showSecondCta}
             />
           </div>
         </div>

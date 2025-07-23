@@ -104,7 +104,7 @@ runtime.registerComponent(
             secondTitle: TextInput({ label: 'Second Title', defaultValue: 'Second slide title' }),
             showDescription: Checkbox({ label: 'Show description', defaultValue: true }),
             description: TextArea({ label: 'Description', defaultValue: 'Slide description' }),
-            imageSrc: Image(),
+            imageSrc: Image({ label: 'Image or Video' }),
             imageAlt: TextInput({ label: 'Image alt', defaultValue: 'Slide image' }),
             showButton: Checkbox({ label: 'Show button', defaultValue: true }),
             buttonText: TextInput({ label: 'Button text', defaultValue: 'Shop all' }),
