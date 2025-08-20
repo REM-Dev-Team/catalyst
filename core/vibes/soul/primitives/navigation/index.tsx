@@ -40,6 +40,14 @@ interface Link {
       href: string;
     }>;
   }>;
+  imageColumns?: Array<{
+    image?: {
+      src: string;
+      alt: string;
+    };
+    title?: string;
+    href?: string;
+  }>;
 }
 
 interface Locale {
@@ -458,36 +466,148 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                     </Link>
                   </NavigationMenu.Trigger>
                   {item.groups != null && item.groups.length > 0 && (
-                    <NavigationMenu.Content className="rounded-2xl bg-[var(--nav-menu-background,hsl(var(--background)))] shadow-xl ring-1 ring-[var(--nav-menu-border,hsl(var(--foreground)/5%))]">
-                      <div className="m-auto grid w-full max-w-screen-lg grid-cols-5 justify-center gap-5 px-5 pb-8 pt-5">
-                        {item.groups.map((group, columnIndex) => (
-                          <ul className="flex flex-col" key={columnIndex}>
-                            {/* Second Level Links */}
-                            {group.label != null && group.label !== '' && (
-                              <li>
-                                {group.href != null && group.href !== '' ? (
-                                  <Link className={navGroupClassName} href={group.href}>
-                                    {group.label}
-                                  </Link>
-                                ) : (
-                                  <span className={navGroupClassName}>{group.label}</span>
+                    <NavigationMenu.Content className="w-screen bg-[var(--nav-menu-background,hsl(var(--background)))] shadow-xl border-t-2 border-[var(--nav-menu-border,hsl(var(--foreground)/5%))]">
+                                            <div className="m-auto w-full max-w-screen-xl px-5 pb-8 pt-5">
+                        <div className="grid grid-cols-10 gap-5">
+                          {/* Category Columns - 3 columns */}
+                          <div className="col-span-2">
+                            {item.groups.slice(0, Math.ceil(item.groups.length / 3)).map((group, columnIndex) => (
+                              <ul className="flex flex-col mb-4" key={columnIndex}>
+                                {/* Second Level Links */}
+                                {group.label != null && group.label !== '' && (
+                                  <li>
+                                    {group.href != null && group.href !== '' ? (
+                                      <Link className={navGroupClassName} href={group.href}>
+                                        {group.label}
+                                      </Link>
+                                    ) : (
+                                      <span className={navGroupClassName}>{group.label}</span>
+                                    )}
+                                  </li>
                                 )}
-                              </li>
-                            )}
 
-                            {group.links.map((link, idx) => (
-                              // Third Level Links
-                              <li key={idx}>
-                                <Link
-                                  className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
-                                  href={link.href}
-                                >
-                                  {link.label}
-                                </Link>
-                              </li>
+                                {group.links.map((link, idx) => (
+                                  // Third Level Links
+                                  <li key={idx}>
+                                    <Link
+                                      className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
+                                      href={link.href}
+                                    >
+                                      {link.label}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
                             ))}
-                          </ul>
-                        ))}
+                          </div>
+                          
+                                                     <div className="col-span-2">
+                             {item.groups.slice(Math.ceil(item.groups.length / 3), Math.ceil(item.groups.length / 3) * 2).map((group, columnIndex) => (
+                              <ul className="flex flex-col mb-4" key={columnIndex}>
+                                {/* Second Level Links */}
+                                {group.label != null && group.label !== '' && (
+                                  <li>
+                                    {group.href != null && group.href !== '' ? (
+                                      <Link className={navGroupClassName} href={group.href}>
+                                        {group.label}
+                                      </Link>
+                                    ) : (
+                                      <span className={navGroupClassName}>{group.label}</span>
+                                    )}
+                                  </li>
+                                )}
+
+                                {group.links.map((link, idx) => (
+                                  // Third Level Links
+                                  <li key={idx}>
+                                    <Link
+                                      className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
+                                      href={link.href}
+                                    >
+                                      {link.label}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            ))}
+                          </div>
+                          
+                                                     <div className="col-span-2">
+                             {item.groups.slice(Math.ceil(item.groups.length / 3) * 2).map((group, columnIndex) => (
+                              <ul className="flex flex-col mb-4" key={columnIndex}>
+                                {/* Second Level Links */}
+                                {group.label != null && group.label !== '' && (
+                                  <li>
+                                    {group.href != null && group.href !== '' ? (
+                                      <Link className={navGroupClassName} href={group.href}>
+                                        {group.label}
+                                      </Link>
+                                    ) : (
+                                      <span className={navGroupClassName}>{group.label}</span>
+                                    )}
+                                  </li>
+                                )}
+
+                                {group.links.map((link, idx) => (
+                                  // Third Level Links
+                                  <li key={idx}>
+                                    <Link
+                                      className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
+                                      href={link.href}
+                                    >
+                                      {link.label}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            ))}
+                          </div>
+                          
+                                                     {/* Image Columns - Each image gets its own column */}
+                           {item.imageColumns?.map((imageColumn, imageIndex) => (
+                             <div key={`image-${imageIndex}`} className="col-span-2">
+                              {imageColumn.image && imageColumn.image.src && (
+                                <div>
+                                  {imageColumn.href ? (
+                                    <Link href={imageColumn.href} className="block relative group">
+                                      <img
+                                        src={imageColumn.image.src}
+                                        alt={imageColumn.image.alt || 'Navigation image'}
+                                        className="w-full aspect-[2/3] object-cover rounded-lg transition-opacity"
+                                        onError={(e) => {
+                                          console.warn('Failed to load navigation image:', imageColumn.image?.src);
+                                          e.currentTarget.style.display = 'none';
+                                        }}
+                                      />
+                                      {imageColumn.title && (
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                          <p className="text-sm font-medium truncate">{imageColumn.title}</p>
+                                        </div>
+                                      )}
+                                    </Link>
+                                  ) : (
+                                    <div className="relative group">
+                                      <img
+                                        src={imageColumn.image.src}
+                                        alt={imageColumn.image.alt || 'Navigation image'}
+                                        className="w-full aspect-[2/3] object-cover rounded-lg"
+                                        onError={(e) => {
+                                          console.warn('Failed to load navigation image:', imageColumn.image?.src);
+                                          e.currentTarget.style.display = 'none';
+                                        }}
+                                      />
+                                      {imageColumn.title && (
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                          <p className="text-sm font-medium truncate">{imageColumn.title}</p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </NavigationMenu.Content>
                   )}
@@ -582,7 +702,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
       </div>
 
       <div className="perspective-[2000px] absolute left-0 right-0 top-full z-50 flex w-full justify-center">
-        <NavigationMenu.Viewport className="relative mt-2 w-full data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95" />
+        <NavigationMenu.Viewport className="relative mt-2 w-screen data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95" />
       </div>
     </NavigationMenu.Root>
   );

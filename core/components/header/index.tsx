@@ -43,28 +43,7 @@ const getLayoutData = cache(async () => {
   return readFragment(HeaderFragment, response).site;
 });
 
-const getLinks = async () => {
-  const data = await getLayoutData();
-
-  /**  To prevent the navigation menu from overflowing, we limit the number of categories to 6.
-   To show a full list of categories, modify the `slice` method to remove the limit.
-   Will require modification of navigation menu styles to accommodate the additional categories.
-   */
-  const categoryTree = data.categoryTree.slice(0, 6);
-
-  return categoryTree.map(({ name, path, children }) => ({
-    label: name,
-    href: path,
-    groups: children.map((firstChild) => ({
-      label: firstChild.name,
-      href: firstChild.path,
-      links: firstChild.children.map((secondChild) => ({
-        label: secondChild.name,
-        href: secondChild.path,
-      })),
-    })),
-  }));
-};
+const getLinks = async () => [];
 
 const getLogo = async () => {
   const data = await getLayoutData();

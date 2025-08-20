@@ -79,6 +79,20 @@ const groups = List({
   getItemLabel: (item) => item?.label ?? 'Text',
 });
 
+const imageColumns = List({
+  label: 'Image columns',
+  type: Group({
+    label: 'Image column',
+    props: {
+      imageSrc: Image({ label: 'Image' }),
+      imageAlt: TextInput({ label: 'Image alt', defaultValue: 'Image alt text' }),
+      title: TextInput({ label: 'Title', defaultValue: 'Image title' }),
+      link: Link({ label: 'Image link' }),
+    },
+  }),
+  getItemLabel: (item) => item?.title ?? 'Image column',
+});
+
 runtime.registerComponent(MakeswiftHeader, {
   type: COMPONENT_TYPE,
   label: 'Site Header',
@@ -94,6 +108,7 @@ runtime.registerComponent(MakeswiftHeader, {
           label: TextInput({ label: 'Text', defaultValue: 'Text' }),
           link: Link({ label: 'URL' }),
           groups,
+          imageColumns,
         },
       }),
       getItemLabel: (item) => item?.label ?? 'Text',
