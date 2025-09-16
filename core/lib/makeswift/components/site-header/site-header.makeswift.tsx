@@ -54,6 +54,18 @@ const logo = Group({
   },
 });
 
+const subLinks = List({
+  label: 'Sub-links',
+  type: Group({
+    label: 'Sub-link',
+    props: {
+      label: TextInput({ label: 'Text', defaultValue: 'Sub-link text' }),
+      link: Link({ label: 'URL' }),
+    },
+  }),
+  getItemLabel: (item) => item?.label ?? 'Sub-link text',
+});
+
 const links = List({
   label: 'Links',
   type: Group({
@@ -61,6 +73,7 @@ const links = List({
     props: {
       label: TextInput({ label: 'Text', defaultValue: 'Text' }),
       link: Link({ label: 'URL' }),
+      subLinks,
     },
   }),
   getItemLabel: (item) => item?.label ?? 'Text',

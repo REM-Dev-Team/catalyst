@@ -62,6 +62,10 @@ interface Props {
       links: Array<{
         label: string;
         link: { href: string };
+        subLinks?: Array<{
+          label: string;
+          link: { href: string };
+        }>;
       }>;
     }>;
     imageColumns: Array<{
@@ -91,7 +95,14 @@ function combineLinks(
       groups: groups.map((group) => ({
         label: group.label,
         href: group.link.href,
-        links: group.links.map((item) => ({ label: item.label, href: item.link.href })),
+        links: group.links.map((item) => ({ 
+          label: item.label, 
+          href: item.link.href,
+          subLinks: item.subLinks?.map((subItem) => ({ 
+            label: subItem.label, 
+            href: subItem.link.href 
+          }))
+        })),
       })),
       imageColumns: imageColumns.map((imageColumn) => ({
         image: imageColumn.imageSrc ? { src: imageColumn.imageSrc, alt: imageColumn.imageAlt } : undefined,

@@ -38,6 +38,10 @@ interface Link {
     links: Array<{
       label: string;
       href: string;
+      subLinks?: Array<{
+        label: string;
+        href: string;
+      }>;
     }>;
   }>;
   imageColumns?: Array<{
@@ -186,6 +190,208 @@ const MobileMenuButton = forwardRef<
 
 MobileMenuButton.displayName = 'MobileMenuButton';
 
+// Mobile Navigation Container - manages shared state for all links
+const MobileNavigationContainer = ({ links }: { links: Link[] }) => {
+  const [activeLinkIndex, setActiveLinkIndex] = useState<number | null>(null);
+  const [activeGroupIndex, setActiveGroupIndex] = useState<number | null>(null);
+
+  const handleLinkClick = (linkIndex: number) => {
+    setActiveLinkIndex(linkIndex);
+    setActiveGroupIndex(null);
+  };
+
+  const handleGroupClick = (linkIndex: number, groupIndex: number) => {
+    setActiveLinkIndex(linkIndex);
+    setActiveGroupIndex(groupIndex);
+  };
+
+  const handleBack = () => {
+    if (activeGroupIndex !== null) {
+      setActiveGroupIndex(null);
+    } else if (activeLinkIndex !== null) {
+      setActiveLinkIndex(null);
+    }
+  };
+
+  return (
+    <>
+      {links.map((item, i) => {
+        const isActive = activeLinkIndex === i;
+        const shouldShow = isActive || activeLinkIndex === null;
+        
+        if (!shouldShow) return null;
+        
+        return (
+          <div key={i}>
+            <div className="p-2 @4xl:gap-2 @4xl:p-5">
+              <MobileNavigation 
+                item={item} 
+                linkIndex={i}
+                isActive={isActive}
+                activeLinkIndex={activeLinkIndex}
+                activeGroupIndex={activeGroupIndex}
+                onLinkClick={handleLinkClick}
+                onGroupClick={handleGroupClick}
+                onBack={handleBack}
+              />
+            </div>
+            {i < links.length - 1 && activeLinkIndex === null && (
+              <div className="mx-5 border-t border-[var(--nav-mobile-divider,hsl(var(--contrast-100)))] @4xl:mx-10" />
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
+// Mobile Navigation Component
+const MobileNavigation = ({ 
+  item, 
+  linkIndex, 
+  isActive, 
+  activeLinkIndex,
+  activeGroupIndex, 
+  onLinkClick, 
+  onGroupClick, 
+  onBack 
+}: { 
+  item: Link;
+  linkIndex: number;
+  isActive: boolean;
+  activeLinkIndex: number | null;
+  activeGroupIndex: number | null;
+  onLinkClick: (linkIndex: number) => void;
+  onGroupClick: (linkIndex: number, groupIndex: number) => void;
+  onBack: () => void;
+}) => {
+  const currentView = activeGroupIndex !== null ? 'subLinks' : (isActive ? 'groups' : 'links');
+  const selectedGroup = activeGroupIndex !== null && item.groups ? item.groups[activeGroupIndex] : null;
+
+  const goToLinks = () => {
+    onBack();
+  };
+
+  const goToGroups = () => {
+    onLinkClick(linkIndex);
+  };
+
+  const goToSubLinks = (group: { label?: string; links: Array<{ label: string; href: string; subLinks?: Array<{ label: string; href: string }> }> }) => {
+    const groupIndex = item.groups?.findIndex(g => g === group) ?? -1;
+    if (groupIndex >= 0) {
+      onGroupClick(linkIndex, groupIndex);
+    }
+  };
+
+  return (
+    <div className="flex flex-col">
+      {/* Header with back button when not in links view */}
+      {currentView !== 'links' && (
+        <button
+          className="flex w-full items-center gap-2 rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+          onClick={currentView === 'subLinks' ? goToGroups : goToLinks}
+        >
+          <ChevronDown className="h-4 w-4 rotate-90" />
+          <span>
+            {currentView === 'subLinks' ? item.label : 'Back'}
+          </span>
+        </button>
+      )}
+
+      {/* Links View - First Layer */}
+      {currentView === 'links' && (
+        <>
+          {/* Check if this link has groups */}
+          {item.groups && item.groups.length > 0 ? (
+            <button
+              className="flex w-full items-center justify-between rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+              onClick={goToGroups}
+            >
+              <span>{item.label}</span>
+              <ChevronDown className="h-4 w-4 -rotate-90" />
+            </button>
+          ) : (
+            /* If no groups, show direct link */
+            <Link
+              className="block rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+              href={item.href}
+            >
+              {item.label}
+            </Link>
+          )}
+        </>
+      )}
+
+      {/* Groups View - Second Layer */}
+      {currentView === 'groups' && (
+        <>
+          {/* Groups list */}
+          <div className="mt-1 space-y-1">
+            {item.groups?.map((group, groupIndex) => (
+              group.links && group.links.length > 0 ? (
+                <button
+                  key={groupIndex}
+                  className="flex w-full items-center justify-between rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+                  onClick={() => goToSubLinks(group)}
+                >
+                  <span>{group.label}</span>
+                  <ChevronDown className="h-4 w-4 -rotate-90" />
+                </button>
+              ) : (
+                <div
+                  key={groupIndex}
+                  className="flex w-full items-center justify-between rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--contrast-400)))] @4xl:py-4"
+                >
+                  <span>{group.label}</span>
+                </div>
+              )
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* SubLinks View - Third Layer */}
+      {currentView === 'subLinks' && selectedGroup && (
+        <>
+          {/* Group header */}
+          <div className="px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))]">
+            {selectedGroup.label}
+          </div>
+
+          {/* SubLinks list */}
+          <div className="mt-1 space-y-1">
+            {selectedGroup.links.map((link, linkIndex) => (
+              <div key={linkIndex}>
+                <Link
+                  className="block rounded-lg bg-[var(--nav-mobile-sub-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-mobile-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+                  href={link.href}
+                >
+                  {link.label}
+                </Link>
+
+                {/* Fourth level links */}
+                {link.subLinks && link.subLinks.length > 0 && (
+                  <div className="ml-3 mt-1 space-y-1">
+                    {link.subLinks.map((subLink, subIndex) => (
+                      <Link
+                        key={subIndex}
+                        className="block rounded-lg bg-[var(--nav-mobile-sub-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-mobile-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+                        href={subLink.href}
+                      >
+                        {subLink.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const navGroupClassName =
   'block rounded-lg bg-[var(--nav-group-background,transparent)] px-3 py-2 font-[family-name:var(--nav-group-font-family,var(--font-family-body))] font-medium text-[var(--nav-group-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-group-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-group-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2';
 const navButtonClassName =
@@ -215,6 +421,9 @@ const navButtonClassName =
  *   --nav-sub-link-background: transparent;
  *   --nav-sub-link-background-hover: hsl(var(--contrast-100));
  *   --nav-sub-link-font-family: var(--font-family-body);
+ *   --nav-sub-sub-link-text: hsl(var(--contrast-400));
+ *   --nav-sub-sub-link-text-hover: hsl(var(--foreground));
+ *   --nav-sub-sub-link-font-family: var(--font-family-body);
  *   --nav-button-icon: hsl(var(--foreground));
  *   --nav-button-icon-hover: hsl(var(--foreground));
  *   --nav-button-background: hsl(var(--background));
@@ -343,7 +552,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
           </Popover.Trigger>
           <Popover.Portal>
             <Popover.Content className="max-h-[calc(var(--radix-popover-content-available-height)-8px)] w-[var(--radix-popper-anchor-width)] @container data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95">
-              <div className="max-h-[inherit] divide-y divide-[var(--nav-mobile-divider,hsl(var(--contrast-100)))] overflow-y-auto bg-[var(--nav-mobile-background,hsl(var(--background)))]">
+              <div className="max-h-[inherit] overflow-y-auto bg-[var(--nav-mobile-background,hsl(var(--background)))]">
                 <Stream
                   fallback={
                     <ul className="flex animate-pulse flex-col gap-4 p-5 @4xl:gap-2 @4xl:p-5">
@@ -363,34 +572,9 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                   }
                   value={streamableLinks}
                 >
-                  {(links) =>
-                    links.map((item, i) => (
-                      <ul className="flex flex-col p-2 @4xl:gap-2 @4xl:p-5" key={i}>
-                        {item.label !== '' && (
-                          <li>
-                            <Link
-                              className="block rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
-                              href={item.href}
-                            >
-                              {item.label}
-                            </Link>
-                          </li>
-                        )}
-                        {item.groups
-                          ?.flatMap((group) => group.links)
-                          .map((link, j) => (
-                            <li key={j}>
-                              <Link
-                                className="block rounded-lg bg-[var(--nav-mobile-sub-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-mobile-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
-                                href={link.href}
-                              >
-                                {link.label}
-                              </Link>
-                            </li>
-                          ))}
-                      </ul>
-                    ))
-                  }
+                  {(links) => (
+                    <MobileNavigationContainer links={links} />
+                  )}
                 </Stream>
               </div>
             </Popover.Content>
@@ -467,12 +651,12 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                   </NavigationMenu.Trigger>
                   {item.groups != null && item.groups.length > 0 && (
                     <NavigationMenu.Content className="w-screen bg-[var(--nav-menu-background,hsl(var(--background)))] shadow-xl border-t-2 border-[var(--nav-menu-border,hsl(var(--foreground)/5%))]">
-                                            <div className="m-auto w-full max-w-screen-xl px-5 pb-8 pt-5">
-                        <div className="grid grid-cols-10 gap-5">
-                          {/* Category Columns - 3 columns */}
-                          <div className="col-span-2">
-                            {item.groups.slice(0, Math.ceil(item.groups.length / 3)).map((group, columnIndex) => (
-                              <ul className="flex flex-col mb-4" key={columnIndex}>
+                                            <div className="m-auto w-full max-w-screen-xl px-5 pb-4 pt-3">
+                        <div className="columns-5 gap-5 max-h-[41rem]">
+                          {/* All groups - CSS columns will distribute them evenly */}
+                          {item.groups.map((group, groupIndex) => (
+                            <div key={groupIndex} className="break-inside-avoid mb-4">
+                              <ul className="flex flex-col">
                                 {/* Second Level Links */}
                                 {group.label != null && group.label !== '' && (
                                   <li>
@@ -495,77 +679,32 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                                     >
                                       {link.label}
                                     </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            ))}
-                          </div>
-                          
-                                                     <div className="col-span-2">
-                             {item.groups.slice(Math.ceil(item.groups.length / 3), Math.ceil(item.groups.length / 3) * 2).map((group, columnIndex) => (
-                              <ul className="flex flex-col mb-4" key={columnIndex}>
-                                {/* Second Level Links */}
-                                {group.label != null && group.label !== '' && (
-                                  <li>
-                                    {group.href != null && group.href !== '' ? (
-                                      <Link className={navGroupClassName} href={group.href}>
-                                        {group.label}
-                                      </Link>
-                                    ) : (
-                                      <span className={navGroupClassName}>{group.label}</span>
+                                    
+                                    {/* Fourth Level Links */}
+                                    {link.subLinks && link.subLinks.length > 0 && (
+                                      <ul className="mt-1 space-y-1">
+                                        {link.subLinks.map((subLink, subIdx) => (
+                                          <li key={subIdx}>
+                                            <Link
+                                              className="block rounded-lg px-3 py-1 font-[family-name:var(--nav-sub-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-sub-link-text,hsl(var(--contrast-400)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:text-[var(--nav-sub-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
+                                              href={subLink.href}
+                                            >
+                                              {subLink.label}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                      </ul>
                                     )}
                                   </li>
-                                )}
-
-                                {group.links.map((link, idx) => (
-                                  // Third Level Links
-                                  <li key={idx}>
-                                    <Link
-                                      className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
-                                      href={link.href}
-                                    >
-                                      {link.label}
-                                    </Link>
-                                  </li>
                                 ))}
                               </ul>
-                            ))}
-                          </div>
-                          
-                                                     <div className="col-span-2">
-                             {item.groups.slice(Math.ceil(item.groups.length / 3) * 2).map((group, columnIndex) => (
-                              <ul className="flex flex-col mb-4" key={columnIndex}>
-                                {/* Second Level Links */}
-                                {group.label != null && group.label !== '' && (
-                                  <li>
-                                    {group.href != null && group.href !== '' ? (
-                                      <Link className={navGroupClassName} href={group.href}>
-                                        {group.label}
-                                      </Link>
-                                    ) : (
-                                      <span className={navGroupClassName}>{group.label}</span>
-                                    )}
-                                  </li>
-                                )}
+                            </div>
+                          ))}
 
-                                {group.links.map((link, idx) => (
-                                  // Third Level Links
-                                  <li key={idx}>
-                                    <Link
-                                      className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
-                                      href={link.href}
-                                    >
-                                      {link.label}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            ))}
-                          </div>
                           
                                                      {/* Image Columns - Each image gets its own column */}
                            {item.imageColumns?.map((imageColumn, imageIndex) => (
-                             <div key={`image-${imageIndex}`} className="col-span-2">
+                             <div key={`image-${imageIndex}`} className="break-inside-avoid">
                               {imageColumn.image && imageColumn.image.src && (
                                 <div>
                                   {imageColumn.href ? (
@@ -580,8 +719,8 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                                         }}
                                       />
                                       {imageColumn.title && (
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                          <p className="text-sm font-medium truncate">{imageColumn.title}</p>
+                                        <div className="absolute bottom-0 left-0 right-0 p-2 rounded-b-lg transition-all duration-200 group-hover:bg-black/70">
+                                          <p className="font-medium truncate text-white group-hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] font-[family-name:var(--nav-group-font-family,var(--font-family-body))]">{imageColumn.title}</p>
                                         </div>
                                       )}
                                     </Link>
@@ -597,8 +736,8 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                                         }}
                                       />
                                       {imageColumn.title && (
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                          <p className="text-sm font-medium truncate">{imageColumn.title}</p>
+                                        <div className="absolute bottom-0 left-0 right-0 p-2 rounded-b-lg transition-all duration-200 group-hover:bg-black/70">
+                                          <p className="font-medium truncate text-white group-hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] font-[family-name:var(--nav-group-font-family,var(--font-family-body))]">{imageColumn.title}</p>
                                         </div>
                                       )}
                                     </div>
