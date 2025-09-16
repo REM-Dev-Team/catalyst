@@ -23,6 +23,7 @@ import { MakeswiftProvider } from '~/lib/makeswift/provider';
 import { getToastNotification } from '../../lib/server-toast';
 import { CookieNotifications } from '../notifications';
 import { Providers } from '../providers';
+import { AgeVerification } from '@/vibes/soul/primitives/age-verification';
 
 import '~/lib/makeswift/components';
 
@@ -112,6 +113,7 @@ export default async function RootLayout({ params, children }: Props) {
           <NextIntlClientProvider locale={locale} messages={messages}>
             <NuqsAdapter>
               <Providers>
+                <AgeVerification />
                 {toastNotificationCookieData && (
                   <CookieNotifications {...toastNotificationCookieData} />
                 )}
