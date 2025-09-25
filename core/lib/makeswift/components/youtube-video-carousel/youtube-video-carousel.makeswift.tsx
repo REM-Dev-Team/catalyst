@@ -24,6 +24,7 @@ interface MakeswiftYouTubeVideoCarouselProps {
   ctaUrl?: string;
   limit?: string;
   channelId?: string;
+  playlistId?: string;
   scrollbarLabel?: string;
   previousLabel?: string;
   nextLabel?: string;
@@ -112,6 +113,7 @@ function MakeswiftYouTubeVideoCarousel({
   ctaUrl,
   limit = '6',
   channelId,
+  playlistId,
   scrollbarLabel = 'YouTube videos',
   previousLabel = 'Previous',
   nextLabel = 'Next',
@@ -123,6 +125,7 @@ function MakeswiftYouTubeVideoCarousel({
   const isDesktop = useIsDesktop();
   const { videos, isLoading, error } = useYouTubeVideos({
     channelId: channelId || undefined,
+    playlistId: playlistId || undefined,
     limit: limitNumber,
   });
 
@@ -277,6 +280,10 @@ runtime.registerComponent(MakeswiftYouTubeVideoCarousel, {
     }),
     channelId: TextInput({ 
       label: 'YouTube Channel ID (optional)', 
+      defaultValue: ''
+    }),
+    playlistId: TextInput({ 
+      label: 'YouTube Playlist ID or URL (optional)', 
       defaultValue: ''
     }),
     scrollbarLabel: TextInput({ 

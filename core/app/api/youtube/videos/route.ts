@@ -4,6 +4,7 @@ import { YouTubeVideo, transformVideoItem } from '~/lib/youtube/utils';
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const channelId = searchParams.get('channelId');
+  const playlistId = searchParams.get('playlistId');
   const limit = searchParams.get('limit') || '6';
   const apiKey = process.env.YOUTUBE_API_KEY;
 
@@ -11,31 +12,46 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'YouTube API key not configured' }, { status: 500 });
   }
 
-  if (!channelId) {
-    return NextResponse.json({ error: 'Channel ID is required' }, { status: 400 });
+  if (!channelId && !playlistId) {
+    return NextResponse.json({ error: 'Channel ID or Playlist ID is required' }, { status: 400 });
   }
 
   try {
-    // First, get the channel's uploads playlist
-    const channelResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${apiKey}`
-    );
+    let targetPlaylistId = playlistId;
 
-    if (!channelResponse.ok) {
-      throw new Error('Failed to fetch channel');
+    // If playlistId is provided, use it directly. Otherwise, get channel's uploads playlist
+    if (!playlistId && channelId) {
+      // First, get the channel's uploads playlist
+      const channelResponse = await fetch(
+        `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${apiKey}`
+      );
+
+      if (!channelResponse.ok) {
+        throw new Error('Failed to fetch channel');
+      }
+
+      const channelData = await channelResponse.json();
+      
+      if (!channelData.items || channelData.items.length === 0) {
+        return NextResponse.json({ error: 'Channel not found' }, { status: 404 });
+      }
+
+      targetPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
     }
 
-    const channelData = await channelResponse.json();
-    
-    if (!channelData.items || channelData.items.length === 0) {
-      return NextResponse.json({ error: 'Channel not found' }, { status: 404 });
+    // Extract playlist ID from URL if a full URL is provided
+    if (targetPlaylistId && targetPlaylistId.includes('youtube.com/playlist')) {
+      const urlMatch = targetPlaylistId.match(/[?&]list=([^&]+)/);
+      if (urlMatch && urlMatch[1]) {
+        targetPlaylistId = urlMatch[1];
+      } else {
+        return NextResponse.json({ error: 'Invalid YouTube playlist URL' }, { status: 400 });
+      }
     }
 
-    const uploadsPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
-
-    // Get videos from the uploads playlist
+    // Get videos from the specified playlist
     const playlistResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${limit}&key=${apiKey}`
+      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${targetPlaylistId}&maxResults=${limit}&key=${apiKey}`
     );
 
     if (!playlistResponse.ok) {

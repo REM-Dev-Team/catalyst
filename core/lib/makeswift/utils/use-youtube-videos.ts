@@ -3,26 +3,33 @@ import { YouTubeVideo } from '~/lib/youtube/utils';
 
 interface UseYouTubeVideosOptions {
   channelId?: string | null;
+  playlistId?: string | null;
   limit?: number;
 }
 
 export function useYouTubeVideos({
   channelId,
+  playlistId,
   limit = 10,
 }: UseYouTubeVideosOptions) {
-  const shouldFetch = !!channelId;
+  const shouldFetch = !!(channelId || playlistId);
   
   const { data: videos, error, isLoading } = useSWR<YouTubeVideo[]>(
-    shouldFetch ? ['youtube-videos', channelId, limit] : null,
+    shouldFetch ? ['youtube-videos', channelId, playlistId, limit] : null,
     async () => {
       try {
-        if (!channelId) {
-          throw new Error('Channel ID is required');
+        if (!channelId && !playlistId) {
+          throw new Error('Channel ID or Playlist ID is required');
         }
 
         // Use our API route instead of direct YouTube API calls
+        const params = new URLSearchParams();
+        if (channelId) params.append('channelId', channelId);
+        if (playlistId) params.append('playlistId', playlistId);
+        params.append('limit', limit.toString());
+        
         const response = await fetch(
-          `/api/youtube/videos?channelId=${channelId}&limit=${limit}`
+          `/api/youtube/videos?${params.toString()}`
         );
 
         if (!response.ok) {
