@@ -338,12 +338,13 @@ const MobileNavigation = ({
                   <ChevronDown className="h-4 w-4 -rotate-90" />
                 </button>
               ) : (
-                <div
+                <Link
                   key={groupIndex}
-                  className="flex w-full items-center justify-between rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--contrast-400)))] @4xl:py-4"
+                  className="flex w-full items-center justify-between rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+                  href={group.href || '#'}
                 >
                   <span>{group.label}</span>
-                </div>
+                </Link>
               )
             ))}
           </div>
@@ -354,9 +355,12 @@ const MobileNavigation = ({
       {currentView === 'subLinks' && selectedGroup && (
         <>
           {/* Group header */}
-          <div className="px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))]">
+          <Link
+            className="block rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+            href={selectedGroup.href || '#'}
+          >
             {selectedGroup.label}
-          </div>
+          </Link>
 
           {/* SubLinks list */}
           <div className="mt-1 space-y-1">
