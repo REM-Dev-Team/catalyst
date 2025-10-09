@@ -216,10 +216,18 @@ function SlideContent({ slide, idx }: { slide: Slide; idx: number }) {
         <div className="slideshow-content-padding flex h-full w-full items-center text-balance">
           <div className="w-full">
             <h1
-              className="slideshow-title m-0 w-full font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))]"
-              style={{ fontSize: '31px' }}
+              className="slideshow-title m-0 w-full font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))] futura-text"
+              style={{ 
+                fontSize: '31px',
+                display: 'flex',
+                gap: '8px',
+                fontFamily: "'futura-pt', 'Futura', sans-serif",
+                fontWeight: 700
+              }}
             >
-              {title}
+              <span style={{ color: 'transparent' }}>
+                {title}
+              </span>
             </h1>
             {secondTitle ? (
               <h2

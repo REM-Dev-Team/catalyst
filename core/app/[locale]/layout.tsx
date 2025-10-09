@@ -106,6 +106,14 @@ export default async function RootLayout({ params, children }: Props) {
       <html className={clsx(fonts.map((f) => f.variable))} lang={locale}>
         <head>
           <link rel="stylesheet" href="https://use.typekit.net/ddi4oux.css" />
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              .futura-text span:first-child {
+                -webkit-text-stroke: 1px #f8f8f2 !important;
+                text-stroke: 1px #f8f8f2 !important;
+              }
+            `
+          }} />
           <SiteTheme />
           <DraftModeScript appOrigin={process.env.MAKESWIFT_APP_ORIGIN} />
         </head>
