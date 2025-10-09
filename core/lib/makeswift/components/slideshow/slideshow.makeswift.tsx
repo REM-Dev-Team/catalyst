@@ -29,6 +29,8 @@ interface Slide {
   secondButtonLink?: { href?: string; target?: string };
   secondButtonText: string;
   secondButtonColor: 'primary' | 'secondary' | 'tertiary' | 'ghost';
+  contentAlignment: 'left' | 'center' | 'right';
+  verticalAlignment: 'top' | 'center' | 'bottom';
 }
 
 interface MSAccordionsProps {
@@ -39,7 +41,12 @@ interface MSAccordionsProps {
 }
 
 runtime.registerComponent(
-  function MSSlideshow({ className, slides, autoplay, interval }: MSAccordionsProps) {
+  function MSSlideshow({ 
+    className, 
+    slides, 
+    autoplay, 
+    interval
+  }: MSAccordionsProps) {
     return (
       <Slideshow
         className={className}
@@ -61,6 +68,8 @@ runtime.registerComponent(
             secondButtonLink,
             secondButtonText,
             secondButtonColor,
+            contentAlignment,
+            verticalAlignment,
           }) => {
             return {
               title,
@@ -84,6 +93,8 @@ runtime.registerComponent(
                 shape: 'rounded',
                 size: 'x-small',
               },
+              contentAlignment,
+              verticalAlignment,
             };
           },
         )}
@@ -134,6 +145,24 @@ runtime.registerComponent(
                 { value: 'ghost', label: 'Ghost' },
               ],
               defaultValue: 'secondary',
+            }),
+            contentAlignment: Select({
+              label: 'Content alignment',
+              options: [
+                { value: 'left', label: 'Left' },
+                { value: 'center', label: 'Center' },
+                { value: 'right', label: 'Right' },
+              ],
+              defaultValue: 'left',
+            }),
+            verticalAlignment: Select({
+              label: 'Vertical alignment',
+              options: [
+                { value: 'top', label: 'Top' },
+                { value: 'center', label: 'Center' },
+                { value: 'bottom', label: 'Bottom' },
+              ],
+              defaultValue: 'center',
             }),
           },
         }),

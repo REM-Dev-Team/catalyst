@@ -112,6 +112,33 @@ export default async function RootLayout({ params, children }: Props) {
                 -webkit-text-stroke: 1px #f8f8f2 !important;
                 text-stroke: 1px #f8f8f2 !important;
               }
+              .slideshow-content-responsive {
+                padding-left: 40px !important;
+                padding-right: 40px !important;
+              }
+              @media (min-width: 1024px) {
+                .slideshow-content-responsive {
+                  padding-left: 80px !important;
+                  padding-right: 80px !important;
+                }
+              }
+              .slideshow-vertical-top {
+                align-items: flex-start !important;
+              }
+              .slideshow-vertical-center {
+                align-items: center !important;
+              }
+              .slideshow-vertical-bottom {
+                align-items: flex-end !important;
+              }
+              @media (min-width: 1024px) {
+                .slideshow-content-responsive {
+                  padding-left: 80px !important;
+                  padding-right: 80px !important;
+                  --slideshow-top: 80px !important;
+                  --slideshow-bottom: 80px !important;
+                }
+              }
             `
           }} />
           <SiteTheme />

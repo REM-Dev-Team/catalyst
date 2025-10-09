@@ -34,6 +34,8 @@ interface Slide {
     shape?: ButtonLinkProps['shape'];
   };
   showSecondCta?: boolean;
+  contentAlignment?: 'left' | 'center' | 'right';
+  verticalAlignment?: 'top' | 'center' | 'bottom';
 }
 
 // Helper function to check if a file is a video
@@ -113,7 +115,7 @@ function SlideButtons({
   return (
     <>
       <div
-        className="mt-6 @xl:mt-8"
+        className="mt-0"
         style={{
           width: '170px',
           height: '2px',
@@ -196,7 +198,13 @@ function SlideImage({ image, idx }: { image?: Slide['image']; idx: number }) {
   );
 }
 
-function SlideContent({ slide, idx }: { slide: Slide; idx: number }) {
+function SlideContent({ 
+  slide, 
+  idx
+}: { 
+  slide: Slide; 
+  idx: number;
+}) {
   const {
     title,
     secondTitle,
@@ -207,22 +215,54 @@ function SlideContent({ slide, idx }: { slide: Slide; idx: number }) {
     showCta = true,
     secondCta,
     showSecondCta = false,
+    contentAlignment = 'left',
+    verticalAlignment = 'center',
   } = slide;
+
+  // Debug logging
+  console.log('Slide alignment:', { contentAlignment, verticalAlignment });
+  console.log('Vertical alignment value:', verticalAlignment);
 
   return (
     <div className="relative h-full w-full min-w-0 shrink-0 grow-0 basis-full" key={idx}>
       <SlideImage idx={idx} image={image} />
       <div className="absolute inset-0 z-10">
-        <div className="slideshow-content-padding flex h-full w-full items-center text-balance">
-          <div className="w-full">
+        <div 
+          className="slideshow-content-responsive w-full text-balance"
+          style={{
+            position: 'absolute',
+            top: verticalAlignment === 'top' ? 'var(--slideshow-top, 30px)' : 
+                 verticalAlignment === 'bottom' ? 'auto' : '50%',
+            bottom: verticalAlignment === 'bottom' ? 'var(--slideshow-bottom, 30px)' : 'auto',
+            left: contentAlignment === 'left' ? '0' : 
+                  contentAlignment === 'right' ? 'auto' : '50%',
+            right: contentAlignment === 'right' ? '0' : 'auto',
+            transform: verticalAlignment === 'center' && contentAlignment === 'center' ? 'translate(-50%, -50%)' :
+                      verticalAlignment === 'center' ? 'translateY(-50%)' :
+                      contentAlignment === 'center' ? 'translateX(-50%)' : 'none',
+            '--slideshow-top': '40px',
+            '--slideshow-bottom': '40px',
+          } as React.CSSProperties}
+        >
+          <div className={clsx(
+            "w-full flex-shrink-0",
+            contentAlignment === 'center' ? 'text-center' : 
+            contentAlignment === 'right' ? 'text-right' : 'text-left'
+          )}>
             <h1
-              className="slideshow-title m-0 w-full font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))] futura-text"
+              className={clsx(
+                "slideshow-title m-0 font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))] futura-text",
+                contentAlignment === 'center' ? 'w-full text-center' :
+                contentAlignment === 'right' ? 'w-full text-right' : 'w-full text-left'
+              )}
               style={{ 
                 fontSize: '31px',
                 display: 'flex',
                 gap: '8px',
                 fontFamily: "'futura-pt', 'Futura', sans-serif",
-                fontWeight: 700
+                fontWeight: 700,
+                justifyContent: contentAlignment === 'center' ? 'center' : 
+                               contentAlignment === 'right' ? 'flex-end' : 'flex-start'
               }}
             >
               <span style={{ color: 'transparent' }}>
@@ -231,7 +271,11 @@ function SlideContent({ slide, idx }: { slide: Slide; idx: number }) {
             </h1>
             {secondTitle ? (
               <h2
-                className="slideshow-title mt-2 w-full font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))]"
+                className={clsx(
+                  "slideshow-title mt-2 w-full font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))]",
+                  contentAlignment === 'center' ? 'text-center' :
+                  contentAlignment === 'right' ? 'text-right' : 'text-left'
+                )}
                 style={{ fontSize: '31px' }}
               >
                 {secondTitle}
@@ -239,18 +283,27 @@ function SlideContent({ slide, idx }: { slide: Slide; idx: number }) {
             ) : null}
             {showDescription ? (
               <p
-                className="slideshow-description mt-2 w-full font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] font-medium leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))]"
+                className={clsx(
+                  "slideshow-description mt-2 mb-6 w-full font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] font-medium leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))]",
+                  contentAlignment === 'center' ? 'text-center' :
+                  contentAlignment === 'right' ? 'text-right' : 'text-left'
+                )}
                 style={{ fontSize: '14px' }}
               >
                 {description}
               </p>
             ) : null}
-            <SlideButtons
-              cta={cta}
-              secondCta={secondCta}
-              showCta={showCta}
-              showSecondCta={showSecondCta}
-            />
+            <div className={clsx(
+              contentAlignment === 'center' ? 'flex flex-col items-center' :
+              contentAlignment === 'right' ? 'flex flex-col items-end' : 'flex flex-col items-start'
+            )}>
+              <SlideButtons
+                cta={cta}
+                secondCta={secondCta}
+                showCta={showCta}
+                showSecondCta={showSecondCta}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -281,7 +334,12 @@ function SlideContent({ slide, idx }: { slide: Slide; idx: number }) {
  * }
  * ```
  */
-export function Slideshow({ slides, playOnInit = true, interval = 5000, className }: Props) {
+export function Slideshow({ 
+  slides, 
+  playOnInit = true, 
+  interval = 5000, 
+  className
+}: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 20 }, [
     Autoplay({ delay: interval, playOnInit }),
     Fade(),
@@ -301,7 +359,11 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
       <div className="h-full overflow-hidden" ref={emblaRef}>
         <div className="flex h-full">
           {slides.map((slide, idx) => (
-            <SlideContent idx={idx} key={idx} slide={slide} />
+            <SlideContent 
+              idx={idx} 
+              key={idx} 
+              slide={slide}
+            />
           ))}
         </div>
       </div>
