@@ -1,17 +1,19 @@
 import { clsx } from 'clsx';
 import { Play, Eye, Clock } from 'lucide-react';
 
-import { Image } from '~/components/image';
 import { YouTubeVideo } from '~/lib/youtube/utils';
 import { YouTubeVideoModal } from '~/lib/makeswift/components/youtube-video-modal';
 
 interface Props {
   video: YouTubeVideo;
   className?: string;
+  textColor?: string;
 }
 
-export function YouTubeVideoCard({ video, className }: Props) {
+export function YouTubeVideoCard({ video, className, textColor }: Props) {
   const { title, description, thumbnail, publishedAt, viewCount, duration } = video;
+
+  const textStyle = textColor ? { color: textColor } : {};
 
   const cardContent = (
     <div
@@ -20,15 +22,14 @@ export function YouTubeVideoCard({ video, className }: Props) {
         className,
       )}
     >
-      <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-2xl bg-contrast-100">
+      <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-2xl">
         {thumbnail ? (
           <>
-            <Image
+            <img
               alt={title}
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-              fill
-              sizes="(min-width: 80rem) 25vw, (min-width: 56rem) 33vw, (min-width: 28rem) 50vw, 100vw"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
               src={thumbnail}
+              style={{ width: 'calc(100% + 2px)', height: 'calc(100% + 2px)', margin: '-1px' }}
             />
             {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -48,10 +49,10 @@ export function YouTubeVideoCard({ video, className }: Props) {
         )}
       </div>
 
-      <div className="text-lg font-medium leading-snug line-clamp-2">{title}</div>
-      <p className="mb-3 mt-1.5 line-clamp-2 text-sm font-normal text-contrast-400">{description}</p>
+      <div className="text-lg font-medium leading-snug line-clamp-2" style={textColor ? textStyle : {}}>{title}</div>
+      <p className={clsx("mb-3 mt-1.5 line-clamp-2 text-sm font-normal", !textColor && "text-contrast-400")} style={textColor ? textStyle : {}}>{description}</p>
       
-      <div className="flex items-center gap-4 text-sm text-contrast-500">
+      <div className={clsx("flex items-center gap-4 text-sm", !textColor && "text-contrast-500")} style={textColor ? textStyle : {}}>
         <div className="flex items-center gap-1">
           <Eye className="h-3 w-3" />
           <span>{viewCount}</span>
