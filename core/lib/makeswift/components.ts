@@ -21,6 +21,7 @@ import './components/youtube-video-carousel-row/youtube-video-carousel-row.makes
 import './components/youtube-playlist-switcher/youtube-playlist-switcher.makeswift';
 import './components/youtube-video-card/youtube-video-card.makeswift';
 import './components/youtube-video-modal/youtube-video-modal.makeswift';
+import './components/image-hotspot/image-hotspot.makeswift';
 import './components/product-detail/register';
 
 import './components/site-theme/register';
