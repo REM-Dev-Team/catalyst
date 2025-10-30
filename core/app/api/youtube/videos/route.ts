@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Extract playlist ID from URL if a full URL is provided
-    if (targetPlaylistId && targetPlaylistId.includes('youtube.com/playlist')) {
+    if (targetPlaylistId && (targetPlaylistId.includes('youtube.com/playlist') || targetPlaylistId.includes('youtube.com/watch'))) {
       const urlMatch = targetPlaylistId.match(/[?&]list=([^&]+)/);
       if (urlMatch && urlMatch[1]) {
         targetPlaylistId = urlMatch[1];

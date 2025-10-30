@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { TextInput, Style, Checkbox } from '@makeswift/runtime/controls';
 import { clsx } from 'clsx';
 
@@ -21,7 +22,13 @@ interface MakeswiftYouTubeVideoCarouselRowProps {
   ctaUrl?: string;
   limit?: string;
   channelId?: string;
-  playlistId?: string;
+  componentId?: string;
+  playlist1Id?: string;
+  playlist1Label?: string;
+  playlist2Id?: string;
+  playlist2Label?: string;
+  playlist3Id?: string;
+  playlist3Label?: string;
   scrollbarLabel?: string;
   previousLabel?: string;
   nextLabel?: string;
@@ -33,9 +40,11 @@ interface MakeswiftYouTubeVideoCarouselRowProps {
 function YouTubeVideoCarouselRowSkeleton({ className }: { className?: string }) {
   return (
     <div className={clsx('space-y-6', className)}>
-      <div className="flex items-center justify-between">
-        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+          <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+        </div>
       </div>
       
       {/* Horizontal skeleton for both desktop and mobile */}
@@ -73,7 +82,13 @@ function MakeswiftYouTubeVideoCarouselRow({
   ctaUrl,
   limit = '6',
   channelId,
-  playlistId,
+  componentId,
+  playlist1Id,
+  playlist1Label = 'Playlist 1',
+  playlist2Id,
+  playlist2Label = 'Playlist 2',
+  playlist3Id,
+  playlist3Label = 'Playlist 3',
   scrollbarLabel = 'YouTube videos',
   previousLabel = 'Previous',
   nextLabel = 'Next',
@@ -82,13 +97,36 @@ function MakeswiftYouTubeVideoCarouselRow({
   showButtons = true,
 }: MakeswiftYouTubeVideoCarouselRowProps) {
   const limitNumber = parseInt(limit) || 6;
+  const [activePlaylist, setActivePlaylist] = useState<string | undefined>(playlist1Id);
+  
+  // Listen for external playlist switch events from a separate button component
+  useEffect(() => {
+    if (!componentId) return;
+    const eventName = `yt-playlist-switch:${componentId}`;
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<{ playlistId?: string }>; 
+      setActivePlaylist(custom.detail?.playlistId);
+    };
+    window.addEventListener(eventName, handler as EventListener);
+    return () => {
+      window.removeEventListener(eventName, handler as EventListener);
+    };
+  }, [componentId]);
+  
+  // Create playlist options
+  const playlists = [
+    { id: playlist1Id, label: playlist1Label },
+    { id: playlist2Id, label: playlist2Label },
+    { id: playlist3Id, label: playlist3Label },
+  ].filter(playlist => playlist.id); // Only include playlists with IDs
+  
   const { videos, isLoading, error } = useYouTubeVideos({
     channelId: channelId || undefined,
-    playlistId: playlistId || undefined,
+    playlistId: activePlaylist || undefined,
     limit: limitNumber,
   });
 
-  // Helper function to render header
+  // Helper function to render header (buttons moved to separate component via events)
   const renderHeader = () => (
     <div className="flex items-center justify-between">
       <h2 className="text-2xl font-medium" style={{ color: '#f8f8f2' }}>{title}</h2>
@@ -100,7 +138,7 @@ function MakeswiftYouTubeVideoCarouselRow({
     </div>
   );
 
-  if (isLoading) {
+  if (isLoading && !videos) {
     return <YouTubeVideoCarouselRowSkeleton className={className} />;
   }
 
@@ -133,20 +171,20 @@ function MakeswiftYouTubeVideoCarouselRow({
       {/* Horizontal carousel for both desktop and mobile */}
       <Carousel className="group/youtube-video-carousel" hideOverflow={hideOverflow}>
         <CarouselContent className="mb-10">
-          {videos.map((video) => (
-            <CarouselItem
-              className="basis-full"
-              key={video.id}
-            >
-              <YouTubeVideoCard video={video} textColor="#f8f8f2" />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <div className="flex w-full items-center justify-between">
-          {showScrollbar && <CarouselScrollbar label={scrollbarLabel} />}
-          {showButtons && <CarouselButtons nextLabel={nextLabel} previousLabel={previousLabel} />}
-        </div>
-      </Carousel>
+        {videos.map((video) => (
+          <CarouselItem
+            className="basis-full"
+            key={video.id}
+          >
+            <YouTubeVideoCard video={video} textColor="#f8f8f2" />
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <div className="flex w-full items-center justify-between">
+        {showScrollbar && <CarouselScrollbar label={scrollbarLabel} />}
+        {showButtons && <CarouselButtons nextLabel={nextLabel} previousLabel={previousLabel} />}
+      </div>
+    </Carousel>
     </div>
   );
 }
@@ -176,9 +214,33 @@ runtime.registerComponent(MakeswiftYouTubeVideoCarouselRow, {
       label: 'YouTube Channel ID (optional)', 
       defaultValue: ''
     }),
-    playlistId: TextInput({ 
-      label: 'YouTube Playlist ID or URL (optional)', 
+    componentId: TextInput({ 
+      label: 'Shared Component ID (for playlist switcher)', 
       defaultValue: ''
+    }),
+    playlist1Id: TextInput({ 
+      label: 'Playlist 1 ID', 
+      defaultValue: ''
+    }),
+    playlist1Label: TextInput({ 
+      label: 'Playlist 1 Label', 
+      defaultValue: 'Playlist 1'
+    }),
+    playlist2Id: TextInput({ 
+      label: 'Playlist 2 ID', 
+      defaultValue: ''
+    }),
+    playlist2Label: TextInput({ 
+      label: 'Playlist 2 Label', 
+      defaultValue: 'Playlist 2'
+    }),
+    playlist3Id: TextInput({ 
+      label: 'Playlist 3 ID', 
+      defaultValue: ''
+    }),
+    playlist3Label: TextInput({ 
+      label: 'Playlist 3 Label', 
+      defaultValue: 'Playlist 3'
     }),
     scrollbarLabel: TextInput({ 
       label: 'Scrollbar label', 

@@ -52,6 +52,7 @@ export function useYouTubeVideos({
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       dedupingInterval: 300000, // 5 minutes
+      keepPreviousData: true, // Keep previous data while loading new data
     }
   );
 

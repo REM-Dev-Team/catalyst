@@ -18,6 +18,7 @@ import './components/slideshow/slideshow.makeswift';
 import './components/sticky-sidebar/sticky-sidebar.makeswift';
 import './components/youtube-video-carousel/youtube-video-carousel.makeswift';
 import './components/youtube-video-carousel-row/youtube-video-carousel-row.makeswift';
+import './components/youtube-playlist-switcher/youtube-playlist-switcher.makeswift';
 import './components/youtube-video-card/youtube-video-card.makeswift';
 import './components/youtube-video-modal/youtube-video-modal.makeswift';
 import './components/product-detail/register';
