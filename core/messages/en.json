@@ -180,6 +180,15 @@
       "cta": "Return to Home"
     }
   },
+  "ShopAll": {
+    "title": "Shop all",
+    "emptyStateTitle": "No products found",
+    "emptyStateSubtitle": "Try using different filters.",
+    "Breadcrumbs": {
+      "home": "Home",
+      "shopAll": "Shop all"
+    }
+  },
   "Search": {
     "title": "Search results",
     "heading": "Search",
