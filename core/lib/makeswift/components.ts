@@ -23,6 +23,7 @@ import './components/youtube-video-card/youtube-video-card.makeswift';
 import './components/youtube-video-modal/youtube-video-modal.makeswift';
 import './components/image-hotspot/image-hotspot.makeswift';
 import './components/product-detail/register';
+import './components/video/video.makeswift';
 
 import './components/site-theme/register';
 
