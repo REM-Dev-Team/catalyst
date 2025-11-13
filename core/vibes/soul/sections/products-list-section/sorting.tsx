@@ -49,7 +49,7 @@ export function Sorting({
       pending={isPending}
       placeholder={placeholder}
       value={optimisticParam}
-      variant="round"
+      variant="rectangle"
     />
   );
 }

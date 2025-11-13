@@ -1,7 +1,7 @@
 import { themeToCssVars } from './to-css';
 
 export const colors = {
-  primary: '96 100% 68%',
+  primary: '357 89% 52%',
   accent: '96 100% 88%',
   background: '0 0% 100%',
   foreground: '0 0% 7%',

@@ -42,6 +42,8 @@ interface Props {
   removeLabel?: Streamable<string>;
   maxItems?: number;
   maxCompareLimitMessage?: Streamable<string>;
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
+  mobileLayout?: 'portrait' | 'landscape';
 }
 
 export function ProductsListSection({
@@ -71,79 +73,17 @@ export function ProductsListSection({
   removeLabel,
   maxItems,
   maxCompareLimitMessage,
+  aspectRatio = '5:6',
+  mobileLayout = 'portrait',
 }: Props) {
   return (
     <div className="group/products-list-section @container">
       <div className="mx-auto max-w-screen-2xl px-4 py-10 @xl:px-6 @xl:py-14 @4xl:px-8 @4xl:py-12">
-        <div>
-          <Stream fallback={<BreadcrumbsSkeleton />} value={streamableBreadcrumbs}>
-            {(breadcrumbs) =>
-              breadcrumbs && breadcrumbs.length > 1 && <Breadcrumbs breadcrumbs={breadcrumbs} />
-            }
-          </Stream>
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-8 pt-6 text-foreground">
-            <h1 className="flex items-center gap-2 font-heading text-3xl font-medium leading-none @lg:text-4xl @2xl:text-5xl">
-              <Suspense
-                fallback={
-                  <span className="inline-flex h-[1lh] w-[6ch] animate-pulse rounded-lg bg-contrast-100" />
-                }
-              >
-                {title}
-              </Suspense>
-              <Suspense
-                fallback={
-                  <span className="inline-flex h-[1lh] w-[2ch] animate-pulse rounded-lg bg-contrast-100" />
-                }
-              >
-                <span className="text-contrast-300">{totalCount}</span>
-              </Suspense>
-            </h1>
-            <div className="flex gap-2">
-              <Stream
-                fallback={<SortingSkeleton />}
-                value={Streamable.all([
-                  streamableSortLabel,
-                  streamableSortOptions,
-                  streamableSortPlaceholder,
-                ])}
-              >
-                {([label, options, placeholder]) => (
-                  <Sorting
-                    defaultValue={sortDefaultValue}
-                    label={label}
-                    options={options}
-                    paramName={sortParamName}
-                    placeholder={placeholder}
-                  />
-                )}
-              </Stream>
-              <div className="block @3xl:hidden">
-                <SidePanel.Root>
-                  <SidePanel.Trigger asChild>
-                    <Button size="medium" variant="secondary">
-                      {filterLabel}
-                      <span className="hidden @xl:block">
-                        <Sliders size={20} />
-                      </span>
-                    </Button>
-                  </SidePanel.Trigger>
-                  <Stream value={streamableFiltersPanelTitle}>
-                    {(filtersPanelTitle) => (
-                      <SidePanel.Content title={filtersPanelTitle}>
-                        <FiltersPanel
-                          filters={filters}
-                          paginationInfo={paginationInfo}
-                          rangeFilterApplyLabel={rangeFilterApplyLabel}
-                          resetFiltersLabel={resetFiltersLabel}
-                        />
-                      </SidePanel.Content>
-                    )}
-                  </Stream>
-                </SidePanel.Root>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Stream fallback={<BreadcrumbsSkeleton />} value={streamableBreadcrumbs}>
+          {(breadcrumbs) =>
+            breadcrumbs && breadcrumbs.length > 1 && <Breadcrumbs breadcrumbs={breadcrumbs} />
+          }
+        </Stream>
         <div className="flex items-stretch gap-8 @4xl:gap-10">
           <aside className="hidden w-52 @3xl:block @4xl:w-60">
             <Stream value={streamableFiltersPanelTitle}>
@@ -159,7 +99,63 @@ export function ProductsListSection({
           </aside>
 
           <div className="flex-1 group-has-[[data-pending]]/products-list-section:animate-pulse">
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-8 text-foreground">
+              <h1 className="flex items-center gap-2 font-heading text-3xl font-medium leading-none uppercase @lg:text-4xl @2xl:text-5xl">
+                <Suspense
+                  fallback={
+                    <span className="inline-flex h-[1lh] w-[6ch] animate-pulse rounded-lg bg-contrast-100" />
+                  }
+                >
+                  {title}
+                </Suspense>
+              </h1>
+              <div className="flex gap-2">
+                <Stream
+                  fallback={<SortingSkeleton />}
+                  value={Streamable.all([
+                    streamableSortLabel,
+                    streamableSortOptions,
+                    streamableSortPlaceholder,
+                  ])}
+                >
+                  {([label, options, placeholder]) => (
+                    <Sorting
+                      defaultValue={sortDefaultValue}
+                      label={label}
+                      options={options}
+                      paramName={sortParamName}
+                      placeholder={placeholder}
+                    />
+                  )}
+                </Stream>
+                <div className="block @3xl:hidden">
+                  <SidePanel.Root>
+                    <SidePanel.Trigger asChild>
+                      <Button size="medium" variant="secondary">
+                        {filterLabel}
+                        <span className="hidden @xl:block">
+                          <Sliders size={20} />
+                        </span>
+                      </Button>
+                    </SidePanel.Trigger>
+                    <Stream value={streamableFiltersPanelTitle}>
+                      {(filtersPanelTitle) => (
+                        <SidePanel.Content title={filtersPanelTitle}>
+                          <FiltersPanel
+                            filters={filters}
+                            paginationInfo={paginationInfo}
+                            rangeFilterApplyLabel={rangeFilterApplyLabel}
+                            resetFiltersLabel={resetFiltersLabel}
+                          />
+                        </SidePanel.Content>
+                      )}
+                    </Stream>
+                  </SidePanel.Root>
+                </div>
+              </div>
+            </div>
             <ProductList
+              aspectRatio={aspectRatio as '5:6' | '3:4' | '1:1' | '4:3'}
               compareHref={compareHref}
               compareLabel={compareLabel}
               compareParamName={compareParamName}
@@ -168,6 +164,7 @@ export function ProductsListSection({
               emptyStateTitle={emptyStateTitle}
               maxCompareLimitMessage={maxCompareLimitMessage}
               maxItems={maxItems}
+              mobileLayout={mobileLayout}
               placeholderCount={placeholderCount}
               products={products}
               removeLabel={removeLabel}

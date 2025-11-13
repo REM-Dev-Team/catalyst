@@ -23,6 +23,7 @@ import { getCompareProducts as getCompareProductsData } from '../../fetch-compar
 import { fetchFacetedSearch } from '../../fetch-faceted-search';
 
 import { CategoryViewed } from './_components/category-viewed';
+import { getCustomCategoryPage } from './_lib/get-custom-category-page';
 import { getCategoryPageData } from './page-data';
 
 const cachedCategoryDataVariables = cache((categoyId: string) => {
@@ -35,7 +36,7 @@ const cacheCategoryFacetedSearch = cache((categoryId: string) => {
   return { category: Number(categoryId) };
 });
 
-async function getCategory(props: Props) {
+export async function getCategory(props: Props) {
   const { slug } = await props.params;
 
   const variables = cachedCategoryDataVariables(slug);
@@ -91,7 +92,7 @@ const getRefinedSearch = cache(async (props: Props) => {
   });
 });
 
-async function getBreadcrumbs(props: Props): Promise<Breadcrumb[]> {
+export async function getBreadcrumbs(props: Props): Promise<Breadcrumb[]> {
   const category = await getCategory(props);
 
   return removeEdgesAndNodes(category.breadcrumbs).map(({ name, path }) => ({
@@ -123,7 +124,7 @@ async function getSubCategoriesFilters(props: Props): Promise<Filter[]> {
   ];
 }
 
-async function getTitle(props: Props): Promise<string | null> {
+export async function getTitle(props: Props): Promise<string | null> {
   const category = await getCategory(props);
 
   return category.name;
@@ -135,19 +136,19 @@ const getSearch = cache(async (props: Props) => {
   return search;
 });
 
-async function getTotalCount(props: Props): Promise<number> {
+export async function getTotalCount(props: Props): Promise<number> {
   const search = await getSearch(props);
 
   return search.products.collectionInfo?.totalItems ?? 0;
 }
 
-async function getProducts(props: Props) {
+export async function getProducts(props: Props) {
   const search = await getSearch(props);
 
   return search.products.items;
 }
 
-async function getListProducts(props: Props): Promise<Product[]> {
+export async function getListProducts(props: Props): Promise<Product[]> {
   const products = await getProducts(props);
   const format = await getFormatter();
 
@@ -160,10 +161,11 @@ async function getListProducts(props: Props): Promise<Product[]> {
       : undefined,
     price: pricesTransformer(product.prices, format),
     subtitle: product.brand?.name ?? undefined,
+    rating: product.reviewSummary?.averageRating ?? undefined,
   }));
 }
 
-async function getFilters(props: Props): Promise<Filter[]> {
+export async function getFilters(props: Props): Promise<Filter[]> {
   const { slug } = await props.params;
   const searchParams = await props.searchParams;
   const searchParamsCache = await createCategorySearchParamsCache(props);
@@ -191,13 +193,13 @@ async function getFilters(props: Props): Promise<Filter[]> {
   return [...subCategoriesFilters, ...filters];
 }
 
-async function getSortLabel(): Promise<string> {
+export async function getSortLabel(): Promise<string> {
   const t = await getTranslations('FacetedGroup.SortBy');
 
   return t('ariaLabel');
 }
 
-async function getSortOptions(): Promise<SortOption[]> {
+export async function getSortOptions(): Promise<SortOption[]> {
   const t = await getTranslations('FacetedGroup.SortBy');
 
   return [
@@ -213,13 +215,13 @@ async function getSortOptions(): Promise<SortOption[]> {
   ];
 }
 
-async function getPaginationInfo(props: Props): Promise<CursorPaginationInfo> {
+export async function getPaginationInfo(props: Props): Promise<CursorPaginationInfo> {
   const search = await getRefinedSearch(props);
 
   return pageInfoTransformer(search.products.pageInfo);
 }
 
-async function getShowCompare(props: Props) {
+export async function getShowCompare(props: Props) {
   const { slug } = await props.params;
 
   const variables = cachedCategoryDataVariables(slug);
@@ -238,7 +240,7 @@ const cachedCompareProductIds = cache(async (props: Props) => {
   return { entityIds: compare ? compare.map((id: string) => Number(id)) : [] };
 });
 
-async function getCompareProducts(props: Props) {
+export async function getCompareProducts(props: Props) {
   const compareIds = await cachedCompareProductIds(props);
 
   const products = await getCompareProductsData(compareIds);
@@ -253,55 +255,55 @@ async function getCompareProducts(props: Props) {
   }));
 }
 
-async function getFilterLabel(): Promise<string> {
+export async function getFilterLabel(): Promise<string> {
   const t = await getTranslations('FacetedGroup.FacetedSearch');
 
   return t('filters');
 }
 
-async function getCompareLabel(): Promise<string> {
+export async function getCompareLabel(): Promise<string> {
   const t = await getTranslations('Components.ProductCard.Compare');
 
   return t('compare');
 }
 
-async function getRemoveLabel(): Promise<string> {
+export async function getRemoveLabel(): Promise<string> {
   const t = await getTranslations('Components.ProductCard.Compare');
 
   return t('remove');
 }
 
-async function getMaxCompareLimitMessage(): Promise<string> {
+export async function getMaxCompareLimitMessage(): Promise<string> {
   const t = await getTranslations('Components.ProductCard.Compare');
 
   return t('maxCompareLimit');
 }
 
-async function getFiltersPanelTitle(): Promise<string> {
+export async function getFiltersPanelTitle(): Promise<string> {
   const t = await getTranslations('FacetedGroup.FacetedSearch');
 
   return t('filters');
 }
 
-async function getRangeFilterApplyLabel(): Promise<string> {
+export async function getRangeFilterApplyLabel(): Promise<string> {
   const t = await getTranslations('FacetedGroup.FacetedSearch.Range');
 
   return t('apply');
 }
 
-async function getResetFiltersLabel(): Promise<string> {
+export async function getResetFiltersLabel(): Promise<string> {
   const t = await getTranslations('FacetedGroup.FacetedSearch');
 
   return t('resetFilters');
 }
 
-async function getEmptyStateTitle(): Promise<string> {
+export async function getEmptyStateTitle(): Promise<string> {
   const t = await getTranslations('Category.Empty');
 
   return t('title');
 }
 
-async function getEmptyStateSubtitle(): Promise<string> {
+export async function getEmptyStateSubtitle(): Promise<string> {
   const t = await getTranslations('Category.Empty');
 
   return t('subtitle');
@@ -309,7 +311,7 @@ async function getEmptyStateSubtitle(): Promise<string> {
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-interface Props {
+export interface Props {
   params: Promise<{
     slug: string;
     locale: string;
@@ -334,6 +336,19 @@ export default async function Category(props: Props) {
 
   setRequestLocale(locale);
 
+  // Check if there's a custom page for this category
+  const category = await getCategory(props);
+  const breadcrumbs = await getBreadcrumbs(props);
+  // Get the category path from breadcrumbs (last item is the current category)
+  const categoryPath = breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1]?.href : undefined;
+  const CustomCategoryPage = await getCustomCategoryPage(category.entityId, categoryPath);
+
+  // If a custom page exists, render it instead of the default template
+  if (CustomCategoryPage) {
+    return <CustomCategoryPage {...props} />;
+  }
+
+  // Default template for categories without custom pages
   return (
     <>
       <ProductsListSection

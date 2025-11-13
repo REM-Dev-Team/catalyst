@@ -1,7 +1,9 @@
 import { clsx } from 'clsx';
 
 import { Badge } from '@/vibes/soul/primitives/badge';
+import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import { Price, PriceLabel } from '@/vibes/soul/primitives/price-label';
+import { Rating } from '@/vibes/soul/primitives/rating';
 import * as Skeleton from '@/vibes/soul/primitives/skeleton';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
@@ -22,13 +24,14 @@ export interface Product {
 export interface ProductCardProps {
   className?: string;
   colorScheme?: 'light' | 'dark';
-  aspectRatio?: '5:6' | '3:4' | '1:1';
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
   showCompare?: boolean;
   imagePriority?: boolean;
   imageSizes?: string;
   compareLabel?: string;
   compareParamName?: string;
   product: Product;
+  mobileLayout?: 'portrait' | 'landscape';
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -52,7 +55,7 @@ export interface ProductCardProps {
  * ```
  */
 export function ProductCard({
-  product: { id, title, subtitle, badge, price, image, href },
+  product: { id, title, subtitle, badge, price, image, href, rating },
   colorScheme = 'light',
   className,
   showCompare = false,
@@ -61,23 +64,34 @@ export function ProductCard({
   compareParamName,
   imagePriority = false,
   imageSizes = '(min-width: 80rem) 20vw, (min-width: 64rem) 25vw, (min-width: 42rem) 33vw, (min-width: 24rem) 50vw, 100vw',
+  mobileLayout = 'portrait',
 }: ProductCardProps) {
+  const isMobileLandscape = mobileLayout === 'landscape';
+
   return (
     <article
       className={clsx(
-        'group flex min-w-0 max-w-md flex-col gap-2 font-[family-name:var(--card-font-family,var(--font-family-body))] @container',
+        'group flex min-w-0 max-w-md font-[family-name:var(--card-font-family,var(--font-family-body))] @container',
+        isMobileLandscape ? 'flex-row gap-3 xl:flex-col xl:gap-2' : 'flex-col gap-2',
         className,
       )}
+      data-product-valid="true"
     >
-      <div className="relative">
+      <div className={clsx(
+        'relative',
+        isMobileLandscape ? 'w-24 shrink-0 xl:w-full' : 'w-full'
+      )}>
         <div
           className={clsx(
             'relative overflow-hidden rounded-xl @md:rounded-2xl',
-            {
-              '5:6': 'aspect-[5/6]',
-              '3:4': 'aspect-[3/4]',
-              '1:1': 'aspect-square',
-            }[aspectRatio],
+            isMobileLandscape
+              ? 'aspect-square xl:aspect-[4/3]'
+              : {
+                  '5:6': 'aspect-[5/6]',
+                  '3:4': 'aspect-[3/4]',
+                  '1:1': 'aspect-square',
+                  '4:3': 'aspect-[4/3]',
+                }[aspectRatio],
             {
               light: 'bg-[var(--product-card-light-background,hsl(var(--contrast-100)))]',
               dark: 'bg-[var(--product-card-dark-background,hsl(var(--contrast-500)))]',
@@ -102,7 +116,7 @@ export function ProductCard({
           ) : (
             <div
               className={clsx(
-                'break-words pl-5 pt-5 text-4xl font-bold leading-[0.8] tracking-tighter opacity-25 transition-transform duration-500 ease-out group-hover:scale-105 @xs:text-7xl',
+                'absolute inset-0 flex items-center justify-center break-words p-4 text-base font-bold leading-tight tracking-tighter opacity-25 transition-transform duration-500 ease-out group-hover:scale-105 @xs:text-lg',
                 {
                   light: 'text-[var(--product-card-light-title,hsl(var(--foreground)))]',
                   dark: 'text-[var(--product-card-dark-title,hsl(var(--background)))]',
@@ -117,37 +131,6 @@ export function ProductCard({
               {badge}
             </Badge>
           )}
-        </div>
-
-        <div className="mt-2 flex flex-col items-start gap-x-4 gap-y-3 px-1 @xs:mt-3 @2xl:flex-row">
-          <div className="flex-1 text-sm @[16rem]:text-base">
-            <span
-              className={clsx(
-                'block font-semibold',
-                {
-                  light: 'text-[var(--product-card-light-title,hsl(var(--foreground)))]',
-                  dark: 'text-[var(--product-card-dark-title,hsl(var(--background)))]',
-                }[colorScheme],
-              )}
-            >
-              {title}
-            </span>
-
-            {subtitle != null && subtitle !== '' && (
-              <span
-                className={clsx(
-                  'block text-sm font-normal',
-                  {
-                    light: 'text-[var(--product-card-light-subtitle,hsl(var(--foreground)/75%))]',
-                    dark: 'text-[var(--product-card-dark-subtitle,hsl(var(--background)/75%))]',
-                  }[colorScheme],
-                )}
-              >
-                {subtitle}
-              </span>
-            )}
-            {price != null && <PriceLabel colorScheme={colorScheme} price={price} />}
-          </div>
         </div>
         <Link
           aria-label={title}
@@ -164,16 +147,126 @@ export function ProductCard({
           <span className="sr-only">View product</span>
         </Link>
       </div>
-      {showCompare && (
-        <div className="mt-0.5 shrink-0">
-          <Compare
-            colorScheme={colorScheme}
-            label={compareLabel}
-            paramName={compareParamName}
-            product={{ id, title, href, image }}
-          />
+
+      {/* Mobile Landscape: Column 2 - Title (only on mobile when landscape) */}
+      {isMobileLandscape && (
+        <div className="flex-1 flex flex-col justify-start min-w-0 xl:hidden">
+          <span
+            className={clsx(
+              'block font-semibold uppercase text-sm',
+              {
+                light: 'text-[var(--product-card-light-title,hsl(var(--foreground)))]',
+                dark: 'text-[var(--product-card-dark-title,hsl(var(--background)))]',
+              }[colorScheme],
+            )}
+          >
+            {title}
+          </span>
+          {subtitle != null && subtitle !== '' && (
+            <span
+              className={clsx(
+                'block text-xs font-normal',
+                {
+                  light: 'text-[var(--product-card-light-subtitle,hsl(var(--foreground)/75%))]',
+                  dark: 'text-[var(--product-card-dark-subtitle,hsl(var(--background)/75%))]',
+                }[colorScheme],
+              )}
+            >
+              {subtitle}
+            </span>
+          )}
         </div>
       )}
+
+      {/* Mobile Landscape: Column 3 - Price, Rating, Button (only on mobile when landscape) */}
+      {isMobileLandscape && (
+        <div className="flex flex-col justify-center items-end gap-2 shrink-0 xl:hidden">
+          {price != null && <PriceLabel colorScheme={colorScheme} price={price} />}
+          {rating != null && (
+            <div>
+              <Rating rating={rating} showRating={false} />
+            </div>
+          )}
+          <ButtonLink
+            className="!border-[#ED1C24] !bg-[#ED1C24] !text-white hover:!bg-[#ED1C24]/90"
+            href={href}
+            shape="rounded"
+            size="x-small"
+            variant="primary"
+          >
+            Shop Now
+          </ButtonLink>
+        </div>
+      )}
+
+      {/* Desktop/Portrait Layout */}
+      <div className={clsx(
+        'mt-2 flex flex-col items-start gap-x-4 gap-y-3 px-1 @xs:mt-3 @2xl:flex-row',
+        isMobileLandscape && 'hidden xl:flex'
+      )}>
+        <div className="flex-1 text-sm @[16rem]:text-base">
+          <span
+            className={clsx(
+              'block font-semibold uppercase',
+              {
+                light: 'text-[var(--product-card-light-title,hsl(var(--foreground)))]',
+                dark: 'text-[var(--product-card-dark-title,hsl(var(--background)))]',
+              }[colorScheme],
+            )}
+          >
+            {title}
+          </span>
+
+          {subtitle != null && subtitle !== '' && (
+            <span
+              className={clsx(
+                'block text-sm font-normal',
+                {
+                  light: 'text-[var(--product-card-light-subtitle,hsl(var(--foreground)/75%))]',
+                  dark: 'text-[var(--product-card-dark-subtitle,hsl(var(--background)/75%))]',
+                }[colorScheme],
+              )}
+            >
+              {subtitle}
+            </span>
+          )}
+          {price != null && <PriceLabel colorScheme={colorScheme} price={price} />}
+        </div>
+      </div>
+      {/* Desktop/Portrait: Compare or Rating/Button */}
+      <div className={clsx(
+        isMobileLandscape && 'hidden xl:block'
+      )}>
+        {showCompare ? (
+          <div className="mt-0.5 shrink-0">
+            <Compare
+              colorScheme={colorScheme}
+              label={compareLabel}
+              paramName={compareParamName}
+              product={{ id, title, href, image }}
+            />
+          </div>
+        ) : (
+          <div className="mt-0.5 shrink-0 space-y-4 pb-4">
+            {rating != null && (
+              <div>
+                <Rating rating={rating} showRating={false} />
+              </div>
+            )}
+            <div className="flex justify-center">
+              <ButtonLink
+                className="!border-[#ED1C24] !bg-[#ED1C24] !text-white hover:!bg-[#ED1C24]/90"
+                href={href}
+                shape="rounded"
+                size="x-small"
+                variant="primary"
+              >
+                Shop Now
+              </ButtonLink>
+            </div>
+          </div>
+        )}
+      </div>
     </article>
   );
 }
@@ -187,11 +280,12 @@ export function ProductCardSkeleton({
       <Skeleton.Box
         className={clsx(
           'rounded-[var(--product-card-border-radius,1rem)]',
-          {
-            '5:6': 'aspect-[5/6]',
-            '3:4': 'aspect-[3/4]',
-            '1:1': 'aspect-square',
-          }[aspectRatio],
+            {
+              '5:6': 'aspect-[5/6]',
+              '3:4': 'aspect-[3/4]',
+              '1:1': 'aspect-square',
+              '4:3': 'aspect-[4/3]',
+            }[aspectRatio],
         )}
       />
       <div className="mt-2 flex flex-col items-start gap-x-4 gap-y-3 px-1 @xs:mt-3 @xs:flex-row">

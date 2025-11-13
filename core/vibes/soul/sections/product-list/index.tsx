@@ -14,7 +14,7 @@ interface ProductListProps {
   compareProducts?: Streamable<Product[]>;
   className?: string;
   colorScheme?: 'light' | 'dark';
-  aspectRatio?: '5:6' | '3:4' | '1:1';
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
   showCompare?: Streamable<boolean>;
   compareHref?: string;
   compareLabel?: Streamable<string>;
@@ -25,6 +25,7 @@ interface ProductListProps {
   removeLabel?: Streamable<string>;
   maxItems?: number;
   maxCompareLimitMessage?: Streamable<string>;
+  mobileLayout?: 'portrait' | 'landscape';
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -59,6 +60,7 @@ export function ProductList({
   removeLabel: streamableRemoveLabel,
   maxItems,
   maxCompareLimitMessage: streamableMaxCompareLimitMessage,
+  mobileLayout = 'portrait',
 }: ProductListProps) {
   return (
     <Stream
@@ -80,7 +82,24 @@ export function ProductList({
         removeLabel,
         maxCompareLimitMessage,
       ]) => {
-        if (products.length === 0) {
+        // Ensure products is a valid array and filter out any invalid products
+        const validProducts = Array.isArray(products)
+          ? products.filter(
+              (product) =>
+                product &&
+                typeof product === 'object' &&
+                product.id &&
+                typeof product.id === 'string' &&
+                product.title &&
+                typeof product.title === 'string' &&
+                product.href &&
+                typeof product.href === 'string' &&
+                product.title.trim() !== '' &&
+                product.id.trim() !== '',
+            )
+          : [];
+
+        if (validProducts.length === 0) {
           return (
             <ProductListEmptyState
               emptyStateSubtitle={emptyStateSubtitle}
@@ -96,20 +115,21 @@ export function ProductList({
             maxCompareLimitMessage={maxCompareLimitMessage}
             maxItems={maxItems}
           >
-            <div className={clsx('w-full @container', className)}>
+            <div className={clsx('w-full @container', className)} key={`products-${validProducts.length}-${validProducts.map(p => p.id).join('-')}`}>
               <div className="mx-auto grid grid-cols-1 gap-x-4 gap-y-6 @sm:grid-cols-2 @2xl:grid-cols-3 @2xl:gap-x-5 @2xl:gap-y-8 @5xl:grid-cols-4 @7xl:grid-cols-5">
-                {products.map((product) => (
-                  <ProductCard
-                    aspectRatio={aspectRatio}
-                    colorScheme={colorScheme}
-                    compareLabel={compareLabel}
-                    compareParamName={compareParamName}
-                    imageSizes="(min-width: 80rem) 20vw, (min-width: 64rem) 25vw, (min-width: 42rem) 33vw, (min-width: 24rem) 50vw, 100vw"
-                    key={product.id}
-                    product={product}
-                    showCompare={showCompare}
-                  />
-                ))}
+                {validProducts.map((product) => (
+                    <ProductCard
+                      aspectRatio={aspectRatio}
+                      colorScheme={colorScheme}
+                      compareLabel={compareLabel}
+                      compareParamName={compareParamName}
+                      imageSizes="(min-width: 80rem) 20vw, (min-width: 64rem) 25vw, (min-width: 42rem) 33vw, (min-width: 24rem) 50vw, 100vw"
+                      key={`${product.id}-${product.href}`}
+                      mobileLayout={mobileLayout}
+                      product={product}
+                      showCompare={showCompare}
+                    />
+                  ))}
               </div>
             </div>
             {showCompare && compareProducts.length > 0 && (
