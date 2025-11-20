@@ -173,7 +173,7 @@ function SlideImage({ image, idx }: { image?: Slide['image']; idx: number }) {
             fill
             placeholder={image.blurDataUrl != null && image.blurDataUrl !== '' ? 'blur' : 'empty'}
             priority={idx === 0}
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
             src={image.src}
           />
         </video>
@@ -191,7 +191,7 @@ function SlideImage({ image, idx }: { image?: Slide['image']; idx: number }) {
         fill
         placeholder={image.blurDataUrl != null && image.blurDataUrl !== '' ? 'blur' : 'empty'}
         priority={idx === 0}
-        sizes="100vw"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
         src={image.src}
       />
     </div>

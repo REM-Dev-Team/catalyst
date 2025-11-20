@@ -108,7 +108,7 @@ export default async function IronSightsCategoryPage(props: Props) {
             fill
             className="hidden object-cover @xl:block"
             priority
-            sizes="100vw"
+            sizes="(max-width: 1536px) 100vw, 1536px"
           />
         </div>
       </section>
