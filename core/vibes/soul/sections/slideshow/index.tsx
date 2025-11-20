@@ -219,10 +219,6 @@ function SlideContent({
     verticalAlignment = 'center',
   } = slide;
 
-  // Debug logging
-  console.log('Slide alignment:', { contentAlignment, verticalAlignment });
-  console.log('Vertical alignment value:', verticalAlignment);
-
   return (
     <div className="relative h-full w-full min-w-0 shrink-0 grow-0 basis-full" key={idx}>
       <SlideImage idx={idx} image={image} />
