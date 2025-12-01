@@ -6,12 +6,12 @@
 
 import { clsx } from 'clsx';
 import { parseAsString, useQueryStates } from 'nuqs';
-import { Suspense, useOptimistic, useState, useTransition } from 'react';
+import { useOptimistic, useState, useTransition } from 'react';
 
 import { Checkbox } from '@/vibes/soul/form/checkbox';
 import { RangeInput } from '@/vibes/soul/form/range-input';
 import { ToggleGroup } from '@/vibes/soul/form/toggle-group';
-import { Streamable, useStreamable } from '@/vibes/soul/lib/streamable';
+import { Stream, Streamable, useStreamable } from '@/vibes/soul/lib/streamable';
 import { Accordion, AccordionItem } from '@/vibes/soul/primitives/accordion';
 import { Button } from '@/vibes/soul/primitives/button';
 import { CursorPaginationInfo } from '@/vibes/soul/primitives/cursor-pagination';
@@ -79,30 +79,40 @@ export function FiltersPanel({
   filters,
   resetFiltersLabel,
   rangeFilterApplyLabel,
+  paginationInfo,
 }: Props) {
   return (
-    <Suspense fallback={<FiltersSkeleton />}>
-      <FiltersPanelInner
-        className={className}
-        filters={filters}
-        rangeFilterApplyLabel={rangeFilterApplyLabel}
-        resetFiltersLabel={resetFiltersLabel}
-      />
-    </Suspense>
+    <Stream
+      fallback={<FiltersSkeleton />}
+      value={Streamable.all([filters, resetFiltersLabel, rangeFilterApplyLabel, paginationInfo])}
+    >
+      {([resolvedFilters, resolvedResetFiltersLabel, resolvedRangeFilterApplyLabel, resolvedPaginationInfo]) => (
+        <FiltersPanelInner
+          className={className}
+          filters={resolvedFilters}
+          rangeFilterApplyLabel={resolvedRangeFilterApplyLabel}
+          resetFiltersLabel={resolvedResetFiltersLabel}
+          paginationInfo={resolvedPaginationInfo}
+        />
+      )}
+    </Stream>
   );
 }
 
 export function FiltersPanelInner({
   className,
-  filters: streamableFilters,
-  resetFiltersLabel: streamableResetFiltersLabel,
-  rangeFilterApplyLabel: streamableRangeFilterApplyLabel,
-  paginationInfo: streamablePaginationInfo,
-}: Props) {
-  const filters = useStreamable(streamableFilters);
-  const resetFiltersLabel = useStreamable(streamableResetFiltersLabel) ?? 'Reset filters';
-  const rangeFilterApplyLabel = useStreamable(streamableRangeFilterApplyLabel);
-  const paginationInfo = useStreamable(streamablePaginationInfo);
+  filters,
+  resetFiltersLabel,
+  rangeFilterApplyLabel,
+  paginationInfo,
+}: {
+  className?: string;
+  filters: Filter[];
+  resetFiltersLabel?: string;
+  rangeFilterApplyLabel?: string;
+  paginationInfo?: CursorPaginationInfo;
+}) {
+  const resolvedResetFiltersLabel = resetFiltersLabel ?? 'Reset filters';
   const startCursorParamName = paginationInfo?.startCursorParamName ?? 'before';
   const endCursorParamName = paginationInfo?.endCursorParamName ?? 'after';
   const [params, setParams] = useQueryStates(
@@ -295,7 +305,7 @@ export function FiltersPanelInner({
         size="small"
         variant="secondary"
       >
-        {resetFiltersLabel}
+        {resolvedResetFiltersLabel}
       </Button>
     </div>
   );

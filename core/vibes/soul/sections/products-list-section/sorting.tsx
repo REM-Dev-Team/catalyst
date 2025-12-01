@@ -4,7 +4,6 @@ import { parseAsString, useQueryState } from 'nuqs';
 import { useOptimistic, useTransition } from 'react';
 
 import { Select } from '@/vibes/soul/form/select';
-import { Streamable, useStreamable } from '@/vibes/soul/lib/streamable';
 
 export interface Option {
   label: string;
@@ -12,17 +11,17 @@ export interface Option {
 }
 
 export function Sorting({
-  label: streamableLabel,
-  options: streamableOptions,
+  label,
+  options,
   paramName = 'sort',
   defaultValue = '',
-  placeholder: streamablePlaceholder,
+  placeholder,
 }: {
-  label?: Streamable<string | null>;
-  options: Streamable<Option[]>;
+  label?: string | null;
+  options: Option[];
   paramName?: string;
   defaultValue?: string;
-  placeholder?: Streamable<string | null>;
+  placeholder?: string | null;
 }) {
   const [param, setParam] = useQueryState(
     paramName,
@@ -30,14 +29,13 @@ export function Sorting({
   );
   const [optimisticParam, setOptimisticParam] = useOptimistic(param);
   const [isPending, startTransition] = useTransition();
-  const options = useStreamable(streamableOptions);
-  const label = useStreamable(streamableLabel) ?? 'Sort';
-  const placeholder = useStreamable(streamablePlaceholder) ?? 'Sort by';
+  const resolvedLabel = label ?? 'Sort';
+  const resolvedPlaceholder = placeholder ?? 'Sort by';
 
   return (
     <Select
       hideLabel
-      label={label}
+      label={resolvedLabel}
       name={paramName}
       onValueChange={(value) => {
         startTransition(async () => {
@@ -47,7 +45,7 @@ export function Sorting({
       }}
       options={options}
       pending={isPending}
-      placeholder={placeholder}
+      placeholder={resolvedPlaceholder}
       value={optimisticParam}
       variant="rectangle"
     />

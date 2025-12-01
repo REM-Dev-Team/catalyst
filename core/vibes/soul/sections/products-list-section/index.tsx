@@ -1,5 +1,4 @@
 import { Sliders } from 'lucide-react';
-import { Suspense } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { Button } from '@/vibes/soul/primitives/button';
@@ -101,13 +100,14 @@ export function ProductsListSection({
           <div className="flex-1 group-has-[[data-pending]]/products-list-section:animate-pulse">
             <div className="flex flex-wrap items-center justify-between gap-4 pb-8 text-foreground">
               <h1 className="flex items-center gap-2 font-heading text-3xl font-medium leading-none uppercase @lg:text-4xl @2xl:text-5xl">
-                <Suspense
+                <Stream
                   fallback={
                     <span className="inline-flex h-[1lh] w-[6ch] animate-pulse rounded-lg bg-contrast-100" />
                   }
+                  value={title}
                 >
-                  {title}
-                </Suspense>
+                  {(titleValue) => titleValue}
+                </Stream>
               </h1>
               <div className="flex gap-2">
                 <Stream
@@ -171,7 +171,11 @@ export function ProductsListSection({
               showCompare={showCompare}
             />
 
-            {paginationInfo && <CursorPagination info={paginationInfo} />}
+            <Stream fallback={null} value={paginationInfo}>
+              {(resolvedPaginationInfo) =>
+                resolvedPaginationInfo ? <CursorPagination info={resolvedPaginationInfo} /> : null
+              }
+            </Stream>
           </div>
         </div>
       </div>

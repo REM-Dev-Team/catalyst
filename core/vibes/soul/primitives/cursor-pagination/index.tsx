@@ -4,9 +4,7 @@ import { clsx } from 'clsx';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { createSerializer, parseAsString } from 'nuqs';
-import { Suspense } from 'react';
 
-import { Streamable, useStreamable } from '@/vibes/soul/lib/streamable';
 import { Link } from '~/components/link';
 
 export interface CursorPaginationInfo {
@@ -17,50 +15,42 @@ export interface CursorPaginationInfo {
 }
 
 interface Props {
-  label?: Streamable<string | null>;
-  info: Streamable<CursorPaginationInfo>;
-  previousLabel?: Streamable<string | null>;
-  nextLabel?: Streamable<string | null>;
+  label?: string | null;
+  info: CursorPaginationInfo;
+  previousLabel?: string | null;
+  nextLabel?: string | null;
   scroll?: boolean;
 }
 
-export function CursorPagination(props: Props) {
-  return (
-    <Suspense fallback={<CursorPaginationSkeleton />}>
-      <CursorPaginationResolved {...props} />
-    </Suspense>
-  );
-}
-
-function CursorPaginationResolved({
-  label: streamableLabel,
+export function CursorPagination({
+  label,
   info,
-  previousLabel: streamablePreviousLabel,
-  nextLabel: streamableNextLabel,
+  previousLabel,
+  nextLabel,
   scroll,
 }: Props) {
-  const label = useStreamable(streamableLabel) ?? 'pagination';
+  const resolvedLabel = label ?? 'pagination';
   const {
     startCursorParamName = 'before',
     endCursorParamName = 'after',
     startCursor,
     endCursor,
-  } = useStreamable(info);
+  } = info;
   const searchParams = useSearchParams();
   const serialize = createSerializer({
     [startCursorParamName]: parseAsString,
     [endCursorParamName]: parseAsString,
   });
-  const previousLabel = useStreamable(streamablePreviousLabel) ?? 'Go to previous page';
-  const nextLabel = useStreamable(streamableNextLabel) ?? 'Go to next page';
+  const resolvedPreviousLabel = previousLabel ?? 'Go to previous page';
+  const resolvedNextLabel = nextLabel ?? 'Go to next page';
 
   return (
-    <nav aria-label={label} className="py-10" role="navigation">
+    <nav aria-label={resolvedLabel} className="py-10" role="navigation">
       <ul className="flex items-center justify-center gap-3">
         <li>
           {startCursor != null ? (
             <PaginationLink
-              aria-label={previousLabel}
+              aria-label={resolvedPreviousLabel}
               href={serialize(searchParams, {
                 [startCursorParamName]: startCursor,
                 [endCursorParamName]: null,
@@ -78,7 +68,7 @@ function CursorPaginationResolved({
         <li>
           {endCursor != null ? (
             <PaginationLink
-              aria-label={nextLabel}
+              aria-label={resolvedNextLabel}
               href={serialize(searchParams, {
                 [endCursorParamName]: endCursor,
                 [startCursorParamName]: null,
