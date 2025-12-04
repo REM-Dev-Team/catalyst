@@ -87,13 +87,13 @@ export function FiltersPanel({
       value={Streamable.all([filters, resetFiltersLabel, rangeFilterApplyLabel, paginationInfo])}
     >
       {([resolvedFilters, resolvedResetFiltersLabel, resolvedRangeFilterApplyLabel, resolvedPaginationInfo]) => (
-        <FiltersPanelInner
-          className={className}
+      <FiltersPanelInner
+        className={className}
           filters={resolvedFilters}
           rangeFilterApplyLabel={resolvedRangeFilterApplyLabel}
           resetFiltersLabel={resolvedResetFiltersLabel}
           paginationInfo={resolvedPaginationInfo}
-        />
+      />
       )}
     </Stream>
   );

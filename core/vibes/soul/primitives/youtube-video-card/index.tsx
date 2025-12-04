@@ -8,9 +8,12 @@ interface Props {
   video: YouTubeVideo;
   className?: string;
   textColor?: string;
+  showDescription?: boolean;
+  showViewCount?: boolean;
+  showUploadDate?: boolean;
 }
 
-export function YouTubeVideoCard({ video, className, textColor }: Props) {
+export function YouTubeVideoCard({ video, className, textColor, showDescription = true, showViewCount = true, showUploadDate = true }: Props) {
   const { title, description, thumbnail, publishedAt, viewCount, duration } = video;
 
   const textStyle = textColor ? { color: textColor } : {};
@@ -27,9 +30,8 @@ export function YouTubeVideoCard({ video, className, textColor }: Props) {
           <>
             <img
               alt={title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+              className="absolute inset-0 w-full h-full object-cover scale-[1.02] transition-transform duration-500 ease-out group-hover:scale-110"
               src={thumbnail}
-              style={{ width: 'calc(100% + 2px)', height: 'calc(100% + 2px)', margin: '-1px' }}
             />
             {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -50,24 +52,32 @@ export function YouTubeVideoCard({ video, className, textColor }: Props) {
       </div>
 
       <div className="text-lg font-medium leading-snug line-clamp-2" style={textColor ? textStyle : {}}>{title}</div>
-      <p className={clsx("mb-3 mt-1.5 line-clamp-2 text-sm font-normal", !textColor && "text-contrast-400")} style={textColor ? textStyle : {}}>{description}</p>
+      {showDescription && (
+        <p className={clsx("mb-3 mt-1.5 line-clamp-2 text-sm font-normal", !textColor && "text-contrast-400")} style={textColor ? textStyle : {}}>{description}</p>
+      )}
       
-      <div className={clsx("flex items-center gap-4 text-sm", !textColor && "text-contrast-500")} style={textColor ? textStyle : {}}>
-        <div className="flex items-center gap-1">
-          <Eye className="h-3 w-3" />
-          <span>{viewCount}</span>
+      {(showViewCount || showUploadDate) && (
+        <div className={clsx("flex items-center gap-4 text-sm", !textColor && "text-contrast-500")} style={textColor ? textStyle : {}}>
+          {showViewCount && (
+            <div className="flex items-center gap-1">
+              <Eye className="h-3 w-3" />
+              <span>{viewCount}</span>
+            </div>
+          )}
+          {showUploadDate && (
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              <time dateTime={publishedAt}>
+                {new Date(publishedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </time>
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-1">
-          <Clock className="h-3 w-3" />
-          <time dateTime={publishedAt}>
-            {new Date(publishedAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
-          </time>
-        </div>
-      </div>
+      )}
     </div>
   );
 

@@ -35,6 +35,13 @@ interface MakeswiftYouTubeVideoCarouselRowProps {
   hideOverflow?: boolean;
   showScrollbar?: boolean;
   showButtons?: boolean;
+  textColor?: string;
+  showDescription?: boolean;
+  showViewCount?: boolean;
+  showUploadDate?: boolean;
+  wrapToRows?: boolean;
+  columnsPerRow?: string;
+  columnsPerRowMobile?: string;
 }
 
 function YouTubeVideoCarouselRowSkeleton({ className }: { className?: string }) {
@@ -95,8 +102,17 @@ function MakeswiftYouTubeVideoCarouselRow({
   hideOverflow = true,
   showScrollbar = true,
   showButtons = true,
+  textColor = '#f8f8f2',
+  showDescription = true,
+  showViewCount = true,
+  showUploadDate = true,
+  wrapToRows = false,
+  columnsPerRow = '3',
+  columnsPerRowMobile = '1',
 }: MakeswiftYouTubeVideoCarouselRowProps) {
   const limitNumber = parseInt(limit) || 6;
+  const columnsNumber = parseInt(columnsPerRow) || 3;
+  const columnsNumberMobile = parseInt(columnsPerRowMobile) || 1;
   const [activePlaylist, setActivePlaylist] = useState<string | undefined>(playlist1Id);
   
   // Listen for external playlist switch events from a separate button component
@@ -113,13 +129,6 @@ function MakeswiftYouTubeVideoCarouselRow({
     };
   }, [componentId]);
   
-  // Create playlist options
-  const playlists = [
-    { id: playlist1Id, label: playlist1Label },
-    { id: playlist2Id, label: playlist2Label },
-    { id: playlist3Id, label: playlist3Label },
-  ].filter(playlist => playlist.id); // Only include playlists with IDs
-  
   const { videos, isLoading, error } = useYouTubeVideos({
     channelId: channelId || undefined,
     playlistId: activePlaylist || undefined,
@@ -129,9 +138,9 @@ function MakeswiftYouTubeVideoCarouselRow({
   // Helper function to render header (buttons moved to separate component via events)
   const renderHeader = () => (
     <div className="flex items-center justify-between">
-      <h2 className="text-2xl font-medium" style={{ color: '#f8f8f2' }}>{title}</h2>
+      <h2 className="text-2xl font-medium" style={{ color: textColor }}>{title}</h2>
       {ctaLabel && ctaUrl && (
-        <a href={ctaUrl} className="text-sm underline hover:no-underline" style={{ color: '#f8f8f2' }}>
+        <a href={ctaUrl} className="text-sm underline hover:no-underline" style={{ color: textColor }}>
           {ctaLabel}
         </a>
       )}
@@ -146,7 +155,7 @@ function MakeswiftYouTubeVideoCarouselRow({
     return (
       <div className={clsx('space-y-6', className)}>
         {renderHeader()}
-        <div className="p-6 text-center bg-gray-50 rounded-xl" style={{ color: '#f8f8f2' }}>
+        <div className="p-6 text-center bg-gray-50 rounded-xl" style={{ color: textColor }}>
           Failed to load YouTube videos. Please check your API key and channel settings.
         </div>
       </div>
@@ -157,7 +166,7 @@ function MakeswiftYouTubeVideoCarouselRow({
     return (
       <div className={clsx('space-y-6', className)}>
         {renderHeader()}
-        <div className="p-6 text-center bg-gray-50 rounded-xl" style={{ color: '#f8f8f2' }}>
+        <div className="p-6 text-center bg-gray-50 rounded-xl" style={{ color: textColor }}>
           No YouTube videos found.
         </div>
       </div>
@@ -168,23 +177,57 @@ function MakeswiftYouTubeVideoCarouselRow({
     <div className={clsx('space-y-6', className)}>
       {renderHeader()}
       
-      {/* Horizontal carousel for both desktop and mobile */}
-      <Carousel className="group/youtube-video-carousel" hideOverflow={hideOverflow}>
-        <CarouselContent className="mb-10">
-        {videos.map((video) => (
-          <CarouselItem
-            className="basis-full"
-            key={video.id}
-          >
-            <YouTubeVideoCard video={video} textColor="#f8f8f2" />
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <div className="flex w-full items-center justify-between">
-        {showScrollbar && <CarouselScrollbar label={scrollbarLabel} />}
-        {showButtons && <CarouselButtons nextLabel={nextLabel} previousLabel={previousLabel} />}
-      </div>
-    </Carousel>
+      {wrapToRows ? (
+        /* Grid layout that wraps to multiple rows */
+        <>
+          <style>{`
+            .youtube-grid-responsive {
+              grid-template-columns: repeat(${columnsNumberMobile}, minmax(0, 1fr));
+            }
+            @media (min-width: 768px) {
+              .youtube-grid-responsive {
+                grid-template-columns: repeat(${columnsNumber}, minmax(0, 1fr));
+              }
+            }
+          `}</style>
+          <div className="grid gap-4 gap-y-8 youtube-grid-responsive">
+          {videos.map((video) => (
+            <YouTubeVideoCard 
+              key={video.id}
+              video={video} 
+              textColor={textColor}
+              showDescription={showDescription}
+              showViewCount={showViewCount}
+              showUploadDate={showUploadDate}
+            />
+          ))}
+          </div>
+        </>
+      ) : (
+        /* Horizontal carousel for both desktop and mobile */
+        <Carousel className="group/youtube-video-carousel" hideOverflow={hideOverflow}>
+          <CarouselContent className="mb-10">
+          {videos.map((video) => (
+            <CarouselItem
+              className="basis-full"
+              key={video.id}
+            >
+              <YouTubeVideoCard 
+                video={video} 
+                textColor={textColor}
+                showDescription={showDescription}
+                showViewCount={showViewCount}
+                showUploadDate={showUploadDate}
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <div className="flex w-full items-center justify-between">
+          {showScrollbar && <CarouselScrollbar label={scrollbarLabel} />}
+          {showButtons && <CarouselButtons nextLabel={nextLabel} previousLabel={previousLabel} />}
+        </div>
+        </Carousel>
+      )}
     </div>
   );
 }
@@ -265,6 +308,34 @@ runtime.registerComponent(MakeswiftYouTubeVideoCarouselRow, {
     showButtons: Checkbox({
       label: 'Show buttons',
       defaultValue: true,
+    }),
+    textColor: TextInput({
+      label: 'Text color',
+      defaultValue: '#f8f8f2',
+    }),
+    showDescription: Checkbox({
+      label: 'Show description',
+      defaultValue: true,
+    }),
+    showViewCount: Checkbox({
+      label: 'Show view count',
+      defaultValue: true,
+    }),
+    showUploadDate: Checkbox({
+      label: 'Show upload date',
+      defaultValue: true,
+    }),
+    wrapToRows: Checkbox({
+      label: 'Wrap to multiple rows',
+      defaultValue: false,
+    }),
+    columnsPerRow: TextInput({
+      label: 'Number of videos per row (desktop, when wrapping)',
+      defaultValue: '3',
+    }),
+    columnsPerRowMobile: TextInput({
+      label: 'Number of videos per row (mobile, when wrapping)',
+      defaultValue: '1',
     }),
   },
 });
