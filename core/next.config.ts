@@ -1,6 +1,6 @@
 import createWithMakeswift from '@makeswift/runtime/next/plugin';
 import bundleAnalyzer from '@next/bundle-analyzer';
-import type { NextConfig } from 'next';
+import type { NextConfig } from 'next/dist/server/config-shared';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 import { writeBuildConfig } from './build-config/writer';
@@ -9,7 +9,7 @@ import { graphql } from './client/graphql';
 import { cspHeader } from './lib/content-security-policy';
 
 const withMakeswift = createWithMakeswift({ previewMode: false });
-const withNextIntl = createNextIntlPlugin();
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const LocaleQuery = graphql(`
   query LocaleQuery {
@@ -41,6 +41,7 @@ export default async (): Promise<NextConfig> => {
       optimizePackageImports: ['@icons-pack/react-simple-icons'],
       ppr: 'incremental',
     },
+    turbopack: {},
     typescript: {
       ignoreBuildErrors: !!process.env.CI,
     },

@@ -17,7 +17,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -38,8 +38,12 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/vibes/*": ["./vibes/*"],
-      "~/*": ["./*"]
+      "@/vibes/*": [
+        "./vibes/*"
+      ],
+      "~/*": [
+        "./*"
+      ]
     },
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
@@ -51,7 +55,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "tests/**/*"
+    "tests/**/*",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
