@@ -9,7 +9,8 @@ import { graphql } from './client/graphql';
 import { cspHeader } from './lib/content-security-policy';
 
 const withMakeswift = createWithMakeswift({ previewMode: false });
-const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+// Use root i18n.ts for auto-detection (next-intl looks for i18n.ts or i18n/request.ts)
+const withNextIntl = createNextIntlPlugin();
 
 const LocaleQuery = graphql(`
   query LocaleQuery {
