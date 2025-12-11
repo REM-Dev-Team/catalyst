@@ -84,6 +84,26 @@ function YouTubePlaylistSwitcher({
     'x-large': { gap: '32px' },
   };
 
+  // Map theme CSS variables to what Button component expects
+  // Theme generates --button-*-foreground, but Button expects --button-*-text
+  const getButtonStyle = (buttonVariant: typeof variant): Record<string, string> => {
+    const variantMap: Record<string, Record<string, string>> = {
+      primary: {
+        '--button-primary-text': 'var(--button-primary-foreground)',
+      },
+      secondary: {
+        '--button-secondary-text': 'var(--button-secondary-foreground)',
+      },
+      tertiary: {
+        '--button-tertiary-text': 'var(--button-tertiary-foreground)',
+      },
+      ghost: {
+        '--button-ghost-text': 'var(--button-ghost-foreground)',
+      },
+    };
+    return variantMap[buttonVariant || 'primary'] || variantMap.primary;
+  };
+
   return (
     <div 
       className={clsx('flex flex-wrap', gapClasses[gap], className)}
@@ -94,49 +114,39 @@ function YouTubePlaylistSwitcher({
         const isGhost = variant === 'ghost';
         
         return (
-          <div
+          <Button
             key={p.id}
-            className={isActive ? 'bg-white rounded-lg' : ''}
-            style={{ 
-              backgroundColor: isActive ? 'white' : 'transparent',
-              borderRadius: isActive ? '8px' : '0px',
-              padding: '1px'
-            }}
+            onClick={() => dispatchSwitch(p.id)}
+            variant={variant}
+            size={size}
+            shape={shape}
+            style={getButtonStyle(variant)}
+            className={clsx(
+              'whitespace-nowrap',
+              isGhost && !isActive && 'text-white border-white hover:text-black'
+            )}
           >
-            <Button
-              onClick={() => dispatchSwitch(p.id)}
-              variant={variant}
-              size={size}
-              shape={shape}
-              className={clsx(
-                'whitespace-nowrap',
-                isGhost && !isActive && 'text-white border-white hover:text-black',
-                isActive && '!bg-transparent !text-[#1b3642] !border-transparent'
-              )}
-            >
-              {p.label}
-            </Button>
-          </div>
+            {p.label}
+          </Button>
         );
       })}
       
       {hasLink && (
-        <div style={{ padding: '1px' }}>
-          <Button
-            asChild
-            variant={variant}
-            size={size}
-            shape={shape}
-            className={clsx(
-              'whitespace-nowrap',
-              variant === 'ghost' ? 'text-white border-white hover:text-black' : ''
-            )}
-          >
-            <a href={link4Url} target="_blank" rel="noopener noreferrer">
-              {link4Label}
-            </a>
-          </Button>
-        </div>
+        <Button
+          asChild
+          variant={variant}
+          size={size}
+          shape={shape}
+          style={getButtonStyle(variant)}
+          className={clsx(
+            'whitespace-nowrap',
+            variant === 'ghost' ? 'text-white border-white hover:text-black' : ''
+          )}
+        >
+          <a href={link4Url} target="_blank" rel="noopener noreferrer">
+            {link4Label}
+          </a>
+        </Button>
       )}
     </div>
   );
