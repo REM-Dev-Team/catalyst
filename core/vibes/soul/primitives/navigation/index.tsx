@@ -655,11 +655,11 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                   </NavigationMenu.Trigger>
                   {item.groups != null && item.groups.length > 0 && (
                     <NavigationMenu.Content className="w-screen bg-[var(--nav-menu-background,hsl(var(--background)))] shadow-xl border-t-2 border-[var(--nav-menu-border,hsl(var(--foreground)/5%))]">
-                                            <div className="m-auto w-full max-w-screen-xl px-5 pb-4 pt-3">
-                        <div className="columns-5 gap-5 max-h-[41rem]">
-                          {/* All groups - CSS columns will distribute them evenly */}
+                      <div className="m-auto w-full max-w-screen-xl px-5 pb-4 pt-3">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-h-[41rem] justify-items-center">
+                          {/* All groups - Grid layout for better centering */}
                           {item.groups.map((group, groupIndex) => (
-                            <div key={groupIndex} className="break-inside-avoid mb-4">
+                            <div key={groupIndex} className="w-full max-w-[200px]">
                               <ul className="flex flex-col">
                                 {/* Second Level Links */}
                                 {group.label != null && group.label !== '' && (
@@ -706,9 +706,9 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                           ))}
 
                           
-                                                     {/* Image Columns - Each image gets its own column */}
-                           {item.imageColumns?.map((imageColumn, imageIndex) => (
-                             <div key={`image-${imageIndex}`} className="break-inside-avoid">
+                          {/* Image Columns - Each image gets its own grid cell */}
+                          {item.imageColumns?.map((imageColumn, imageIndex) => (
+                            <div key={`image-${imageIndex}`} className="w-full max-w-[200px]">
                               {imageColumn.image && imageColumn.image.src && (
                                 <div>
                                   {imageColumn.href ? (
