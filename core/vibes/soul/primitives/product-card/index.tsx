@@ -59,7 +59,7 @@ export function ProductCard({
   colorScheme = 'light',
   className,
   showCompare = false,
-  aspectRatio = '5:6',
+  aspectRatio = '4:3',
   compareLabel,
   compareParamName,
   imagePriority = false,
@@ -273,7 +273,7 @@ export function ProductCard({
 
 export function ProductCardSkeleton({
   className,
-  aspectRatio = '5:6',
+  aspectRatio = '4:3',
 }: Pick<ProductCardProps, 'className' | 'aspectRatio'>) {
   return (
     <Skeleton.Root className={clsx(className)}>

@@ -48,7 +48,7 @@ export function ProductList({
   products: streamableProducts,
   className,
   colorScheme = 'light',
-  aspectRatio = '5:6',
+  aspectRatio = '4:3',
   showCompare: streamableShowCompare = true,
   compareHref,
   compareProducts: streamableCompareProducts = [],

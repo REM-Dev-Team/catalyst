@@ -22,7 +22,7 @@ export interface ProductCarouselProps {
   products: Streamable<CarouselProduct[]>;
   className?: string;
   colorScheme?: 'light' | 'dark';
-  aspectRatio?: '5:6' | '3:4' | '1:1';
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
   emptyStateTitle?: Streamable<string>;
   emptyStateSubtitle?: Streamable<string>;
   scrollbarLabel?: string;
@@ -54,7 +54,7 @@ export function ProductCarousel({
   products: streamableProducts,
   className,
   colorScheme = 'light',
-  aspectRatio = '5:6',
+  aspectRatio = '4:3',
   emptyStateTitle = 'No products found',
   emptyStateSubtitle = 'Try browsing our complete catalog of products.',
   scrollbarLabel = 'Scroll',
@@ -69,6 +69,7 @@ export function ProductCarousel({
     <Stream
       fallback={
         <ProductsCarouselSkeleton
+          aspectRatio={aspectRatio}
           className={className}
           hideOverflow={hideOverflow}
           placeholderCount={placeholderCount}
@@ -80,6 +81,7 @@ export function ProductCarousel({
         if (products.length === 0) {
           return (
             <ProductsCarouselEmptyState
+              aspectRatio={aspectRatio}
               className={className}
               colorScheme={colorScheme}
               emptyStateSubtitle={emptyStateSubtitle}
@@ -133,7 +135,8 @@ export function ProductsCarouselSkeleton({
   className,
   placeholderCount = 8,
   hideOverflow,
-}: Pick<ProductCarouselProps, 'className' | 'placeholderCount' | 'hideOverflow'>) {
+  aspectRatio = '4:3',
+}: Pick<ProductCarouselProps, 'className' | 'placeholderCount' | 'hideOverflow' | 'aspectRatio'>) {
   return (
     <Skeleton.Root
       className={clsx('group-has-[[data-pending]]/product-carousel:animate-pulse', className)}
@@ -147,7 +150,7 @@ export function ProductsCarouselSkeleton({
               className="min-w-0 shrink-0 grow-0 basis-full pl-4 @md:basis-1/2 @lg:basis-1/3 @2xl:basis-1/4 @2xl:pl-5"
               key={index}
             >
-              <ProductCardSkeleton />
+              <ProductCardSkeleton aspectRatio={aspectRatio} />
             </div>
           ))}
         </div>
@@ -170,6 +173,7 @@ export function ProductsCarouselEmptyState({
   emptyStateSubtitle,
   hideOverflow,
   colorScheme = 'light',
+  aspectRatio = '4:3',
 }: Pick<
   ProductCarouselProps,
   | 'className'
@@ -178,6 +182,7 @@ export function ProductsCarouselEmptyState({
   | 'emptyStateSubtitle'
   | 'hideOverflow'
   | 'colorScheme'
+  | 'aspectRatio'
 >) {
   return (
     <Skeleton.Root className={clsx('relative', className)} hideOverflow={hideOverflow}>
@@ -188,7 +193,7 @@ export function ProductsCarouselEmptyState({
               className="min-w-0 shrink-0 grow-0 basis-full pl-4 @md:basis-1/2 @lg:basis-1/3 @2xl:basis-1/4 @2xl:pl-5"
               key={index}
             >
-              <ProductCardSkeleton />
+              <ProductCardSkeleton aspectRatio={aspectRatio} />
             </div>
           ))}
         </div>

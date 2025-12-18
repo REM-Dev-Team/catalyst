@@ -20,6 +20,7 @@ export interface FeaturedProductCarouselProps {
   previousLabel?: string;
   nextLabel?: string;
   hideOverflow?: boolean;
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -48,6 +49,7 @@ export function FeaturedProductCarousel({
   previousLabel,
   nextLabel,
   hideOverflow = false,
+  aspectRatio = '4:3',
 }: FeaturedProductCarouselProps) {
   return (
     <SectionLayout containerSize="2xl">
@@ -70,6 +72,7 @@ export function FeaturedProductCarousel({
       </div>
       <div className="group/product-carousel">
         <ProductCarousel
+          aspectRatio={aspectRatio}
           emptyStateSubtitle={emptyStateSubtitle}
           emptyStateTitle={emptyStateTitle}
           hideOverflow={hideOverflow}

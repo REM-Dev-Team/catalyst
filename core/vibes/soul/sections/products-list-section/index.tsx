@@ -72,7 +72,7 @@ export function ProductsListSection({
   removeLabel,
   maxItems,
   maxCompareLimitMessage,
-  aspectRatio = '5:6',
+  aspectRatio = '4:3',
   mobileLayout = 'portrait',
 }: Props) {
   return (
