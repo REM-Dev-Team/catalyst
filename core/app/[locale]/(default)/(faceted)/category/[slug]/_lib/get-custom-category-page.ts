@@ -4,6 +4,9 @@ import type { ComponentType } from 'react';
 import type { Props } from '../page';
 import { getCategoryIdByPath } from './get-category-id-by-path';
 import IronSightsPage from '../custom/iron-sights';
+import ChassisSystemsPage from '../custom/chassis-systems';
+import MuzzleDevicesPage from '../custom/muzzle-devices';
+import ShootingSystemPage from '../custom/shooting-system';
 
 /**
  * Registry of custom category pages by category ID.
@@ -36,6 +39,9 @@ export const customCategoryPages: Record<number, ComponentType<Props>> = {};
  */
 export const customCategoryPagesByPath: Record<string, ComponentType<Props>> = {
   '/iron-sights/': IronSightsPage,
+  '/chassis-systems/': ChassisSystemsPage,
+  '/muzzle-devices/': MuzzleDevicesPage,
+  '/shooting-system/': ShootingSystemPage,
 };
 
 /**

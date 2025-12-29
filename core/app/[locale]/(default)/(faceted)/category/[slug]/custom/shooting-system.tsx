@@ -1,5 +1,5 @@
 /**
- * Custom category page for "Iron Sights" category.
+ * Custom category page for "Shooting System" category.
  * This page uses the same format as the default category page with a custom hero banner.
  */
 
@@ -35,7 +35,7 @@ import {
 import { ProductsListSection } from '@/vibes/soul/sections/products-list-section';
 import { MAX_COMPARE_LIMIT } from '../../../../compare/page-data';
 
-export default async function IronSightsCategoryPage(props: Props) {
+export default async function ShootingSystemCategoryPage(props: Props) {
   const { locale } = await props.params;
 
   setRequestLocale(locale);
@@ -94,7 +94,7 @@ export default async function IronSightsCategoryPage(props: Props) {
         <div className="relative h-[400px] w-full overflow-hidden @xl:h-[500px] @2xl:h-[600px]">
           {/* Background Images - Different for mobile and desktop */}
           <Image
-            src={imageManagerImageUrl('iron-sights-mobile.jpeg')}
+            src={imageManagerImageUrl('shooting-system-mobile.jpeg')}
             alt={category.name}
             fill
             className="object-cover @xl:hidden"
@@ -102,7 +102,7 @@ export default async function IronSightsCategoryPage(props: Props) {
             sizes="100vw"
           />
           <Image
-            src={imageManagerImageUrl('iron-sights-desktop.jpeg')}
+            src={imageManagerImageUrl('shooting-system-desktop.jpeg')}
             alt={category.name}
             fill
             className="hidden object-cover @xl:block"
@@ -151,4 +151,5 @@ export default async function IronSightsCategoryPage(props: Props) {
     </>
   );
 }
+
 
