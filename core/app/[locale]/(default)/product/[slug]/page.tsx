@@ -59,16 +59,8 @@ const getProduct = async (props: Props) => {
 
   const specifications = [
     {
-      name: t('sku'),
-      value: product.sku,
-    },
-    {
       name: t('weight'),
       value: `${product.weight?.value} ${product.weight?.unit}`,
-    },
-    {
-      name: t('condition'),
-      value: product.condition,
     },
     ...customFields.map((field) => ({
       name: field.name,
