@@ -19,6 +19,8 @@ export interface Product {
   subtitle?: string;
   badge?: string;
   rating?: number;
+  numberOfReviews?: number;
+  inventoryMessage?: string;
 }
 
 export interface ProductCardProps {

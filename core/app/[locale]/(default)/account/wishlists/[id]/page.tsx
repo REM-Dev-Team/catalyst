@@ -1,5 +1,5 @@
-import { notFound } from 'next/navigation';
-import { getFormatter, getTranslations } from 'next-intl/server';
+import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
+import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { SearchParams } from 'nuqs';
 import { createSearchParamsCache, parseAsInteger, parseAsString } from 'nuqs/server';
 
@@ -9,6 +9,7 @@ import { Wishlist, WishlistDetails } from '@/vibes/soul/sections/wishlist-detail
 import { ExistingResultType } from '~/client/util';
 import { defaultPageInfo, pageInfoTransformer } from '~/data-transformers/page-info-transformer';
 import { wishlistDetailsTransformer } from '~/data-transformers/wishlists-transformer';
+import { redirect } from '~/i18n/routing';
 import { isMobileUser } from '~/lib/user-agent';
 
 import { removeWishlistItem } from '../_actions/remove-wishlist-item';
@@ -16,10 +17,11 @@ import { getDeleteWishlistModal, getRenameWishlistModal } from '../modals';
 
 import { addWishlistItemToCart } from './_actions/add-to-cart';
 import { WishlistActions, WishlistActionsSkeleton } from './_components/wishlist-actions';
+import { WishlistAnalyticsProvider } from './_components/wishlist-analytics-provider';
 import { getCustomerWishlist } from './page-data';
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
   searchParams: Promise<SearchParams>;
 }
 
@@ -33,9 +35,10 @@ const searchParamsCache = createSearchParamsCache({
 
 async function getWishlist(
   id: string,
-  t: ExistingResultType<typeof getTranslations>,
-  pt: ExistingResultType<typeof getTranslations>,
+  t: ExistingResultType<typeof getTranslations<'Wishlist'>>,
+  pt: ExistingResultType<typeof getTranslations<'Product.ProductDetails'>>,
   searchParamsPromise: Promise<SearchParams>,
+  locale: string,
 ): Promise<Wishlist> {
   const entityId = Number(id);
   const searchParamsParsed = searchParamsCache.parse(await searchParamsPromise);
@@ -43,11 +46,35 @@ async function getWishlist(
   const wishlist = await getCustomerWishlist(entityId, searchParamsParsed);
 
   if (!wishlist) {
-    return notFound();
+    return redirect({ href: '/account/wishlists/', locale });
   }
 
   return wishlistDetailsTransformer(wishlist, t, pt, formatter);
 }
+
+const getAnalyticsData = async (id: string, searchParamsPromise: Promise<SearchParams>) => {
+  const entityId = Number(id);
+  const searchParamsParsed = searchParamsCache.parse(await searchParamsPromise);
+  const wishlist = await getCustomerWishlist(entityId, searchParamsParsed);
+
+  if (!wishlist) {
+    return [];
+  }
+
+  return removeEdgesAndNodes(wishlist.items)
+    .map(({ product }) => product)
+    .filter((product) => product !== null)
+    .map((product) => {
+      return {
+        id: product.entityId,
+        name: product.name,
+        sku: product.sku,
+        brand: product.brand?.name ?? '',
+        price: product.prices?.price.value ?? 0,
+        currency: product.prices?.price.currencyCode ?? '',
+      };
+    });
+};
 
 async function getPaginationInfo(
   id: string,
@@ -61,8 +88,11 @@ async function getPaginationInfo(
 }
 
 export default async function WishlistPage({ params, searchParams }: Props) {
-  const { id } = await params;
-  const t = await getTranslations('Account.Wishlists');
+  const { locale, id } = await params;
+
+  setRequestLocale(locale);
+
+  const t = await getTranslations('Wishlist');
   const pt = await getTranslations('Product.ProductDetails');
   const wishlistActions = (wishlist?: Wishlist) => {
     if (!wishlist) {
@@ -71,6 +101,7 @@ export default async function WishlistPage({ params, searchParams }: Props) {
 
     return (
       <WishlistActions
+        actionsTitle={t('actionsTitle')}
         isMobileUser={isMobileUser()}
         menuActions={[
           {
@@ -85,6 +116,7 @@ export default async function WishlistPage({ params, searchParams }: Props) {
         ]}
         shareCloseLabel={t('Modal.close')}
         shareCopiedMessage={t('shareCopied')}
+        shareCopyLabel={t('Modal.copy')}
         shareDisabledTooltip={t('shareDisabled')}
         shareLabel={t('share')}
         shareModalTitle={t('Modal.shareTitle', { name: wishlist.name })}
@@ -95,14 +127,17 @@ export default async function WishlistPage({ params, searchParams }: Props) {
   };
 
   return (
-    <WishlistDetails
-      action={addWishlistItemToCart}
-      emptyStateText={t('emptyWishlist')}
-      headerActions={wishlistActions}
-      paginationInfo={Streamable.from(() => getPaginationInfo(id, searchParams))}
-      prevHref="/account/wishlists"
-      removeAction={removeWishlistItem}
-      wishlist={Streamable.from(() => getWishlist(id, t, pt, searchParams))}
-    />
+    <WishlistAnalyticsProvider data={Streamable.from(() => getAnalyticsData(id, searchParams))}>
+      <WishlistDetails
+        action={addWishlistItemToCart}
+        emptyStateText={t('emptyWishlist')}
+        headerActions={wishlistActions}
+        paginationInfo={Streamable.from(() => getPaginationInfo(id, searchParams))}
+        prevHref="/account/wishlists"
+        removeAction={removeWishlistItem}
+        removeButtonTitle={t('removeButtonTitle')}
+        wishlist={Streamable.from(() => getWishlist(id, t, pt, searchParams, locale))}
+      />
+    </WishlistAnalyticsProvider>
   );
 }

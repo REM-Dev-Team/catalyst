@@ -20,12 +20,16 @@ import { Label } from '@/vibes/soul/form/label';
  *   --number-input-light-icon-hover: hsl(var(--foreground));
  *   --number-input-light-button-background: hsl(var(--background));
  *   --number-input-light-button-background-hover: hsl(var(--contrast-100) / 50%);
+ *   --number-input-light-border: hsl(var(--contrast-100));
+ *   --number-input-light-border-error: hsl(var(--error));
  *   --number-input-dark-background: hsl(var(--background));
  *   --number-input-dark-text: hsl(var(--background));
  *   --number-input-dark-icon: hsl(var(--contrast-300));
  *   --number-input-dark-icon-hover: hsl(var(--background));
  *   --number-input-dark-button-background: hsl(var(--foreground));
  *   --number-input-dark-button-background-hover: hsl(var(--contrast-500) / 50%);
+ *   --number-input-dark-border: hsl(var(--contrast-500));
+ *   --number-input-dark-border-error: hsl(var(--error));
  *  }
  * ```
  */
@@ -68,6 +72,16 @@ export const NumberInput = React.forwardRef<
             {
               light: 'bg-[var(--number-input-light-background,hsl(var(--background)))]',
               dark: 'bg-[var(--number-input-dark-background,hsl(var(--foreground)))]',
+            }[colorScheme],
+            {
+              light:
+                errors && errors.length > 0
+                  ? 'border-[var(--number-input-light-border-error,hsl(var(--error)))]'
+                  : 'border-[var(--number-input-light-border,hsl(var(--contrast-100)))]',
+              dark:
+                errors && errors.length > 0
+                  ? 'border-[var(--number-input-dark-border-error,hsl(var(--error)))]'
+                  : 'border-[var(--number-input-dark-border,hsl(var(--contrast-500)))]',
             }[colorScheme],
           )}
         >
@@ -152,7 +166,9 @@ export const NumberInput = React.forwardRef<
             />
           </button>
         </div>
-        {errors?.map((error) => <FieldError key={error}>{error}</FieldError>)}
+        {errors?.map((error) => (
+          <FieldError key={error}>{error}</FieldError>
+        ))}
       </div>
     );
   },

@@ -3,10 +3,11 @@ import type { ComponentType } from 'react';
 
 import type { Props } from '../page';
 import { getCategoryIdByPath } from './get-category-id-by-path';
-import IronSightsPage from '../custom/iron-sights';
-import ChassisSystemsPage from '../custom/chassis-systems';
-import MuzzleDevicesPage from '../custom/muzzle-devices';
-import ShootingSystemPage from '../custom/shooting-system';
+// Temporarily disabled - custom pages need to be updated for v1.4
+// import IronSightsPage from '../custom/iron-sights';
+// import ChassisSystemsPage from '../custom/chassis-systems';
+// import MuzzleDevicesPage from '../custom/muzzle-devices';
+// import ShootingSystemPage from '../custom/shooting-system';
 
 /**
  * Registry of custom category pages by category ID.
@@ -38,10 +39,11 @@ export const customCategoryPages: Record<number, ComponentType<Props>> = {};
  * ```
  */
 export const customCategoryPagesByPath: Record<string, ComponentType<Props>> = {
-  '/iron-sights/': IronSightsPage,
-  '/chassis-systems/': ChassisSystemsPage,
-  '/muzzle-devices/': MuzzleDevicesPage,
-  '/shooting-system/': ShootingSystemPage,
+  // Temporarily disabled - custom pages need to be updated for v1.4
+  // '/iron-sights/': IronSightsPage,
+  // '/chassis-systems/': ChassisSystemsPage,
+  // '/muzzle-devices/': MuzzleDevicesPage,
+  // '/shooting-system/': ShootingSystemPage,
 };
 
 /**
@@ -54,37 +56,41 @@ export const customCategoryPagesByPath: Record<string, ComponentType<Props>> = {
  */
 export const getCustomCategoryPage = cache(
   async (
-    categoryId: number,
-    categoryPath?: string,
+    _categoryId: number,
+    _categoryPath?: string,
   ): Promise<ComponentType<Props> | null> => {
+    // Temporarily disabled - custom pages need to be updated for v1.4 structure
+    // TODO: Update custom category pages to work with v1.4
+    return null;
+    
     // First, try direct ID lookup
-    if (customCategoryPages[categoryId]) {
-      return customCategoryPages[categoryId];
-    }
+    // if (customCategoryPages[categoryId]) {
+    //   return customCategoryPages[categoryId];
+    // }
 
     // If path is provided, try path-based lookup
-    if (categoryPath) {
-      // Normalize the path (ensure it starts with / and ends with /)
-      const normalizedPath = categoryPath.startsWith('/')
-        ? categoryPath.endsWith('/')
-          ? categoryPath
-          : `${categoryPath}/`
-        : `/${categoryPath}${categoryPath.endsWith('/') ? '' : '/'}`;
+    // if (categoryPath) {
+    //   // Normalize the path (ensure it starts with / and ends with /)
+    //   const normalizedPath = categoryPath.startsWith('/')
+    //     ? categoryPath.endsWith('/')
+    //       ? categoryPath
+    //       : `${categoryPath}/`
+    //     : `/${categoryPath}${categoryPath.endsWith('/') ? '' : '/'}`;
 
-      // Try exact match first
-      const pathPage = customCategoryPagesByPath[normalizedPath] || customCategoryPagesByPath[categoryPath];
-      if (pathPage) {
-        return pathPage;
-      }
+    //   // Try exact match first
+    //   const pathPage = customCategoryPagesByPath[normalizedPath] || customCategoryPagesByPath[categoryPath];
+    //   if (pathPage) {
+    //     return pathPage;
+    //   }
 
-      // Try to find the category ID from path and check if it matches
-      const pathCategoryId = await getCategoryIdByPath(normalizedPath);
-      if (pathCategoryId === categoryId && customCategoryPages[pathCategoryId]) {
-        return customCategoryPages[pathCategoryId];
-      }
-    }
+    //   // Try to find the category ID from path and check if it matches
+    //   const pathCategoryId = await getCategoryIdByPath(normalizedPath);
+    //   if (pathCategoryId === categoryId && customCategoryPages[pathCategoryId]) {
+    //     return customCategoryPages[pathCategoryId];
+    //   }
+    // }
 
-    return null;
+    // return null;
   },
 );
 

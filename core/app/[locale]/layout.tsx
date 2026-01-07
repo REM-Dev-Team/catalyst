@@ -1,52 +1,74 @@
-import { DraftModeScript } from '@makeswift/runtime/next/server';
+import { getSiteVersion } from '@makeswift/runtime/next/server';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { clsx } from 'clsx';
 import type { Metadata } from 'next';
-import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import { PropsWithChildren } from 'react';
+import { cache, PropsWithChildren } from 'react';
 
-import '../globals.css';
+import '../../globals.css';
 
 import { fonts } from '~/app/fonts';
+import { CookieNotifications } from '~/app/notifications';
+import { Providers } from '~/app/providers';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
+import { WebAnalyticsFragment } from '~/components/analytics/fragment';
+import { AnalyticsProvider } from '~/components/analytics/provider';
+import { ConsentManager } from '~/components/consent-manager';
+import { ScriptsFragment } from '~/components/consent-manager/scripts-fragment';
+import { ContainerQueryPolyfill } from '~/components/polyfills/container-query';
+import { scriptsTransformer } from '~/data-transformers/scripts-transformer';
 import { routing } from '~/i18n/routing';
 import { SiteTheme } from '~/lib/makeswift/components/site-theme';
 import { MakeswiftProvider } from '~/lib/makeswift/provider';
-
-import { getToastNotification } from '../../lib/server-toast';
-import { CookieNotifications } from '../notifications';
-import { Providers } from '../providers';
-import { AgeVerification } from '@/vibes/soul/primitives/age-verification';
+import { getToastNotification } from '~/lib/server-toast';
+import { AgeVerification } from '~/vibes/soul/primitives/age-verification';
 
 import '~/lib/makeswift/components';
 
-const RootLayoutMetadataQuery = graphql(`
-  query RootLayoutMetadataQuery {
-    site {
-      settings {
-        storeName
-        seo {
-          pageTitle
-          metaDescription
-          metaKeywords
+const RootLayoutMetadataQuery = graphql(
+  `
+    query RootLayoutMetadataQuery {
+      site {
+        settings {
+          privacy {
+            cookieConsentEnabled
+            privacyPolicyUrl
+          }
+          storeName
+          seo {
+            pageTitle
+            metaDescription
+            metaKeywords
+          }
+          ...WebAnalyticsFragment
+        }
+        content {
+          ...ScriptsFragment
         }
       }
+      channel {
+        entityId
+      }
     }
-  }
-`);
+  `,
+  [WebAnalyticsFragment, ScriptsFragment],
+);
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { data } = await client.fetch({
+const fetchRootLayoutMetadata = cache(async () => {
+  return await client.fetch({
     document: RootLayoutMetadataQuery,
     fetchOptions: { next: { revalidate } },
   });
+});
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { data } = await fetchRootLayoutMetadata();
 
   const storeName = data.site.settings?.storeName ?? '';
 
@@ -89,7 +111,10 @@ interface Props extends PropsWithChildren {
 
 export default async function RootLayout({ params, children }: Props) {
   const { locale } = await params;
+
+  const rootData = await fetchRootLayoutMetadata();
   const toastNotificationCookieData = await getToastNotification();
+  const siteVersion = await getSiteVersion();
 
   if (!routing.locales.includes(locale)) {
     notFound();
@@ -99,10 +124,13 @@ export default async function RootLayout({ params, children }: Props) {
   // https://next-intl-docs.vercel.app/docs/getting-started/app-router#add-setRequestLocale-to-all-layouts-and-pages
   setRequestLocale(locale);
 
-  const messages = await getMessages();
+  const scripts = scriptsTransformer(rootData.data.site.content.scripts);
+  const isCookieConsentEnabled =
+    rootData.data.site.settings?.privacy?.cookieConsentEnabled ?? false;
+  const privacyPolicyUrl = rootData.data.site.settings?.privacy?.privacyPolicyUrl;
 
   return (
-    <MakeswiftProvider previewMode={(await draftMode()).isEnabled}>
+    <MakeswiftProvider siteVersion={siteVersion}>
       <html className={clsx(fonts.map((f) => f.variable))} lang={locale}>
         <head>
           <link rel="stylesheet" href="https://use.typekit.net/ddi4oux.css" />
@@ -142,21 +170,33 @@ export default async function RootLayout({ params, children }: Props) {
             `
           }} />
           <SiteTheme />
-          <DraftModeScript appOrigin={process.env.MAKESWIFT_APP_ORIGIN} />
         </head>
-        <body>
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            <NuqsAdapter>
-              <Providers>
-                <AgeVerification />
-                {toastNotificationCookieData && (
-                  <CookieNotifications {...toastNotificationCookieData} />
-                )}
-                {children}
-              </Providers>
-            </NuqsAdapter>
+        <body className="flex min-h-screen flex-col">
+          <NextIntlClientProvider>
+            <ConsentManager
+              isCookieConsentEnabled={isCookieConsentEnabled}
+              privacyPolicyUrl={privacyPolicyUrl}
+              scripts={scripts}
+            >
+              <NuqsAdapter>
+                <AnalyticsProvider
+                  channelId={rootData.data.channel.entityId}
+                  isCookieConsentEnabled={isCookieConsentEnabled}
+                  settings={rootData.data.site.settings}
+                >
+                  <Providers>
+                    <AgeVerification />
+                    {toastNotificationCookieData && (
+                      <CookieNotifications {...toastNotificationCookieData} />
+                    )}
+                    {children}
+                  </Providers>
+                </AnalyticsProvider>
+              </NuqsAdapter>
+            </ConsentManager>
           </NextIntlClientProvider>
           <VercelComponents />
+          <ContainerQueryPolyfill />
         </body>
       </html>
     </MakeswiftProvider>

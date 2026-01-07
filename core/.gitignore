@@ -10,6 +10,7 @@
 /test-results/
 /playwright-report/
 /playwright/.cache/
+/.tests
 
 # next.js
 /.next/
@@ -41,8 +42,15 @@ next-env.d.ts
 # generated
 client/generated
 
+# next-intl
+messages/*.d.json.ts
+
 # secrets
 .catalyst
 
 # Build config
 build-config.json
+
+# OpenNext
+.open-next
+.wrangler

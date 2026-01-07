@@ -60,18 +60,14 @@ const getRefinedSearch = cache(async (props: Props) => {
 });
 
 async function getBreadcrumbs(): Promise<Breadcrumb[]> {
-  const t = await getTranslations('ShopAll');
-
   return [
-    { label: t('Breadcrumbs.home'), href: '/' },
-    { label: t('Breadcrumbs.shopAll'), href: '/shop-all' },
+    { label: 'Home', href: '/' },
+    { label: 'Shop All', href: '/shop-all' },
   ];
 }
 
 async function getTitle(): Promise<string> {
-  const t = await getTranslations('ShopAll');
-
-  return t('title');
+  return 'Shop All';
 }
 
 const getSearch = cache(async (props: Props) => {
@@ -128,24 +124,24 @@ async function getFilters(props: Props): Promise<Filter[]> {
 }
 
 async function getSortLabel(): Promise<string> {
-  const t = await getTranslations('FacetedGroup.SortBy');
+  const t = await getTranslations('Faceted');
 
-  return t('ariaLabel');
+  return t('SortBy.sortBy');
 }
 
 async function getSortOptions(): Promise<SortOption[]> {
-  const t = await getTranslations('FacetedGroup.SortBy');
+  const t = await getTranslations('Faceted');
 
   return [
-    { value: 'featured', label: t('featuredItems') },
-    { value: 'newest', label: t('newestItems') },
-    { value: 'best_selling', label: t('bestSellingItems') },
-    { value: 'a_to_z', label: t('aToZ') },
-    { value: 'z_to_a', label: t('zToA') },
-    { value: 'best_reviewed', label: t('byReview') },
-    { value: 'lowest_price', label: t('priceAscending') },
-    { value: 'highest_price', label: t('priceDescending') },
-    { value: 'relevance', label: t('relevance') },
+    { value: 'featured', label: t('SortBy.featuredItems') },
+    { value: 'newest', label: t('SortBy.newestItems') },
+    { value: 'best_selling', label: t('SortBy.bestSellingItems') },
+    { value: 'a_to_z', label: t('SortBy.aToZ') },
+    { value: 'z_to_a', label: t('SortBy.zToA') },
+    { value: 'best_reviewed', label: t('SortBy.byReview') },
+    { value: 'lowest_price', label: t('SortBy.priceAscending') },
+    { value: 'highest_price', label: t('SortBy.priceDescending') },
+    { value: 'relevance', label: t('SortBy.relevance') },
   ];
 }
 
@@ -187,57 +183,53 @@ async function getCompareProducts(props: Props) {
 }
 
 async function getFilterLabel(): Promise<string> {
-  const t = await getTranslations('FacetedGroup.FacetedSearch');
+  const t = await getTranslations('Faceted');
 
-  return t('filters');
+  return t('FacetedSearch.filters');
 }
 
 async function getCompareLabel(): Promise<string> {
-  const t = await getTranslations('Components.ProductCard.Compare');
+  const t = await getTranslations('Faceted');
 
-  return t('compare');
+  return t('Compare.compare');
 }
 
 async function getRemoveLabel(): Promise<string> {
-  const t = await getTranslations('Components.ProductCard.Compare');
+  const t = await getTranslations('Faceted');
 
-  return t('remove');
+  return t('Compare.remove');
 }
 
 async function getMaxCompareLimitMessage(): Promise<string> {
-  const t = await getTranslations('Components.ProductCard.Compare');
+  const t = await getTranslations('Faceted');
 
-  return t('maxCompareLimit');
+  return t('Compare.maxCompareLimit');
 }
 
 async function getFiltersPanelTitle(): Promise<string> {
-  const t = await getTranslations('FacetedGroup.FacetedSearch');
+  const t = await getTranslations('Faceted');
 
-  return t('filters');
+  return t('FacetedSearch.filters');
 }
 
 async function getRangeFilterApplyLabel(): Promise<string> {
-  const t = await getTranslations('FacetedGroup.FacetedSearch.Range');
+  const t = await getTranslations('Faceted');
 
-  return t('apply');
+  return t('FacetedSearch.Range.apply');
 }
 
 async function getResetFiltersLabel(): Promise<string> {
-  const t = await getTranslations('FacetedGroup.FacetedSearch');
+  const t = await getTranslations('Faceted');
 
-  return t('resetFilters');
+  return t('FacetedSearch.resetFilters');
 }
 
 async function getEmptyStateTitle(): Promise<string> {
-  const t = await getTranslations('ShopAll');
-
-  return t('emptyStateTitle');
+  return 'No products found';
 }
 
 async function getEmptyStateSubtitle(): Promise<string> {
-  const t = await getTranslations('ShopAll');
-
-  return t('emptyStateSubtitle');
+  return 'Try using different filters.';
 }
 
 interface Props {
@@ -248,10 +240,8 @@ interface Props {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('ShopAll');
-
   return {
-    title: t('title'),
+    title: 'Shop All',
   };
 }
 

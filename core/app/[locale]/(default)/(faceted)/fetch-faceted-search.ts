@@ -2,12 +2,11 @@ import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { cache } from 'react';
 import { z } from 'zod';
 
-import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { PaginationFragment } from '~/client/fragments/pagination';
 import { graphql, VariablesOf } from '~/client/graphql';
+import { CurrencyCode } from '~/components/header/fragment';
 import { ProductCardFragment } from '~/components/product-card/fragment';
-import { getPreferredCurrencyCode } from '~/lib/currency';
 
 const GetProductSearchResultsQuery = graphql(
   `
@@ -40,10 +39,11 @@ const GetProductSearchResultsQuery = graphql(
               edges {
                 node {
                   __typename
-                  name
+                  displayName
                   isCollapsedByDefault
                   ... on BrandSearchFilter {
                     displayProductCount
+                    displayName
                     brands {
                       pageInfo {
                         ...PaginationFragment
@@ -61,6 +61,7 @@ const GetProductSearchResultsQuery = graphql(
                   }
                   ... on CategorySearchFilter {
                     displayProductCount
+                    displayName
                     categories {
                       pageInfo {
                         ...PaginationFragment
@@ -93,6 +94,8 @@ const GetProductSearchResultsQuery = graphql(
                   ... on ProductAttributeSearchFilter {
                     displayProductCount
                     filterName
+                    filterKey
+                    displayName
                     attributes {
                       pageInfo {
                         ...PaginationFragment
@@ -108,6 +111,7 @@ const GetProductSearchResultsQuery = graphql(
                     }
                   }
                   ... on RatingSearchFilter {
+                    displayName
                     ratings {
                       pageInfo {
                         ...PaginationFragment
@@ -123,6 +127,7 @@ const GetProductSearchResultsQuery = graphql(
                     }
                   }
                   ... on PriceSearchFilter {
+                    displayName
                     selected {
                       minPrice
                       maxPrice
@@ -174,9 +179,11 @@ interface ProductSearch {
 }
 
 const getProductSearchResults = cache(
-  async ({ limit = 9, after, before, sort, filters }: ProductSearch) => {
-    const customerAccessToken = await getSessionCustomerAccessToken();
-    const currencyCode = await getPreferredCurrencyCode();
+  async (
+    { limit = 9, after, before, sort, filters }: ProductSearch,
+    currencyCode?: CurrencyCode,
+    customerAccessToken?: string,
+  ) => {
     const filterArgs = { filters, sort };
     const paginationArgs = before ? { last: limit, before } : { first: limit, after };
 
@@ -329,7 +336,7 @@ export const PublicSearchParamsSchema = z.object({
 });
 
 const AttributeKey = z.custom<`attr_${string}`>((val) => {
-  return typeof val === 'string' ? /^attr_\w+$/.test(val) : false;
+  return typeof val === 'string' ? /^attr_.+$/.test(val) : false;
 });
 
 export const PublicToPrivateParams = PublicSearchParamsSchema.catchall(SearchParamToArray.nullish())
@@ -398,15 +405,23 @@ export const PublicToPrivateParams = PublicSearchParamsSchema.catchall(SearchPar
 
 export const fetchFacetedSearch = cache(
   // We need to make sure the reference passed into this function is the same if we want it to be memoized.
-  async (params: z.input<typeof PublicSearchParamsSchema>) => {
+  async (
+    params: z.input<typeof PublicSearchParamsSchema>,
+    currencyCode?: CurrencyCode,
+    customerAccessToken?: string,
+  ) => {
     const { after, before, limit = 9, sort, filters } = PublicToPrivateParams.parse(params);
 
-    return getProductSearchResults({
-      after,
-      before,
-      limit,
-      sort,
-      filters,
-    });
+    return getProductSearchResults(
+      {
+        after,
+        before,
+        limit,
+        sort,
+        filters,
+      },
+      currencyCode,
+      customerAccessToken,
+    );
   },
 );

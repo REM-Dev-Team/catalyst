@@ -14,7 +14,7 @@ import { FieldNameToFieldId } from '~/data-transformers/form-field-transformer/u
 
 import { type State } from './address-action';
 
-export const UpdateCustomerAddressMutation = graphql(`
+const UpdateCustomerAddressMutation = graphql(`
   mutation UpdateCustomerAddressMutation($input: UpdateCustomerAddressInput!) {
     customer {
       updateCustomerAddress(input: $input) {
@@ -275,7 +275,7 @@ export async function updateAddress(prevState: Awaited<State>, formData: FormDat
 
     return {
       ...prevState,
-      lastResult: submission.reply({ formErrors: [t('Errors.error')] }),
+      lastResult: submission.reply({ formErrors: [t('somethingWentWrong')] }),
     };
   }
 }

@@ -4,8 +4,15 @@ on:
   push:
     branches:
       - canary
+      - integrations/makeswift
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+  pull-requests: write
 
 jobs:
   changesets-release:
@@ -37,6 +44,7 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: pnpm exec changeset publish
+          title: "Version Packages (`${{ github.ref_name }}`)"
+          commit: "Version Packages (`${{ github.ref_name }}`)"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

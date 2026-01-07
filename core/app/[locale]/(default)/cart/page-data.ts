@@ -1,11 +1,14 @@
+import { cache } from 'react';
+
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
-import { FragmentOf, graphql, VariablesOf } from '~/client/graphql';
-import { getShippingZones } from '~/client/management/get-shipping-zones';
+import { graphql, VariablesOf } from '~/client/graphql';
+import { revalidate } from '~/client/revalidate-target';
 import { TAGS } from '~/client/tags';
 
 export const PhysicalItemFragment = graphql(`
   fragment PhysicalItemFragment on CartPhysicalItem {
+    __typename
     name
     brand
     sku
@@ -16,19 +19,11 @@ export const PhysicalItemFragment = graphql(`
     quantity
     productEntityId
     variantEntityId
-    extendedListPrice {
-      currencyCode
-      value
-    }
-    extendedSalePrice {
-      currencyCode
-      value
-    }
-    originalPrice {
-      currencyCode
-      value
-    }
     listPrice {
+      currencyCode
+      value
+    }
+    salePrice {
       currencyCode
       value
     }
@@ -65,6 +60,7 @@ export const PhysicalItemFragment = graphql(`
 
 export const DigitalItemFragment = graphql(`
   fragment DigitalItemFragment on CartDigitalItem {
+    __typename
     name
     brand
     sku
@@ -75,19 +71,11 @@ export const DigitalItemFragment = graphql(`
     quantity
     productEntityId
     variantEntityId
-    extendedListPrice {
-      currencyCode
-      value
-    }
-    extendedSalePrice {
-      currencyCode
-      value
-    }
-    originalPrice {
-      currencyCode
-      value
-    }
     listPrice {
+      currencyCode
+      value
+    }
+    salePrice {
       currencyCode
       value
     }
@@ -119,6 +107,33 @@ export const DigitalItemFragment = graphql(`
       }
     }
     url
+  }
+`);
+
+export const CartGiftCertificateFragment = graphql(`
+  fragment CartGiftCertificateFragment on CartGiftCertificate {
+    __typename
+    entityId
+    name
+    message
+    isTaxable
+    sender {
+      name
+      email
+    }
+    recipient {
+      name
+      email
+    }
+    amount {
+      currencyCode
+      value
+    }
+    amountInDisplayCurrency {
+      currencyCode
+      value
+    }
+    theme
   }
 `);
 
@@ -186,8 +201,16 @@ const GeographyFragment = graphql(
 
 const CartPageQuery = graphql(
   `
-    query CartPageQuery($cartId: String) {
+    query CartPageQuery($cartId: String, $currencyCode: currencyCode) {
       site {
+        settings {
+          url {
+            checkoutUrl
+          }
+          giftCertificates(currencyCode: $currencyCode) {
+            isEnabled
+          }
+        }
         cart(entityId: $cartId) {
           entityId
           version
@@ -201,6 +224,9 @@ const CartPageQuery = graphql(
             }
             digitalItems {
               ...DigitalItemFragment
+            }
+            giftCertificates {
+              ...CartGiftCertificateFragment
             }
             totalQuantity
           }
@@ -225,6 +251,15 @@ const CartPageQuery = graphql(
               ...MoneyFieldsFragment
             }
           }
+          giftCertificates {
+            code
+            balance {
+              ...MoneyFieldsFragment
+            }
+            used {
+              ...MoneyFieldsFragment
+            }
+          }
           ...ShippingInfoFragment
         }
       }
@@ -239,6 +274,7 @@ const CartPageQuery = graphql(
     MoneyFieldsFragment,
     ShippingInfoFragment,
     GeographyFragment,
+    CartGiftCertificateFragment,
   ],
 );
 
@@ -262,18 +298,34 @@ export const getCart = async (variables: Variables) => {
   return data;
 };
 
-export const getShippingCountries = async (geography: FragmentOf<typeof GeographyFragment>) => {
-  const hasAccessToken = Boolean(process.env.BIGCOMMERCE_ACCESS_TOKEN);
-  const shippingZones = hasAccessToken ? await getShippingZones() : [];
-  const countries = geography.countries ?? [];
+const SupportedShippingDestinationsQuery = graphql(`
+  query SupportedShippingDestinations {
+    site {
+      settings {
+        shipping {
+          supportedShippingDestinations {
+            countries {
+              entityId
+              code
+              name
+              statesOrProvinces {
+                entityId
+                name
+                abbreviation
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`);
 
-  const uniqueCountryZones = new Set(
-    shippingZones.map((zone) => zone.locations.map((location) => location.country_iso2)).flat(),
-  );
-
-  return countries.filter((countryDetails) => {
-    const isCountryInTheList = uniqueCountryZones.has(countryDetails.code);
-
-    return isCountryInTheList || !hasAccessToken;
+export const getShippingCountries = cache(async () => {
+  const { data } = await client.fetch({
+    document: SupportedShippingDestinationsQuery,
+    fetchOptions: { next: { revalidate } },
   });
-};
+
+  return data.site.settings?.shipping?.supportedShippingDestinations.countries ?? [];
+});

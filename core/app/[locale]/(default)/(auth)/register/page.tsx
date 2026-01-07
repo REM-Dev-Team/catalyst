@@ -1,31 +1,55 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-// TODO: Add recaptcha token
-// import { bypassReCaptcha } from '~/lib/bypass-recaptcha';
-
+import { Field } from '@/vibes/soul/form/dynamic-form/schema';
 import { DynamicFormSection } from '@/vibes/soul/sections/dynamic-form-section';
-import { formFieldTransformer } from '~/data-transformers/form-field-transformer';
+import {
+  formFieldTransformer,
+  injectCountryCodeOptions,
+} from '~/data-transformers/form-field-transformer';
 import {
   CUSTOMER_FIELDS_TO_EXCLUDE,
-  FULL_NAME_FIELDS,
+  REGISTER_CUSTOMER_FORM_LAYOUT,
+  transformFieldsToLayout,
 } from '~/data-transformers/form-field-transformer/utils';
 import { exists } from '~/lib/utils';
 
+import { ADDRESS_FIELDS_NAME_PREFIX, CUSTOMER_FIELDS_NAME_PREFIX } from './_actions/prefixes';
 import { registerCustomer } from './_actions/register-customer';
 import { getRegisterCustomerQuery } from './page-data';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('Register');
+interface Props {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+
+  const t = await getTranslations({ locale, namespace: 'Auth.Register' });
 
   return {
     title: t('title'),
   };
 }
 
-export default async function Register() {
-  const t = await getTranslations('Register');
+// There is currently a GraphQL gap where the "Exclusive Offers" field isn't accounted for
+// during customer registration, so the field should not be shown on the Catalyst storefront until it is hooked up.
+function removeExlusiveOffersField(field: Field | Field[]): boolean {
+  if (Array.isArray(field)) {
+    // Exclusive offers field will always have ID '25', since it is made upon store creation and is also read-only.
+    return !field.some((f) => f.id === '25');
+  }
+
+  return field.id !== '25';
+}
+
+export default async function Register({ params }: Props) {
+  const { locale } = await params;
+
+  setRequestLocale(locale);
+
+  const t = await getTranslations('Auth.Register');
 
   const registerCustomerData = await getRegisterCustomerQuery({
     address: { sortBy: 'SORT_ORDER' },
@@ -36,23 +60,56 @@ export default async function Register() {
     notFound();
   }
 
-  const { addressFields, customerFields } = registerCustomerData;
-  // const reCaptcha = await bypassReCaptcha(reCaptchaSettings);
+  const { addressFields, customerFields, countries } = registerCustomerData;
+
+  const fields = transformFieldsToLayout(
+    [
+      ...addressFields.map((field) => {
+        if (!field.isBuiltIn) {
+          return {
+            ...field,
+            name: `${ADDRESS_FIELDS_NAME_PREFIX}${field.label}`,
+          };
+        }
+
+        return field;
+      }),
+      ...customerFields.map((field) => {
+        if (!field.isBuiltIn) {
+          return {
+            ...field,
+            name: `${CUSTOMER_FIELDS_NAME_PREFIX}${field.label}`,
+          };
+        }
+
+        return field;
+      }),
+    ].filter((field) => !CUSTOMER_FIELDS_TO_EXCLUDE.includes(field.entityId)),
+    REGISTER_CUSTOMER_FORM_LAYOUT,
+  )
+    .map((field) => {
+      if (Array.isArray(field)) {
+        return field.map(formFieldTransformer).filter(exists);
+      }
+
+      return formFieldTransformer(field);
+    })
+    .filter(exists)
+    .map((field) => {
+      if (Array.isArray(field)) {
+        return field.map((f) => injectCountryCodeOptions(f, countries ?? []));
+      }
+
+      return injectCountryCodeOptions(field, countries ?? []);
+    })
+    .filter(exists)
+    .filter(removeExlusiveOffersField);
 
   return (
     <DynamicFormSection
       action={registerCustomer}
-      fields={[
-        addressFields
-          .filter((field) => FULL_NAME_FIELDS.includes(field.entityId))
-          .map(formFieldTransformer)
-          .filter(exists),
-        ...customerFields
-          .filter((field) => !CUSTOMER_FIELDS_TO_EXCLUDE.includes(field.entityId))
-          .map(formFieldTransformer)
-          .filter(exists),
-      ]}
-      submitLabel={t('Form.submit')}
+      fields={fields}
+      submitLabel={t('cta')}
       title={t('heading')}
     />
   );

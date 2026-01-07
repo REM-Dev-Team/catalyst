@@ -6,6 +6,7 @@ interface FormField {
   errors?: string[];
   required?: boolean;
   id?: string;
+  placeholder?: string;
 }
 
 type RadioField = {
@@ -44,6 +45,7 @@ type NumberInputField = {
 type TextInputField = {
   type: 'text';
   defaultValue?: string;
+  pattern?: string;
 } & FormField;
 
 type EmailInputField = {
@@ -164,6 +166,19 @@ function getFieldSchema(field: Field) {
 
       if (field.min != null) fieldSchema = fieldSchema.min(field.min);
       if (field.max != null) fieldSchema = fieldSchema.max(field.max);
+      if (field.required !== true) fieldSchema = fieldSchema.optional();
+
+      break;
+
+    case 'text':
+      fieldSchema = z.string();
+
+      if (field.pattern != null) {
+        fieldSchema = fieldSchema.regex(new RegExp(field.pattern), {
+          message: 'Invalid format.',
+        });
+      }
+
       if (field.required !== true) fieldSchema = fieldSchema.optional();
 
       break;

@@ -18,11 +18,11 @@ export const facetsTransformer = async ({
   allFacets: ExistingResultType<typeof fetchFacetedSearch>['facets']['items'];
   searchParams: z.input<typeof PublicSearchParamsSchema>;
 }) => {
-  const t = await getTranslations('FacetedGroup.FacetedSearch.Facets');
+  const t = await getTranslations('Faceted.FacetedSearch.Facets');
   const { filters } = PublicToPrivateParams.parse(searchParams);
 
   return allFacets.map((facet) => {
-    const refinedFacet = refinedFacets.find((f) => f.name === facet.name);
+    const refinedFacet = refinedFacets.find((f) => f.displayName === facet.displayName);
 
     if (facet.__typename === 'CategorySearchFilter') {
       const refinedCategorySearchFilter =
@@ -31,7 +31,7 @@ export const facetsTransformer = async ({
       return {
         type: 'toggle-group' as const,
         paramName: 'categoryIn',
-        label: facet.name,
+        label: facet.displayName,
         defaultCollapsed: facet.isCollapsedByDefault,
         options: facet.categories.map((category) => {
           const refinedCategory = refinedCategorySearchFilter?.categories.find(
@@ -40,7 +40,9 @@ export const facetsTransformer = async ({
           const isSelected = filters.categoryEntityIds?.includes(category.entityId) === true;
 
           return {
-            label: category.name,
+            label: facet.displayProductCount
+              ? `${category.name} (${category.productCount})`
+              : category.name,
             value: category.entityId.toString(),
             disabled: refinedCategory == null && !isSelected,
           };
@@ -55,7 +57,7 @@ export const facetsTransformer = async ({
       return {
         type: 'toggle-group' as const,
         paramName: 'brand',
-        label: facet.name,
+        label: facet.displayName,
         defaultCollapsed: facet.isCollapsedByDefault,
         options: facet.brands.map((brand) => {
           const refinedBrand = refinedBrandSearchFilter?.brands.find(
@@ -64,7 +66,7 @@ export const facetsTransformer = async ({
           const isSelected = filters.brandEntityIds?.includes(brand.entityId) === true;
 
           return {
-            label: brand.name,
+            label: facet.displayProductCount ? `${brand.name} (${brand.productCount})` : brand.name,
             value: brand.entityId.toString(),
             disabled: refinedBrand == null && !isSelected,
           };
@@ -78,8 +80,9 @@ export const facetsTransformer = async ({
 
       return {
         type: 'toggle-group' as const,
-        paramName: `attr_${facet.filterName}`,
-        label: facet.filterName,
+        paramName: `attr_${facet.filterKey}`,
+        label: facet.displayName,
+        defaultCollapsed: facet.isCollapsedByDefault,
         options: facet.attributes.map((attribute) => {
           const refinedAttribute = refinedProductAttributeSearchFilter?.attributes.find(
             (a) => a.value === attribute.value,
@@ -90,7 +93,9 @@ export const facetsTransformer = async ({
             true;
 
           return {
-            label: attribute.value,
+            label: facet.displayProductCount
+              ? `${attribute.value} (${attribute.productCount})`
+              : attribute.value,
             value: attribute.value,
             disabled: refinedAttribute == null && !isSelected,
           };
@@ -106,8 +111,9 @@ export const facetsTransformer = async ({
       return {
         type: 'rating' as const,
         paramName: 'minRating',
-        label: facet.name,
+        label: facet.displayName,
         disabled: refinedRatingSearchFilter == null && !isSelected,
+        defaultCollapsed: facet.isCollapsedByDefault,
       };
     }
 
@@ -120,10 +126,11 @@ export const facetsTransformer = async ({
         type: 'range' as const,
         minParamName: 'minPrice',
         maxParamName: 'maxPrice',
-        label: facet.name,
+        label: facet.displayName,
         min: facet.selected?.minPrice ?? undefined,
         max: facet.selected?.maxPrice ?? undefined,
         disabled: refinedPriceSearchFilter == null && !isSelected,
+        defaultCollapsed: facet.isCollapsedByDefault,
       };
     }
 
@@ -138,6 +145,7 @@ export const facetsTransformer = async ({
         type: 'toggle-group' as const,
         paramName: `shipping`,
         label: t('freeShippingLabel'),
+        defaultCollapsed: facet.isCollapsedByDefault,
         options: [
           {
             label: t('freeShippingLabel'),
@@ -159,6 +167,7 @@ export const facetsTransformer = async ({
         type: 'toggle-group' as const,
         paramName: `isFeatured`,
         label: t('isFeaturedLabel'),
+        defaultCollapsed: facet.isCollapsedByDefault,
         options: [
           {
             label: t('isFeaturedLabel'),
@@ -180,6 +189,7 @@ export const facetsTransformer = async ({
         type: 'toggle-group' as const,
         paramName: `stock`,
         label: t('inStockLabel'),
+        defaultCollapsed: facet.isCollapsedByDefault,
         options: [
           {
             label: t('inStockLabel'),

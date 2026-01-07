@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Style, TextInput, Checkbox } from '@makeswift/runtime/controls';
-import { MakeswiftComponentType } from '@makeswift/runtime';
+// MakeswiftComponentType is no longer exported in newer versions
 import { clsx } from 'clsx';
 import { Play } from 'lucide-react';
 
@@ -177,7 +177,7 @@ function Video({
 
 // Override the built-in Makeswift video component
 runtime.registerComponent(Video, {
-  type: MakeswiftComponentType.Video,
+  type: 'Video',
   label: 'Video',
   props: {
     className: Style(),

@@ -139,7 +139,7 @@ export function ProductsCarouselSkeleton({
 }: Pick<ProductCarouselProps, 'className' | 'placeholderCount' | 'hideOverflow' | 'aspectRatio'>) {
   return (
     <Skeleton.Root
-      className={clsx('group-has-[[data-pending]]/product-carousel:animate-pulse', className)}
+      className={clsx('group-has-data-pending/product-carousel:animate-pulse', className)}
       hideOverflow={hideOverflow}
       pending
     >
