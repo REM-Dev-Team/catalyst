@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./core"
+    }
+  ],
+  "compilerOptions": {
+    "composite": true
+  }
+}
+

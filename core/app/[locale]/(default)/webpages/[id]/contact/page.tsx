@@ -135,8 +135,8 @@ async function getContactFields(id: string) {
   };
 
   const optionalFields = contactFields
-    .filter((field): field is ContactField => Object.hasOwn(fieldMapping, field))
-    .map<Field>((field) => ({
+    .filter((field: string): field is ContactField => Object.hasOwn(fieldMapping, field))
+    .map<Field>((field: ContactField) => ({
       id: field,
       name: field,
       label: t(fieldMapping[field]),

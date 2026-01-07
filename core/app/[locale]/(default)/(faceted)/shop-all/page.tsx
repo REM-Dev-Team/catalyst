@@ -31,7 +31,7 @@ const createShopAllSearchParamsCache = cache(async (props: Props) => {
     allFacets,
     searchParams: {},
   });
-  const filters = transformedFacets.filter((facet) => facet != null);
+  const filters = transformedFacets.filter((facet: Filter | null): facet is Filter => facet != null) as Filter[];
   const filterParsers = getFilterParsers(filters);
 
   // If there are no filters, return `null`, since calling `createSearchParamsCache` with an empty
@@ -92,7 +92,7 @@ async function getListProducts(props: Props): Promise<Product[]> {
   const products = await getProducts(props);
   const format = await getFormatter();
 
-  return products.map((product) => ({
+  return products.map((product: (typeof products)[number]) => ({
     id: product.entityId.toString(),
     title: product.name,
     href: product.path,
@@ -120,7 +120,7 @@ async function getFilters(props: Props): Promise<Filter[]> {
     searchParams: { ...searchParams, ...parsedSearchParams },
   });
 
-  return transformedFacets.filter((facet) => facet != null);
+  return transformedFacets.filter((facet: Filter | null): facet is Filter => facet != null) as Filter[];
 }
 
 async function getSortLabel(): Promise<string> {
@@ -172,7 +172,7 @@ async function getCompareProducts(props: Props) {
 
   const products = await getCompareProductsData(compareIds);
 
-  return products.map((product) => ({
+  return products.map((product: (typeof products)[number]) => ({
     id: product.entityId.toString(),
     title: product.name,
     image: product.defaultImage
@@ -252,27 +252,27 @@ export default async function ShopAll(props: Props) {
 
   return (
     <ProductsListSection
-      breadcrumbs={Streamable.from(getBreadcrumbs)}
-      compareLabel={Streamable.from(getCompareLabel)}
+      breadcrumbs={Streamable.from(() => getBreadcrumbs())}
+      compareLabel={Streamable.from(() => getCompareLabel())}
       compareProducts={Streamable.from(() => getCompareProducts(props))}
-      emptyStateSubtitle={Streamable.from(getEmptyStateSubtitle)}
-      emptyStateTitle={Streamable.from(getEmptyStateTitle)}
+      emptyStateSubtitle={Streamable.from(() => getEmptyStateSubtitle())}
+      emptyStateTitle={Streamable.from(() => getEmptyStateTitle())}
       filterLabel={await getFilterLabel()}
       filters={Streamable.from(() => getFilters(props))}
-      filtersPanelTitle={Streamable.from(getFiltersPanelTitle)}
-      maxCompareLimitMessage={Streamable.from(getMaxCompareLimitMessage)}
+      filtersPanelTitle={Streamable.from(() => getFiltersPanelTitle())}
+      maxCompareLimitMessage={Streamable.from(() => getMaxCompareLimitMessage())}
       maxItems={MAX_COMPARE_LIMIT}
       paginationInfo={Streamable.from(() => getPaginationInfo(props))}
       products={Streamable.from(() => getListProducts(props))}
-      rangeFilterApplyLabel={Streamable.from(getRangeFilterApplyLabel)}
-      removeLabel={Streamable.from(getRemoveLabel)}
-      resetFiltersLabel={Streamable.from(getResetFiltersLabel)}
-      showCompare={Streamable.from(getShowCompare)}
+      rangeFilterApplyLabel={Streamable.from(() => getRangeFilterApplyLabel())}
+      removeLabel={Streamable.from(() => getRemoveLabel())}
+      resetFiltersLabel={Streamable.from(() => getResetFiltersLabel())}
+      showCompare={Streamable.from(() => getShowCompare())}
       sortDefaultValue="featured"
-      sortLabel={Streamable.from(getSortLabel)}
-      sortOptions={Streamable.from(getSortOptions)}
+      sortLabel={Streamable.from(() => getSortLabel())}
+      sortOptions={Streamable.from(() => getSortOptions())}
       sortParamName="sort"
-      title={Streamable.from(getTitle)}
+      title={Streamable.from(() => getTitle())}
       totalCount={Streamable.from(() => getTotalCount(props))}
     />
   );

@@ -1,12 +1,14 @@
 import { clsx } from 'clsx';
-import { ComponentPropsWithoutRef } from 'react';
+import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import { Link } from '~/components/link';
 
-export interface ButtonLinkProps extends ComponentPropsWithoutRef<typeof Link> {
+export interface ButtonLinkProps extends Omit<ComponentPropsWithoutRef<typeof Link>, 'children'> {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost';
   size?: 'large' | 'medium' | 'small' | 'x-small';
   shape?: 'pill' | 'rounded' | 'square' | 'circle';
+  children?: ReactNode;
+  className?: string;
 }
 
 // eslint-disable-next-line valid-jsdoc
