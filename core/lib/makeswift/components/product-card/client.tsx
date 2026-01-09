@@ -12,7 +12,7 @@ import { ProductCard, ProductCardSkeleton } from '~/vibes/soul/primitives/produc
 interface Props {
   className?: string;
   entityId?: string;
-  aspectRatio: '1:1' | '5:6' | '3:4';
+  aspectRatio: '1:1' | '5:6' | '3:4' | '4:3';
   colorScheme: 'light' | 'dark';
   badge: { show: boolean; text: string };
   showCompare?: boolean;

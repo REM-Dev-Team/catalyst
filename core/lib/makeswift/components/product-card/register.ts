@@ -29,6 +29,7 @@ runtime.registerComponent(MakeswiftProductCard, {
         { value: '1:1', label: 'Square' },
         { value: '5:6', label: '5:6' },
         { value: '3:4', label: '3:4' },
+        { value: '4:3', label: '4:3' },
       ],
       defaultValue: '5:6',
     }),

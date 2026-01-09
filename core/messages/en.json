@@ -663,5 +663,16 @@
         }
       }
     }
+  },
+  "ShopAll": {
+    "title": "Shop All",
+    "Breadcrumbs": {
+      "home": "Home",
+      "shopAll": "Shop All"
+    },
+    "Empty": {
+      "title": "No products found",
+      "subtitle": "Try using different filters."
+    }
   }
 }

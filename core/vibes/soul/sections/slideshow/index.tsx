@@ -15,6 +15,7 @@ type ButtonLinkProps = ComponentPropsWithoutRef<typeof ButtonLink>;
 
 interface Slide {
   title: string;
+  secondTitle?: string;
   description?: string;
   showDescription?: boolean;
   image?: { alt: string; blurDataUrl?: string; src: string };
@@ -26,6 +27,16 @@ interface Slide {
     shape?: ButtonLinkProps['shape'];
   };
   showCta?: boolean;
+  secondCta?: {
+    label: string;
+    href: string;
+    variant?: ButtonLinkProps['variant'];
+    size?: ButtonLinkProps['size'];
+    shape?: ButtonLinkProps['shape'];
+  };
+  showSecondCta?: boolean;
+  contentAlignment?: 'left' | 'center' | 'right';
+  verticalAlignment?: 'top' | 'center' | 'bottom';
 }
 
 interface Props {
@@ -80,6 +91,118 @@ const useProgressButton = (
     onProgressButtonClick,
   };
 };
+
+// Helper function to check if a file is a video
+function isVideoFile(src: string): boolean {
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv'];
+  const lowerSrc = src.toLowerCase();
+
+  return videoExtensions.some((ext) => lowerSrc.includes(ext));
+}
+
+function SlideButtons({
+  showCta,
+  showSecondCta,
+  cta,
+  secondCta,
+  contentAlignment,
+}: {
+  showCta: boolean;
+  showSecondCta: boolean;
+  cta?: Slide['cta'];
+  secondCta?: Slide['secondCta'];
+  contentAlignment?: 'left' | 'center' | 'right';
+}) {
+  if (!showCta && !showSecondCta) return null;
+
+  return (
+    <>
+      <div
+        className={clsx(
+          'mt-0',
+          contentAlignment === 'center' ? 'mx-auto' : contentAlignment === 'right' ? 'ml-auto' : '',
+        )}
+        style={{
+          width: '170px',
+          height: '2px',
+          backgroundColor: '#ed1c24',
+        }}
+      />
+      <div className="mt-6 flex flex-wrap gap-3 @xl:mt-8">
+        {showCta && (
+          <ButtonLink
+            href={cta?.href ?? '#'}
+            shape={cta?.shape ?? 'rounded'}
+            size={cta?.size ?? 'x-small'}
+            variant={cta?.variant ?? 'tertiary'}
+          >
+            {cta?.label ?? 'Learn more'}
+          </ButtonLink>
+        )}
+        {showSecondCta && (
+          <ButtonLink
+            href={secondCta?.href ?? '#'}
+            shape={secondCta?.shape ?? 'rounded'}
+            size={secondCta?.size ?? 'x-small'}
+            variant={secondCta?.variant ?? 'secondary'}
+          >
+            {secondCta?.label ?? 'Learn more'}
+          </ButtonLink>
+        )}
+      </div>
+    </>
+  );
+}
+
+function SlideImage({ image, idx }: { image?: Slide['image']; idx: number }) {
+  if (!image?.src || image.src === '') return null;
+
+  // Check if the uploaded file is a video
+  if (isVideoFile(image.src)) {
+    return (
+      <div className="relative h-full w-full">
+        <video
+          autoPlay
+          className="absolute inset-0 h-full w-full object-cover"
+          loop
+          muted
+          playsInline
+        >
+          <source src={image.src} type="video/mp4" />
+          <source src={image.src} type="video/webm" />
+          <source src={image.src} type="video/ogg" />
+          {/* Fallback to image if video fails to load */}
+          <Image
+            alt={image.alt}
+            blurDataURL={image.blurDataUrl}
+            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            placeholder={image.blurDataUrl != null && image.blurDataUrl !== '' ? 'blur' : 'empty'}
+            priority={idx === 0}
+            sizes="100vw"
+            src={image.src}
+          />
+        </video>
+      </div>
+    );
+  }
+
+  // Regular image handling
+  return (
+    <div className="relative h-full w-full">
+      <Image
+        alt={image.alt}
+        blurDataURL={image.blurDataUrl}
+        className="absolute inset-0 h-full w-full object-cover"
+        fill
+        placeholder={image.blurDataUrl != null && image.blurDataUrl !== '' ? 'blur' : 'empty'}
+        priority={idx === 0}
+        sizes="100vw"
+        src={image.src}
+      />
+    </div>
+  );
+}
 
 // eslint-disable-next-line valid-jsdoc
 /**
@@ -160,50 +283,147 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
       <div className="h-full overflow-hidden" ref={emblaRef}>
         <div className="flex h-full">
           {slides.map(
-            ({ title, description, showDescription = true, image, cta, showCta = true }, idx) => {
+            (
+              {
+                title,
+                secondTitle,
+                description,
+                showDescription = true,
+                image,
+                cta,
+                showCta = true,
+                secondCta,
+                showSecondCta = false,
+                contentAlignment = 'left',
+                verticalAlignment = 'center',
+              },
+              idx,
+            ) => {
               return (
                 <div
                   className="relative h-full w-full min-w-0 shrink-0 grow-0 basis-full"
                   key={idx}
                 >
-                  <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-[var(--slideshow-mask,hsl(var(--foreground)/80%))] to-transparent">
-                    <div className="mx-auto w-full max-w-screen-2xl text-balance px-4 pb-16 pt-12 @xl:px-6 @xl:pb-20 @xl:pt-16 @4xl:px-8 @4xl:pt-20">
-                      <h1 className="m-0 max-w-xl font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none text-[var(--slideshow-title,hsl(var(--background)))] @2xl:text-5xl @2xl:leading-[.9] @4xl:text-6xl">
-                        {title}
-                      </h1>
-                      {showDescription && (
-                        <p className="mt-2 max-w-xl font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] text-base leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))] @xl:mt-3 @xl:text-lg">
-                          {description}
-                        </p>
-                      )}
-                      {showCta && (
-                        <ButtonLink
-                          className="mt-6 @xl:mt-8"
-                          href={cta?.href ?? '#'}
-                          shape={cta?.shape ?? 'pill'}
-                          size={cta?.size ?? 'large'}
-                          variant={cta?.variant ?? 'tertiary'}
+                  <SlideImage idx={idx} image={image} />
+                  <div className="absolute inset-0 z-10">
+                    <div
+                      className="slideshow-content-responsive w-full text-balance"
+                      style={{
+                        position: 'absolute',
+                        top:
+                          verticalAlignment === 'top'
+                            ? 'var(--slideshow-top, 30px)'
+                            : verticalAlignment === 'bottom'
+                              ? 'auto'
+                              : '50%',
+                        bottom:
+                          verticalAlignment === 'bottom'
+                            ? 'var(--slideshow-bottom, 30px)'
+                            : 'auto',
+                        left:
+                          contentAlignment === 'left'
+                            ? '0'
+                            : contentAlignment === 'right'
+                              ? 'auto'
+                              : '50%',
+                        right: contentAlignment === 'right' ? '0' : 'auto',
+                        transform:
+                          verticalAlignment === 'center' && contentAlignment === 'center'
+                            ? 'translate(-50%, -50%)'
+                            : verticalAlignment === 'center'
+                              ? 'translateY(-50%)'
+                              : contentAlignment === 'center'
+                                ? 'translateX(-50%)'
+                                : 'none',
+                        '--slideshow-top': '40px',
+                        '--slideshow-bottom': '40px',
+                      } as React.CSSProperties}
+                    >
+                      <div
+                        className={clsx(
+                          'w-full flex-shrink-0',
+                          contentAlignment === 'center'
+                            ? 'text-center'
+                            : contentAlignment === 'right'
+                              ? 'text-right'
+                              : 'text-left',
+                        )}
+                      >
+                        <h1
+                          className={clsx(
+                            'slideshow-title futura-text m-0 font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))]',
+                            contentAlignment === 'center'
+                              ? 'w-full text-center'
+                              : contentAlignment === 'right'
+                                ? 'w-full text-right'
+                                : 'w-full text-left',
+                          )}
+                          style={{
+                            fontSize: '31px',
+                            display: 'flex',
+                            gap: '8px',
+                            fontFamily: "'futura-pt', 'Futura', sans-serif",
+                            fontWeight: 700,
+                            justifyContent:
+                              contentAlignment === 'center'
+                                ? 'center'
+                                : contentAlignment === 'right'
+                                  ? 'flex-end'
+                                  : 'flex-start',
+                          }}
                         >
-                          {cta?.label ?? 'Learn more'}
-                        </ButtonLink>
-                      )}
+                          <span style={{ color: 'transparent' }}>{title}</span>
+                        </h1>
+                        {secondTitle ? (
+                          <h2
+                            className={clsx(
+                              'slideshow-title mt-2 w-full font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))]',
+                              contentAlignment === 'center'
+                                ? 'text-center'
+                                : contentAlignment === 'right'
+                                  ? 'text-right'
+                                  : 'text-left',
+                            )}
+                            style={{ fontSize: '31px' }}
+                          >
+                            {secondTitle}
+                          </h2>
+                        ) : null}
+                        {showDescription ? (
+                          <p
+                            className={clsx(
+                              'slideshow-description mt-2 mb-6 w-full font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] font-medium leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))]',
+                              contentAlignment === 'center'
+                                ? 'text-center'
+                                : contentAlignment === 'right'
+                                  ? 'text-right'
+                                  : 'text-left',
+                            )}
+                            style={{ fontSize: '14px' }}
+                          >
+                            {description}
+                          </p>
+                        ) : null}
+                        <div
+                          className={clsx(
+                            contentAlignment === 'center'
+                              ? 'flex flex-col items-center'
+                              : contentAlignment === 'right'
+                                ? 'flex flex-col items-end'
+                                : 'flex flex-col items-start',
+                          )}
+                        >
+                          <SlideButtons
+                            contentAlignment={contentAlignment}
+                            cta={cta}
+                            secondCta={secondCta}
+                            showCta={showCta}
+                            showSecondCta={showSecondCta}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-
-                  {image?.src != null && image.src !== '' && (
-                    <Image
-                      alt={image.alt}
-                      blurDataURL={image.blurDataUrl}
-                      className="block h-20 w-full object-cover"
-                      fill
-                      placeholder={
-                        image.blurDataUrl != null && image.blurDataUrl !== '' ? 'blur' : 'empty'
-                      }
-                      priority={idx === 0}
-                      sizes="100vw"
-                      src={image.src}
-                    />
-                  )}
                 </div>
               );
             },

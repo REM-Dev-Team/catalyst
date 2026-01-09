@@ -27,6 +27,7 @@ import { routing } from '~/i18n/routing';
 import { SiteTheme } from '~/lib/makeswift/components/site-theme';
 import { MakeswiftProvider } from '~/lib/makeswift/provider';
 import { getToastNotification } from '~/lib/server-toast';
+import { AgeVerification } from '@/vibes/soul/primitives/age-verification';
 
 import '~/lib/makeswift/components';
 
@@ -132,6 +133,7 @@ export default async function RootLayout({ params, children }: Props) {
     <MakeswiftProvider siteVersion={siteVersion}>
       <html className={clsx(fonts.map((f) => f.variable))} lang={locale}>
         <head>
+          <link rel="stylesheet" href="https://use.typekit.net/ddi4oux.css" />
           <SiteTheme />
         </head>
         <body className="flex min-h-screen flex-col">
@@ -151,6 +153,7 @@ export default async function RootLayout({ params, children }: Props) {
                     {toastNotificationCookieData && (
                       <CookieNotifications {...toastNotificationCookieData} />
                     )}
+                    <AgeVerification />
                     {children}
                   </Providers>
                 </AnalyticsProvider>

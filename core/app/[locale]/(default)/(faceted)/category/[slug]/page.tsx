@@ -61,7 +61,7 @@ const createCategorySearchParamsLoader = cache(
   },
 );
 
-interface Props {
+export interface Props {
   params: Promise<{
     slug: string;
     locale: string;

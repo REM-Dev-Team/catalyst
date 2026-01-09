@@ -15,7 +15,7 @@ export interface CardProps extends CardContent {
   className?: string;
   textColorScheme?: 'light' | 'dark';
   iconColorScheme?: 'light' | 'dark';
-  aspectRatio?: '5:6' | '3:4' | '1:1';
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
   imageSizes?: string;
   textPosition?: 'inside' | 'outside';
   textSize?: 'small' | 'medium' | 'large' | 'x-large';
@@ -90,6 +90,7 @@ export function Card({
             '5:6': 'aspect-[5/6]',
             '3:4': 'aspect-[3/4]',
             '1:1': 'aspect-square',
+            '4:3': 'aspect-[4/3]',
           }[aspectRatio],
         )}
       >
@@ -196,6 +197,7 @@ export function CardSkeleton({
             '5:6': 'aspect-[5/6]',
             '3:4': 'aspect-[3/4]',
             '1:1': 'aspect-square',
+            '4:3': 'aspect-[4/3]',
           }[aspectRatio],
         )}
       />

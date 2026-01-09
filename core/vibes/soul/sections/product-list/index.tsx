@@ -15,7 +15,7 @@ interface ProductListProps {
   compareProducts?: Streamable<Product[]>;
   className?: string;
   colorScheme?: 'light' | 'dark';
-  aspectRatio?: '5:6' | '3:4' | '1:1';
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
   showCompare?: Streamable<boolean>;
   compareHref?: string;
   compareLabel?: Streamable<string>;

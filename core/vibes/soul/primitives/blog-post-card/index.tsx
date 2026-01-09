@@ -27,7 +27,7 @@ export function BlogPostCard({ blogPost, className }: Props) {
   return (
     <Link
       className={clsx(
-        'group max-w-full rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2',
+        'group max-w-full rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2 font-[family-name:var(--card-font-family,var(--font-family-body))]',
         className,
       )}
       href={href}
@@ -51,7 +51,13 @@ export function BlogPostCard({ blogPost, className }: Props) {
       <div className="text-lg font-medium leading-snug">{title}</div>
       <p className="mb-3 mt-1.5 line-clamp-3 text-sm font-normal text-contrast-400">{content}</p>
       <div className="text-sm">
-        <time dateTime={date}>{date}</time>
+        <time dateTime={date}>
+          {new Date(date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </time>
         {date !== '' && author != null && author !== '' && (
           <span className="after:mx-2 after:content-['•']" />
         )}

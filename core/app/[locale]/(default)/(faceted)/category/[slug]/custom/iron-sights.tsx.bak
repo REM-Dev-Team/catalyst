@@ -1,0 +1,154 @@
+/**
+ * Custom category page for "Iron Sights" category.
+ * This page uses the same format as the default category page with a custom hero banner.
+ */
+
+import { setRequestLocale } from 'next-intl/server';
+import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
+import { Image } from '~/components/image';
+import { imageManagerImageUrl } from '~/lib/store-assets';
+
+import { CategoryViewed } from '../_components/category-viewed';
+import type { Props } from '../page';
+import {
+  getBreadcrumbs,
+  getCategory,
+  getCompareLabel,
+  getCompareProducts,
+  getEmptyStateSubtitle,
+  getEmptyStateTitle,
+  getFilterLabel,
+  getFilters,
+  getFiltersPanelTitle,
+  getListProducts,
+  getMaxCompareLimitMessage,
+  getPaginationInfo,
+  getProducts,
+  getRangeFilterApplyLabel,
+  getRemoveLabel,
+  getResetFiltersLabel,
+  getSortLabel,
+  getSortOptions,
+  getTitle,
+  getTotalCount,
+} from '../page';
+import { ProductsListSection } from '@/vibes/soul/sections/products-list-section';
+import { MAX_COMPARE_LIMIT } from '../../../../compare/page-data';
+
+export default async function IronSightsCategoryPage(props: Props) {
+  const { locale } = await props.params;
+
+  setRequestLocale(locale);
+
+  const category = await getCategory(props);
+
+  // Use the same format as the default category page with a custom hero banner
+  return (
+    <>
+      {/* Custom styles for filters panel background and product card hover */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        [class*="group/products-list-section"] aside {
+          background-color: #d9d8d6 !important;
+          padding: 1rem;
+          border-radius: 0.5rem;
+        }
+        [class*="group/products-list-section"] article[class*="group"] {
+          padding: 0.5rem;
+          box-sizing: border-box;
+          border: 2px solid transparent;
+          border-radius: 0.75rem;
+        }
+        [class*="group/products-list-section"] article[class*="group"]:hover {
+          border-color: #ED1C24 !important;
+        }
+        [class*="group/products-list-section"] button[role="combobox"] {
+          background-color: #d9d8d6 !important;
+        }
+        /* Hide empty product cards and cards without valid data attribute */
+        [class*="group/products-list-section"] article[class*="group"]:empty,
+        [class*="group/products-list-section"] article[class*="group"]:not([data-product-valid="true"]) {
+          display: none !important;
+        }
+        /* Mobile: Swap colors - product cards grey (50% opacity), page white, image container white */
+        @media (max-width: 1279px) {
+          [class*="group/products-list-section"] article[class*="group"] {
+            background-color: rgba(217, 216, 214, 0.5) !important;
+          }
+          [class*="group/products-list-section"] article[class*="group"] > div > div[class*="relative"] {
+            background-color: white !important;
+          }
+          [class*="group/products-list-section"] {
+            background-color: white !important;
+          }
+        }
+        /* Desktop: Product cards white, page/default background */
+        @media (min-width: 1280px) {
+          [class*="group/products-list-section"] article[class*="group"] {
+            background-color: white !important;
+          }
+        }
+      `}} />
+
+      {/* Hero/Banner Section */}
+      <section className="relative w-full">
+        <div className="relative h-[400px] w-full overflow-hidden @xl:h-[500px] @2xl:h-[600px]">
+          {/* Background Images - Different for mobile and desktop */}
+          <Image
+            src={imageManagerImageUrl('iron-sights-mobile.jpeg')}
+            alt={category.name}
+            fill
+            className="object-cover @xl:hidden"
+            priority
+            sizes="100vw"
+          />
+          <Image
+            src={imageManagerImageUrl('iron-sights-desktop.jpeg')}
+            alt={category.name}
+            fill
+            className="hidden object-cover @xl:block"
+            priority
+            sizes="(max-width: 1536px) 100vw, 1536px"
+          />
+        </div>
+      </section>
+
+      <ProductsListSection
+        aspectRatio="4:3"
+        mobileLayout="landscape"
+        breadcrumbs={Streamable.from(() => getBreadcrumbs(props))}
+        compareLabel={Streamable.from(getCompareLabel)}
+        compareProducts={Streamable.from(() => getCompareProducts(props))}
+        emptyStateSubtitle={Streamable.from(getEmptyStateSubtitle)}
+        emptyStateTitle={Streamable.from(getEmptyStateTitle)}
+        filterLabel={await getFilterLabel()}
+        filters={Streamable.from(() => getFilters(props))}
+        filtersPanelTitle={Streamable.from(getFiltersPanelTitle)}
+        maxCompareLimitMessage={Streamable.from(getMaxCompareLimitMessage)}
+        maxItems={MAX_COMPARE_LIMIT}
+        paginationInfo={Streamable.from(() => getPaginationInfo(props))}
+        products={Streamable.from(() => getListProducts(props))}
+        rangeFilterApplyLabel={Streamable.from(getRangeFilterApplyLabel)}
+        removeLabel={Streamable.from(getRemoveLabel)}
+        resetFiltersLabel={Streamable.from(getResetFiltersLabel)}
+        showCompare={Streamable.from(async () => false as boolean)}
+        sortDefaultValue="featured"
+        sortLabel={Streamable.from(getSortLabel)}
+        sortOptions={Streamable.from(getSortOptions)}
+        sortParamName="sort"
+        title={Streamable.from(() => getTitle(props))}
+        totalCount={Streamable.from(() => getTotalCount(props))}
+      />
+      <Stream
+        value={Streamable.all([
+          Streamable.from(() => getCategory(props)),
+          Streamable.from(() => getProducts(props)),
+        ])}
+      >
+        {([category, products]) => (
+          <CategoryViewed category={category} categoryId={category.entityId} products={products} />
+        )}
+      </Stream>
+    </>
+  );
+}
+

@@ -22,7 +22,7 @@ export interface ProductCarouselProps {
   products: Streamable<CarouselProduct[]>;
   className?: string;
   colorScheme?: 'light' | 'dark';
-  aspectRatio?: '5:6' | '3:4' | '1:1';
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
   emptyStateTitle?: Streamable<string>;
   emptyStateSubtitle?: Streamable<string>;
   scrollbarLabel?: string;

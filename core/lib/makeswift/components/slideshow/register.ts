@@ -26,6 +26,7 @@ runtime.registerComponent(MSSlideshow, {
       type: Group({
         props: {
           title: TextInput({ label: 'Title', defaultValue: 'Slide title' }),
+          secondTitle: TextInput({ label: 'Second title', defaultValue: '' }),
           showDescription: Checkbox({ label: 'Show description', defaultValue: true }),
           description: TextArea({ label: 'Description', defaultValue: 'Slide description' }),
           imageSrc: Image(),
@@ -42,6 +43,37 @@ runtime.registerComponent(MSSlideshow, {
               { value: 'ghost', label: 'Ghost' },
             ],
             defaultValue: 'primary',
+          }),
+          showSecondButton: Checkbox({ label: 'Show second button', defaultValue: false }),
+          secondButtonText: TextInput({ label: 'Second button text', defaultValue: 'Learn more' }),
+          secondButtonLink: Link({ label: 'Second button link' }),
+          secondButtonColor: Select({
+            label: 'Second button color',
+            options: [
+              { value: 'primary', label: 'Primary' },
+              { value: 'secondary', label: 'Secondary' },
+              { value: 'tertiary', label: 'Tertiary' },
+              { value: 'ghost', label: 'Ghost' },
+            ],
+            defaultValue: 'secondary',
+          }),
+          contentAlignment: Select({
+            label: 'Content alignment',
+            options: [
+              { value: 'left', label: 'Left' },
+              { value: 'center', label: 'Center' },
+              { value: 'right', label: 'Right' },
+            ],
+            defaultValue: 'left',
+          }),
+          verticalAlignment: Select({
+            label: 'Vertical alignment',
+            options: [
+              { value: 'top', label: 'Top' },
+              { value: 'center', label: 'Center' },
+              { value: 'bottom', label: 'Bottom' },
+            ],
+            defaultValue: 'center',
           }),
         },
       }),

@@ -26,7 +26,7 @@ export interface Product {
 export interface ProductCardProps {
   className?: string;
   colorScheme?: 'light' | 'dark';
-  aspectRatio?: '5:6' | '3:4' | '1:1';
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
   showCompare?: boolean;
   imagePriority?: boolean;
   imageSizes?: string;
@@ -96,6 +96,7 @@ export function ProductCard({
               '5:6': 'aspect-[5/6]',
               '3:4': 'aspect-[3/4]',
               '1:1': 'aspect-square',
+              '4:3': 'aspect-[4/3]',
             }[aspectRatio],
             {
               light: 'bg-[var(--product-card-light-background,hsl(var(--contrast-100)))]',
@@ -225,6 +226,7 @@ export function ProductCardSkeleton({
             '5:6': 'aspect-[5/6]',
             '3:4': 'aspect-[3/4]',
             '1:1': 'aspect-square',
+            '4:3': 'aspect-[4/3]',
           }[aspectRatio],
         )}
       />

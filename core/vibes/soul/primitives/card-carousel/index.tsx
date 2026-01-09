@@ -17,7 +17,7 @@ export type Card = CardProps & {
 
 export interface CardCarouselProps {
   cards: Streamable<Card[]>;
-  aspectRatio?: '5:6' | '3:4' | '1:1';
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
   textColorScheme?: 'light' | 'dark';
   iconColorScheme?: 'light' | 'dark';
   carouselColorScheme?: 'light' | 'dark';
