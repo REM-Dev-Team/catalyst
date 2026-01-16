@@ -308,36 +308,38 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
                   <div className="absolute inset-0 z-10">
                     <div
                       className="slideshow-content-responsive w-full text-balance"
-                      style={{
-                        position: 'absolute',
-                        top:
-                          verticalAlignment === 'top'
-                            ? 'var(--slideshow-top, 30px)'
-                            : verticalAlignment === 'bottom'
-                              ? 'auto'
-                              : '50%',
-                        bottom:
-                          verticalAlignment === 'bottom'
-                            ? 'var(--slideshow-bottom, 30px)'
-                            : 'auto',
-                        left:
-                          contentAlignment === 'left'
-                            ? '0'
-                            : contentAlignment === 'right'
-                              ? 'auto'
-                              : '50%',
-                        right: contentAlignment === 'right' ? '0' : 'auto',
-                        transform:
-                          verticalAlignment === 'center' && contentAlignment === 'center'
-                            ? 'translate(-50%, -50%)'
-                            : verticalAlignment === 'center'
-                              ? 'translateY(-50%)'
-                              : contentAlignment === 'center'
-                                ? 'translateX(-50%)'
-                                : 'none',
-                        '--slideshow-top': '40px',
-                        '--slideshow-bottom': '40px',
-                      } as React.CSSProperties}
+                      style={
+                        {
+                          position: 'absolute',
+                          top:
+                            verticalAlignment === 'top'
+                              ? 'var(--slideshow-top, 30px)'
+                              : verticalAlignment === 'bottom'
+                                ? 'auto'
+                                : '50%',
+                          bottom:
+                            verticalAlignment === 'bottom'
+                              ? 'var(--slideshow-bottom, 30px)'
+                              : 'auto',
+                          left:
+                            contentAlignment === 'left'
+                              ? '0'
+                              : contentAlignment === 'right'
+                                ? 'auto'
+                                : '50%',
+                          right: contentAlignment === 'right' ? '0' : 'auto',
+                          transform:
+                            verticalAlignment === 'center' && contentAlignment === 'center'
+                              ? 'translate(-50%, -50%)'
+                              : verticalAlignment === 'center'
+                                ? 'translateY(-50%)'
+                                : contentAlignment === 'center'
+                                  ? 'translateX(-50%)'
+                                  : 'none',
+                          '--slideshow-top': '40px',
+                          '--slideshow-bottom': '40px',
+                        } as React.CSSProperties
+                      }
                     >
                       <div
                         className={clsx(
@@ -392,7 +394,7 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
                         {showDescription ? (
                           <p
                             className={clsx(
-                              'slideshow-description mt-2 mb-6 w-full font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] font-medium leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))]',
+                              'slideshow-description mb-6 mt-2 w-full font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] font-medium leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))]',
                               contentAlignment === 'center'
                                 ? 'text-center'
                                 : contentAlignment === 'right'

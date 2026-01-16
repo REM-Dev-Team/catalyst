@@ -16,9 +16,7 @@ export function extractVideoId(url: string): string | null {
     /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
   ];
 
-  const match = patterns
-    .map((pattern) => pattern.exec(url))
-    .find((result) => result?.[1]);
+  const match = patterns.map((pattern) => pattern.exec(url)).find((result) => result?.[1]);
 
   return match?.[1] ?? null;
 }

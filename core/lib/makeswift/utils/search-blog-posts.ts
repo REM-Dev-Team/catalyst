@@ -38,6 +38,7 @@ export async function searchBlogPosts(query: string): Promise<BlogPost[]> {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error searching blog posts:', error);
+
     return [];
   }
 }

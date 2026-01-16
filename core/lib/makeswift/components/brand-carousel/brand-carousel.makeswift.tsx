@@ -129,7 +129,7 @@ runtime.registerComponent(
             name: TextInput({ label: 'Brand Name', defaultValue: 'Brand Name' }),
           },
         }),
-        getItemLabel: (item) => (item?.name ?? 'Brand'),
+        getItemLabel: (item) => item?.name ?? 'Brand',
       }),
       logoHeightMobile: Number({
         label: 'Logo height (mobile, px)',

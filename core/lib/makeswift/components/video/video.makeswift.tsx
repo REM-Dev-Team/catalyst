@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Checkbox, Style, TextInput } from '@makeswift/runtime/controls';
 import { MakeswiftComponentType } from '@makeswift/runtime/react/builtins';
 import { clsx } from 'clsx';
 import { Play } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { runtime } from '~/lib/makeswift/runtime';
 
@@ -33,6 +33,7 @@ function Video({
     if (!videoUrl) {
       setEmbedUrl('');
       setThumbnailUrl('');
+
       return;
     }
 
@@ -41,7 +42,8 @@ function Video({
 
     if (isYouTubeUrl) {
       // Extract video ID from YouTube URL
-      const youtubeRegex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
+      const youtubeRegex =
+        /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
       const match = youtubeRegex.exec(videoUrl);
       const videoId = match?.[1];
 
@@ -51,6 +53,7 @@ function Video({
 
         // Build YouTube embed URL with proper parameters
         const embedParams = new URLSearchParams();
+
         embedParams.set('rel', '0');
         embedParams.set('modestbranding', '1');
         embedParams.set('iv_load_policy', '3');
@@ -59,9 +62,11 @@ function Video({
         if (autoplay || isPlaying) {
           embedParams.set('autoplay', '1');
         }
+
         if (muted) {
           embedParams.set('mute', '1');
         }
+
         if (loop) {
           embedParams.set('loop', '1');
         }
@@ -74,6 +79,7 @@ function Video({
         }
 
         const newEmbedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?${embedParams.toString()}`;
+
         setEmbedUrl(newEmbedUrl);
       } else {
         setEmbedUrl('');
@@ -131,19 +137,22 @@ function Video({
           >
             {/* Thumbnail */}
             <img
-              src={thumbnailUrl}
               alt="Video thumbnail"
               className="h-full w-full object-cover"
               onError={(e) => {
                 // Fallback to standard quality thumbnail if maxresdefault doesn't exist
-                const youtubeRegex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
+                const youtubeRegex =
+                  /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
                 const match = youtubeRegex.exec(videoUrl);
                 const fallbackVideoId = match?.[1];
+
                 if (fallbackVideoId) {
                   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                  (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${fallbackVideoId}/hqdefault.jpg`;
+                  (e.target as HTMLImageElement).src =
+                    `https://img.youtube.com/vi/${fallbackVideoId}/hqdefault.jpg`;
                 }
               }}
+              src={thumbnailUrl}
             />
 
             {/* Custom play button overlay */}
@@ -162,12 +171,12 @@ function Video({
       <div className={clsx('w-full', className)}>
         <div className="aspect-video w-full overflow-hidden rounded-lg">
           <iframe
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="h-full w-full"
             key={embedUrl}
             src={embedUrl}
             title="YouTube video player"
-            className="h-full w-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
           />
         </div>
       </div>
@@ -178,12 +187,12 @@ function Video({
   return (
     <div className={clsx('w-full', className)}>
       <video
-        src={videoUrl}
-        controls={showControls}
         autoPlay={autoplay}
-        muted={muted}
-        loop={loop}
         className="h-auto w-full rounded-lg"
+        controls={showControls}
+        loop={loop}
+        muted={muted}
+        src={videoUrl}
         style={{ aspectRatio: '16/9' }}
       >
         <track kind="captions" />

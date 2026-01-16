@@ -4,6 +4,7 @@ import { Style, TextInput } from '@makeswift/runtime/controls';
 import { clsx } from 'clsx';
 
 import { runtime } from '~/lib/makeswift/runtime';
+
 import { YouTubeVideoModal } from './index';
 
 interface MakeswiftYouTubeVideoModalProps {
@@ -35,12 +36,12 @@ function MakeswiftYouTubeVideoModal({
   return (
     <div className={clsx('w-full', className)}>
       <YouTubeVideoModal
-        video={mockVideo}
         trigger={
           <button className="rounded-lg bg-primary px-4 py-2 text-white transition-colors hover:bg-primary/90">
             {triggerText}
           </button>
         }
+        video={mockVideo}
       />
     </div>
   );

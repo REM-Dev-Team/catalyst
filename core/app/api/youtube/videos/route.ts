@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { transformVideoItem, type YouTubeApiItem, YouTubeVideo } from '~/lib/youtube/utils';
 
 export async function GET(request: NextRequest) {
@@ -57,9 +58,7 @@ export async function GET(request: NextRequest) {
       const urlRegex = /[?&]list=([^&]+)/;
       const urlMatch = urlRegex.exec(targetPlaylistId);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       if (urlMatch?.[1]) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         targetPlaylistId = urlMatch[1];
       } else {
         return NextResponse.json({ error: 'Invalid YouTube playlist URL' }, { status: 400 });
@@ -111,7 +110,6 @@ export async function GET(request: NextRequest) {
       items?: unknown[];
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
     const videos: YouTubeVideo[] = (videosData.items ?? []).map((item) => {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       return transformVideoItem(item as YouTubeApiItem);
@@ -120,6 +118,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ videos });
   } catch (error) {
     console.error('YouTube API error:', error);
+
     return NextResponse.json({ error: 'Failed to fetch videos' }, { status: 500 });
   }
 }

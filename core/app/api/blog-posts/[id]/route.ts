@@ -88,6 +88,7 @@ export const GET = async (
     });
   } catch (error) {
     console.error('Error fetching blog post:', error);
+
     return NextResponse.json(
       { status: 'error', error: 'Failed to fetch blog post' },
       { status: 500 },

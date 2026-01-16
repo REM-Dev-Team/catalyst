@@ -108,3 +108,50 @@
 html, body {
   overflow-x: hidden !important;
 }
+
+/* Custom category pages - filters panel and product card styling */
+[class*="group/products-list-section"] aside {
+  background-color: #d9d8d6 !important;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+[class*="group/products-list-section"] article[class*="group"] {
+  padding: 0.5rem;
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+}
+
+[class*="group/products-list-section"] article[class*="group"]:hover {
+  border-color: #ED1C24 !important;
+}
+
+[class*="group/products-list-section"] button[role="combobox"] {
+  background-color: #d9d8d6 !important;
+}
+
+/* Hide empty product cards */
+[class*="group/products-list-section"] article[class*="group"]:empty {
+  display: none !important;
+}
+
+/* Mobile: Swap colors - product cards grey (50% opacity), page white, image container white */
+@media (max-width: 1279px) {
+  [class*="group/products-list-section"] article[class*="group"] {
+    background-color: rgba(217, 216, 214, 0.5) !important;
+  }
+  [class*="group/products-list-section"] article[class*="group"] > div > div[class*="relative"] {
+    background-color: white !important;
+  }
+  [class*="group/products-list-section"] {
+    background-color: white !important;
+  }
+}
+
+/* Desktop: Product cards white, page/default background */
+@media (min-width: 1280px) {
+  [class*="group/products-list-section"] article[class*="group"] {
+    background-color: white !important;
+  }
+}

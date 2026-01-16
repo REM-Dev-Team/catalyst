@@ -1,13 +1,12 @@
-import { cache } from 'react';
-import type { ComponentType } from 'react';
+import { cache, type ComponentType } from 'react';
 
+import ChassisSystemsPage from '../custom/chassis-systems';
+import IronSightsPage from '../custom/iron-sights';
+import MuzzleDevicesPage from '../custom/muzzle-devices';
+import ShootingSystemPage from '../custom/shooting-system';
 import type { Props } from '../page';
+
 import { getCategoryIdByPath } from './get-category-id-by-path';
-// Temporarily disabled - custom pages need to be updated for v1.4 structure
-// import IronSightsPage from '../custom/iron-sights';
-// import ChassisSystemsPage from '../custom/chassis-systems';
-// import MuzzleDevicesPage from '../custom/muzzle-devices';
-// import ShootingSystemPage from '../custom/shooting-system';
 
 /**
  * Registry of custom category pages by category ID.
@@ -39,11 +38,10 @@ export const customCategoryPages: Record<number, ComponentType<Props>> = {};
  * ```
  */
 export const customCategoryPagesByPath: Record<string, ComponentType<Props>> = {
-  // Temporarily disabled - custom pages need to be updated for v1.4 structure
-  // '/iron-sights/': IronSightsPage,
-  // '/chassis-systems/': ChassisSystemsPage,
-  // '/muzzle-devices/': MuzzleDevicesPage,
-  // '/shooting-system/': ShootingSystemPage,
+  '/iron-sights/': IronSightsPage,
+  '/chassis-systems/': ChassisSystemsPage,
+  '/muzzle-devices/': MuzzleDevicesPage,
+  '/shooting-system/': ShootingSystemPage,
 };
 
 /**
@@ -65,9 +63,14 @@ export const getCustomCategoryPage = cache(
     if (categoryPath) {
       // Normalize the path (ensure it starts with / and ends with /)
       let normalizedPath = categoryPath;
+
+      // Remove locale prefix if present (e.g., "/en/shooting-system/" -> "/shooting-system/")
+      normalizedPath = normalizedPath.replace(/^\/[a-z]{2}\//, '/');
+
       if (!normalizedPath.startsWith('/')) {
         normalizedPath = `/${normalizedPath}`;
       }
+
       if (!normalizedPath.endsWith('/')) {
         normalizedPath = `${normalizedPath}/`;
       }
@@ -75,12 +78,31 @@ export const getCustomCategoryPage = cache(
       // Try exact match first
       const pathPage =
         customCategoryPagesByPath[normalizedPath] || customCategoryPagesByPath[categoryPath];
+
       if (pathPage) {
         return pathPage;
       }
 
+      // Try matching without leading/trailing slashes or with partial matches
+      const pathWithoutSlashes = normalizedPath.replace(/^\/|\/$/g, '');
+      const matchingPath = Object.entries(customCategoryPagesByPath).find(
+        ([registeredPath]) => {
+          const registeredPathWithoutSlashes = registeredPath.replace(/^\/|\/$/g, '');
+          return (
+            pathWithoutSlashes === registeredPathWithoutSlashes ||
+            pathWithoutSlashes.endsWith(`/${registeredPathWithoutSlashes}`) ||
+            registeredPathWithoutSlashes.endsWith(`/${pathWithoutSlashes}`)
+          );
+        },
+      );
+
+      if (matchingPath) {
+        return matchingPath[1];
+      }
+
       // Try to find the category ID from path and check if it matches
       const pathCategoryId = await getCategoryIdByPath(normalizedPath);
+
       if (pathCategoryId === categoryId && customCategoryPages[pathCategoryId]) {
         return customCategoryPages[pathCategoryId];
       }

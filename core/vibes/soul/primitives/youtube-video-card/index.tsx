@@ -1,8 +1,8 @@
 import { clsx } from 'clsx';
-import { Play, Eye, Clock } from 'lucide-react';
+import { Clock, Eye, Play } from 'lucide-react';
 
-import { YouTubeVideo } from '~/lib/youtube/utils';
 import { YouTubeVideoModal } from '~/lib/makeswift/components/youtube-video-modal';
+import { YouTubeVideo } from '~/lib/youtube/utils';
 
 interface Props {
   video: YouTubeVideo;
@@ -13,7 +13,14 @@ interface Props {
   showUploadDate?: boolean;
 }
 
-export function YouTubeVideoCard({ video, className, textColor, showDescription = true, showViewCount = true, showUploadDate = true }: Props) {
+export function YouTubeVideoCard({
+  video,
+  className,
+  textColor,
+  showDescription = true,
+  showViewCount = true,
+  showUploadDate = true,
+}: Props) {
   const { title, description, thumbnail, publishedAt, viewCount, duration } = video;
 
   const textStyle = textColor ? { color: textColor } : {};
@@ -21,7 +28,7 @@ export function YouTubeVideoCard({ video, className, textColor, showDescription 
   const cardContent = (
     <div
       className={clsx(
-        'group max-w-full rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2 font-[family-name:var(--card-font-family,var(--font-family-body))] cursor-pointer',
+        'group max-w-full cursor-pointer rounded-b-lg rounded-t-2xl font-[family-name:var(--card-font-family,var(--font-family-body))] text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2',
         className,
       )}
     >
@@ -30,13 +37,13 @@ export function YouTubeVideoCard({ video, className, textColor, showDescription 
           <>
             <img
               alt={title}
-              className="absolute inset-0 w-full h-full object-cover scale-[1.02] transition-transform duration-500 ease-out group-hover:scale-110"
+              className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-500 ease-out group-hover:scale-110"
               src={thumbnail}
             />
             {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/80 text-white transition-transform duration-300 group-hover:scale-110">
-                <Play className="h-8 w-8 ml-1" fill="currentColor" />
+                <Play className="ml-1 h-8 w-8" fill="currentColor" />
               </div>
             </div>
             {/* Duration badge */}
@@ -51,13 +58,29 @@ export function YouTubeVideoCard({ video, className, textColor, showDescription 
         )}
       </div>
 
-      <div className="text-lg font-medium leading-snug line-clamp-2" style={textColor ? textStyle : {}}>{title}</div>
+      <div
+        className="line-clamp-2 text-lg font-medium leading-snug"
+        style={textColor ? textStyle : {}}
+      >
+        {title}
+      </div>
       {showDescription && (
-        <p className={clsx("mb-3 mt-1.5 line-clamp-2 text-sm font-normal", !textColor && "text-contrast-400")} style={textColor ? textStyle : {}}>{description}</p>
+        <p
+          className={clsx(
+            'mb-3 mt-1.5 line-clamp-2 text-sm font-normal',
+            !textColor && 'text-contrast-400',
+          )}
+          style={textColor ? textStyle : {}}
+        >
+          {description}
+        </p>
       )}
-      
+
       {(showViewCount || showUploadDate) && (
-        <div className={clsx("flex items-center gap-4 text-sm", !textColor && "text-contrast-500")} style={textColor ? textStyle : {}}>
+        <div
+          className={clsx('flex items-center gap-4 text-sm', !textColor && 'text-contrast-500')}
+          style={textColor ? textStyle : {}}
+        >
           {showViewCount && (
             <div className="flex items-center gap-1">
               <Eye className="h-3 w-3" />
@@ -81,9 +104,7 @@ export function YouTubeVideoCard({ video, className, textColor, showDescription 
     </div>
   );
 
-  return (
-    <YouTubeVideoModal video={video} trigger={cardContent} />
-  );
+  return <YouTubeVideoModal trigger={cardContent} video={video} />;
 }
 
 export function YouTubeVideoCardSkeleton({ className }: { className?: string }) {
@@ -109,4 +130,4 @@ export function YouTubeVideoCardSkeleton({ className }: { className?: string }) 
       </div>
     </div>
   );
-} 
+}

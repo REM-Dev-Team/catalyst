@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Combobox, Style } from '@makeswift/runtime/controls';
 import { clsx } from 'clsx';
+import { useEffect, useState } from 'react';
 
 import { runtime } from '~/lib/makeswift/runtime';
-import { BlogPostCard } from '~/vibes/soul/primitives/blog-post-card';
 import { searchBlogPosts } from '~/lib/makeswift/utils/search-blog-posts';
+import { BlogPostCard } from '~/vibes/soul/primitives/blog-post-card';
 
 interface BlogPost {
   id: string;
@@ -35,6 +35,7 @@ function MakeswiftBlogPostCard({ className, blogPostId }: MakeswiftBlogPostCardP
     const fetchBlogPost = async () => {
       if (!blogPostId) {
         setBlogPost(null);
+
         return;
       }
 
@@ -109,6 +110,7 @@ runtime.registerComponent(MakeswiftBlogPostCard, {
       label: 'Blog Post',
       async getOptions(query) {
         const posts = await searchBlogPosts(query);
+
         return posts.map((post) => ({
           id: post.id,
           label: post.title,

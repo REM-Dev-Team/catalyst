@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Checkbox, Style, TextInput } from '@makeswift/runtime/controls';
 import { clsx } from 'clsx';
+import { useEffect, useState } from 'react';
 
 import { runtime } from '~/lib/makeswift/runtime';
-import { YouTubeVideoCard } from '~/vibes/soul/primitives/youtube-video-card';
 import {
   Carousel,
   CarouselButtons,
@@ -13,6 +12,8 @@ import {
   CarouselItem,
   CarouselScrollbar,
 } from '~/vibes/soul/primitives/carousel';
+import { YouTubeVideoCard } from '~/vibes/soul/primitives/youtube-video-card';
+
 import { useYouTubeVideos } from '../../utils/use-youtube-videos';
 
 interface MakeswiftYouTubeVideoCarouselRowProps {
@@ -112,27 +113,34 @@ function MakeswiftYouTubeVideoCarouselRow({
     if (detail === null || typeof detail !== 'object') {
       return false;
     }
+
     if (!('playlistId' in detail)) {
       return false;
     }
+
     // Use Reflect.get to access property without type assertion
     const playlistId = Reflect.get(detail, 'playlistId');
+
     return typeof playlistId === 'string' || playlistId === undefined;
   }
 
   // Listen for external playlist switch events from a separate button component
   useEffect(() => {
     if (!componentId) return;
+
     const eventName = `yt-playlist-switch:${componentId}`;
     const handler = (e: Event): void => {
       if (e instanceof CustomEvent) {
         const detail: unknown = e.detail;
+
         if (isPlaylistDetail(detail)) {
           setActivePlaylist(detail.playlistId);
         }
       }
     };
+
     window.addEventListener(eventName, handler);
+
     return () => {
       window.removeEventListener(eventName, handler);
     };
@@ -155,8 +163,8 @@ function MakeswiftYouTubeVideoCarouselRow({
       </h2>
       {ctaLabel && ctaUrl ? (
         <a
-          href={ctaUrl}
           className="text-sm underline hover:no-underline"
+          href={ctaUrl}
           style={{ color: textColor }}
         >
           {ctaLabel}
@@ -212,11 +220,11 @@ function MakeswiftYouTubeVideoCarouselRow({
             {videos.map((video) => (
               <YouTubeVideoCard
                 key={video.id}
-                video={video}
-                textColor={textColor}
                 showDescription={showDescription}
-                showViewCount={showViewCount}
                 showUploadDate={showUploadDate}
+                showViewCount={showViewCount}
+                textColor={textColor}
+                video={video}
               />
             ))}
           </div>
@@ -228,11 +236,11 @@ function MakeswiftYouTubeVideoCarouselRow({
             {videos.map((video) => (
               <CarouselItem className="basis-full" key={video.id}>
                 <YouTubeVideoCard
-                  video={video}
-                  textColor={textColor}
                   showDescription={showDescription}
-                  showViewCount={showViewCount}
                   showUploadDate={showUploadDate}
+                  showViewCount={showViewCount}
+                  textColor={textColor}
+                  video={video}
                 />
               </CarouselItem>
             ))}

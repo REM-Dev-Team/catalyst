@@ -27,7 +27,7 @@ export function BlogPostCard({ blogPost, className }: Props) {
   return (
     <Link
       className={clsx(
-        'group max-w-full rounded-b-lg rounded-t-2xl text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2 font-[family-name:var(--card-font-family,var(--font-family-body))]',
+        'group max-w-full rounded-b-lg rounded-t-2xl font-[family-name:var(--card-font-family,var(--font-family-body))] text-foreground ring-primary ring-offset-4 @container focus:outline-0 focus-visible:ring-2',
         className,
       )}
       href={href}

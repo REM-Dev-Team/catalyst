@@ -19,15 +19,20 @@ export const fontFamilyTokens = {
 };
 
 type FontFamilyToken = keyof typeof fontFamilyTokens;
-export type FontFamilyCssVar = `var(--font-family-${FontFamilyToken})`;
+export type FontFamilyCssVar = `var(--font-family-${FontFamilyToken})` | '"futura-pt", sans-serif';
 
-const fontFamilyCssVar = (token: FontFamilyToken): FontFamilyCssVar =>
+const fontFamilyCssVar = (token: FontFamilyToken): `var(--font-family-${FontFamilyToken})` =>
   `var(--font-family-${token})`;
 
 const fontFamilyOption = (token: FontFamilyToken): { label: string; value: FontFamilyCssVar } => ({
   label: `${fontFamilyTokens[token].config.label}`,
   value: fontFamilyCssVar(token),
 });
+
+const futuraPtOption: { label: string; value: FontFamilyCssVar } = {
+  label: 'Futura PT (Adobe Fonts)',
+  value: '"futura-pt", sans-serif',
+};
 
 export const FontFamily = ({
   label,
@@ -38,7 +43,7 @@ export const FontFamily = ({
 }) =>
   Select({
     label,
-    options: [fontFamilyOption('heading'), fontFamilyOption('body'), fontFamilyOption('accent')],
+    options: [fontFamilyOption('heading'), fontFamilyOption('body'), fontFamilyOption('accent'), futuraPtOption],
     defaultValue,
   });
 

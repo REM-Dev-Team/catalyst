@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Style, TextInput } from '@makeswift/runtime/controls';
 import { clsx } from 'clsx';
+import { useEffect, useState } from 'react';
 
 import { runtime } from '~/lib/makeswift/runtime';
-import { YouTubeVideoCard } from '~/vibes/soul/primitives/youtube-video-card';
 import { YouTubeVideo } from '~/lib/youtube/utils';
+import { YouTubeVideoCard } from '~/vibes/soul/primitives/youtube-video-card';
 
 interface MakeswiftYouTubeVideoCardProps {
   className: string;
@@ -22,6 +22,7 @@ function MakeswiftYouTubeVideoCard({ className, videoUrl }: MakeswiftYouTubeVide
     const fetchVideo = async () => {
       if (!videoUrl) {
         setVideo(null);
+
         return;
       }
 
@@ -36,7 +37,6 @@ function MakeswiftYouTubeVideoCard({ className, videoUrl }: MakeswiftYouTubeVide
           throw new Error('Failed to fetch video');
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const responseData: unknown = await response.json();
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const data = responseData as {

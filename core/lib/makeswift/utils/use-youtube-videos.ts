@@ -21,6 +21,7 @@ export function useYouTubeVideos({ channelId, playlistId, limit = 10 }: UseYouTu
 
         // Use our API route instead of direct YouTube API calls
         const params = new URLSearchParams();
+
         if (channelId) params.append('channelId', channelId);
         if (playlistId) params.append('playlistId', playlistId);
         params.append('limit', limit.toString());

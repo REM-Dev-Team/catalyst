@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import {
   extractVideoId,
   transformVideoItem,
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest) {
   try {
     // Extract video ID from URL
     const videoId = extractVideoId(videoUrl);
+
     if (!videoId) {
       return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
     }
@@ -44,13 +46,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Video not found' }, { status: 404 });
     }
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const item = data.items[0] as YouTubeApiItem;
     const video: YouTubeVideo = transformVideoItem(item);
 
     return NextResponse.json({ video });
   } catch (error) {
     console.error('YouTube API error:', error);
+
     return NextResponse.json({ error: 'Failed to fetch video' }, { status: 500 });
   }
 }

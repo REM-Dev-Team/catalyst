@@ -8,8 +8,9 @@ import {
   TextInput,
 } from '@makeswift/runtime/controls';
 
-import { HotspotData, ImageHotspot } from './index';
 import { runtime } from '~/lib/makeswift/runtime';
+
+import { HotspotData, ImageHotspot } from './index';
 
 interface MSImageHotspotProps {
   className?: string;
@@ -45,7 +46,7 @@ runtime.registerComponent(
       image: hotspot.image?.trim()
         ? {
             src: hotspot.image,
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
             alt: hotspot.imageAlt ?? '',
           }
         : undefined,
@@ -53,15 +54,15 @@ runtime.registerComponent(
 
     return (
       <ImageHotspot
+        className={className}
+        hotspots={transformedHotspots}
         image={{
           src: image || '',
           alt: imageAlt || '',
           width: 800,
           height: 600,
         }}
-        hotspots={transformedHotspots}
         showHotspots={showHotspots}
-        className={className}
       />
     );
   },

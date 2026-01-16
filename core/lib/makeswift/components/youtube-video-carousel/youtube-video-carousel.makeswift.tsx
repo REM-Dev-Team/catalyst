@@ -1,14 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Checkbox, Style, TextInput } from '@makeswift/runtime/controls';
 import { clsx } from 'clsx';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Clock, Eye, Play } from 'lucide-react'; // Play and Eye are used in JSX below
+import { useEffect, useState } from 'react';
 
-import { runtime } from '~/lib/makeswift/runtime';
-import { YouTubeVideoCard } from '~/vibes/soul/primitives/youtube-video-card';
 import { YouTubeVideoModal } from '~/lib/makeswift/components/youtube-video-modal';
+import { runtime } from '~/lib/makeswift/runtime';
 import {
   Carousel,
   CarouselButtons,
@@ -16,6 +14,8 @@ import {
   CarouselItem,
   CarouselScrollbar,
 } from '~/vibes/soul/primitives/carousel';
+import { YouTubeVideoCard } from '~/vibes/soul/primitives/youtube-video-card';
+
 import { useYouTubeVideos } from '../../utils/use-youtube-videos';
 
 interface MakeswiftYouTubeVideoCarouselProps {
@@ -45,6 +45,7 @@ function useIsDesktop() {
 
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
+
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
@@ -132,7 +133,7 @@ function MakeswiftYouTubeVideoCarousel({
     <div className="flex items-center justify-between">
       <h2 className="text-2xl font-medium">{title}</h2>
       {ctaLabel && ctaUrl ? (
-        <a href={ctaUrl} className="text-sm underline hover:no-underline">
+        <a className="text-sm underline hover:no-underline" href={ctaUrl}>
           {ctaLabel}
         </a>
       ) : null}
@@ -173,9 +174,8 @@ function MakeswiftYouTubeVideoCarousel({
         // Desktop: Vertical list with horizontal layout
         <div className="space-y-4">
           {videos.map((video) => (
-            <div key={video.id} className="group flex gap-4">
+            <div className="group flex gap-4" key={video.id}>
               <YouTubeVideoModal
-                video={video}
                 trigger={
                   <div className="group flex cursor-pointer gap-4">
                     <div className="flex-shrink-0">
@@ -184,9 +184,9 @@ function MakeswiftYouTubeVideoCarousel({
                         style={{ width: '192px' }}
                       >
                         <img
-                          src={video.thumbnail}
                           alt={video.title}
                           className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                          src={video.thumbnail}
                         />
                         {/* Play button overlay */}
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -228,6 +228,7 @@ function MakeswiftYouTubeVideoCarousel({
                     </div>
                   </div>
                 }
+                video={video}
               />
             </div>
           ))}
@@ -244,7 +245,9 @@ function MakeswiftYouTubeVideoCarousel({
           </CarouselContent>
           <div className="flex w-full items-center justify-between">
             {showScrollbar ? <CarouselScrollbar label={scrollbarLabel} /> : null}
-            {showButtons ? <CarouselButtons nextLabel={nextLabel} previousLabel={previousLabel} /> : null}
+            {showButtons ? (
+              <CarouselButtons nextLabel={nextLabel} previousLabel={previousLabel} />
+            ) : null}
           </div>
         </Carousel>
       )}

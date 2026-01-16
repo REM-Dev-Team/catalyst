@@ -47,6 +47,7 @@ export function AgeVerification({
   useEffect(() => {
     // Check if user has already verified their age
     const hasVerified = localStorage.getItem('age-verified');
+
     if (!hasVerified) {
       setIsVisible(true);
     }
@@ -74,7 +75,7 @@ export function AgeVerification({
         className={clsx(
           'mx-4 w-full max-w-md rounded-2xl bg-[var(--age-verification-background,hsl(var(--background)))] p-6 shadow-xl ring-1 ring-[var(--age-verification-border,hsl(var(--foreground)/10%))]',
           'transition ease-out',
-          'animate-in fade-in-0 zoom-in-95 duration-200',
+          'duration-200 animate-in fade-in-0 zoom-in-95',
           'font-[family-name:var(--font-family-futura)]',
           className,
         )}
@@ -90,20 +91,20 @@ export function AgeVerification({
 
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button
-            variant="primary"
-            size="medium"
-            shape="rounded"
-            className="flex-1 focus-visible:ring-[var(--age-verification-button-focus,hsl(var(--primary)))] [--button-primary-text:hsl(var(--background))]"
+            className="flex-1 [--button-primary-text:hsl(var(--background))] focus-visible:ring-[var(--age-verification-button-focus,hsl(var(--primary)))]"
             onClick={handleYes}
+            shape="rounded"
+            size="medium"
+            variant="primary"
           >
             {yesLabel}
           </Button>
           <Button
-            variant="tertiary"
-            size="medium"
-            shape="rounded"
-            className="flex-1 focus-visible:ring-[var(--age-verification-button-focus,hsl(var(--primary)))] [--button-tertiary-text:hsl(var(--background))]"
+            className="flex-1 [--button-tertiary-text:hsl(var(--background))] focus-visible:ring-[var(--age-verification-button-focus,hsl(var(--primary)))]"
             onClick={handleNo}
+            shape="rounded"
+            size="medium"
+            variant="tertiary"
           >
             {noLabel}
           </Button>

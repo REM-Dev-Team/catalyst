@@ -1,6 +1,6 @@
+import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 
 import { client } from '~/client';
 import { PaginationFragment } from '~/client/fragments/pagination';
@@ -120,6 +120,7 @@ export const GET = async (request: NextRequest) => {
     });
   } catch (error) {
     console.error('Error fetching blog posts:', error);
+
     return NextResponse.json(
       { status: 'error', error: 'Failed to fetch blog posts' },
       { status: 500 },

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { clsx } from 'clsx';
+import { useState } from 'react';
 
 import { Image } from '~/components/image';
 
@@ -53,24 +53,19 @@ export function ImageHotspot({
       {/* Main Image Container */}
       <div className="relative w-full">
         <Image
-          src={image.src}
           alt={image.alt}
-          width={image.width || 800}
-          height={image.height || 600}
           className="h-auto w-full"
+          height={image.height || 600}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+          src={image.src}
+          width={image.width || 800}
         />
 
         {/* Hotspot Overlays - Always functional, visibility controlled by toggle */}
         {displayHotspots.map((hotspot) => (
           <div
-            key={hotspot.id}
             className="group absolute z-10 cursor-pointer transition-all duration-300"
-            style={{
-              left: `${hotspot.x}%`,
-              top: `${hotspot.y}%`,
-              transform: 'translate(-50%, -50%)',
-            }}
+            key={hotspot.id}
             onClick={() => handleHotspotClick(hotspot)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -79,6 +74,11 @@ export function ImageHotspot({
               }
             }}
             role="button"
+            style={{
+              left: `${hotspot.x}%`,
+              top: `${hotspot.y}%`,
+              transform: 'translate(-50%, -50%)',
+            }}
             tabIndex={0}
           >
             {/* Hotspot circle - visible only when toggle is ON */}
@@ -127,19 +127,19 @@ export function ImageHotspot({
                 </h1>
                 <div className="flex items-center justify-center pr-3">
                   <button
-                    onClick={handleCloseModal}
                     className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-gray-200"
+                    onClick={handleCloseModal}
                   >
                     <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
                       fill="none"
+                      height="20"
                       stroke="currentColor"
                       strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      width="20"
                     >
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" x2="6" y1="6" y2="18" />
+                      <line x1="6" x2="18" y1="6" y2="18" />
                     </svg>
                   </button>
                 </div>
@@ -149,9 +149,9 @@ export function ImageHotspot({
                   {activeHotspot.image?.src ? (
                     <div className="h-48 w-full overflow-hidden rounded-lg bg-gray-100 sm:h-64">
                       <img
-                        src={activeHotspot.image.src}
                         alt={activeHotspot.image.alt}
                         className="h-full w-full object-cover"
+                        src={activeHotspot.image.src}
                       />
                     </div>
                   ) : null}

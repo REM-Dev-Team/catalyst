@@ -12,6 +12,7 @@ import {
   CarouselItem,
   CarouselScrollbar,
 } from '~/vibes/soul/primitives/carousel';
+
 import { useBlogPosts } from '../../utils/use-blog-posts';
 
 interface MakeswiftBlogPostCarouselProps {
@@ -95,7 +96,7 @@ function MakeswiftBlogPostCarousel({
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-medium">{title}</h2>
           {ctaLabel && ctaUrl ? (
-            <a href={ctaUrl} className="text-sm underline hover:no-underline">
+            <a className="text-sm underline hover:no-underline" href={ctaUrl}>
               {ctaLabel}
             </a>
           ) : null}
@@ -113,7 +114,7 @@ function MakeswiftBlogPostCarousel({
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-medium">{title}</h2>
           {ctaLabel && ctaUrl ? (
-            <a href={ctaUrl} className="text-sm underline hover:no-underline">
+            <a className="text-sm underline hover:no-underline" href={ctaUrl}>
               {ctaLabel}
             </a>
           ) : null}
@@ -130,7 +131,7 @@ function MakeswiftBlogPostCarousel({
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-medium">{title}</h2>
         {ctaLabel && ctaUrl ? (
-          <a href={ctaUrl} className="text-sm underline hover:no-underline">
+          <a className="text-sm underline hover:no-underline" href={ctaUrl}>
             {ctaLabel}
           </a>
         ) : null}

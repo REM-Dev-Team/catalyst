@@ -18,11 +18,14 @@ function isErrorWithStatus(error: unknown): error is Error & { status: number } 
   if (!(error instanceof Error)) {
     return false;
   }
+
   if (!Object.prototype.hasOwnProperty.call(error, 'status')) {
     return false;
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/consistent-type-assertions
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const status = (error as unknown as { status: unknown }).status;
+
   return typeof status === 'number';
 }
 
@@ -47,6 +50,7 @@ export const getPageSnapshot = async ({ path, locale }: { path: string; locale: 
     if (isErrorWithStatus(error) && error.status === 400) {
       return null;
     }
+
     throw error;
   }
 };

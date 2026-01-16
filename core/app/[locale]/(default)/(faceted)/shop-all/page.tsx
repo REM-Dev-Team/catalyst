@@ -24,6 +24,7 @@ import { getShopAllPageData } from './page-data';
 
 const createShopAllSearchParamsCache = cache(async (props: Props) => {
   await props.searchParams; // Ensure searchParams is awaited for cache key
+
   const allProductsSearch = await fetchFacetedSearch({});
   const allFacets = allProductsSearch.facets.items;
   const transformedFacets = await facetsTransformer({
@@ -80,7 +81,7 @@ const getSearch = cache(async (props: Props) => {
 
 async function getTotalCount(props: Props): Promise<string> {
   const format = await getFormatter();
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   const search = await getSearch(props);
 
   return format.number(search.products.collectionInfo?.totalItems ?? 0);
@@ -94,7 +95,7 @@ async function getProducts(props: Props) {
 
 async function getListProducts(props: Props): Promise<Product[]> {
   const products = await getProducts(props);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   const format = await getFormatter();
 
   return products.map((product) => ({

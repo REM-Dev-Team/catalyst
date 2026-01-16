@@ -47,17 +47,19 @@ export function useBlogPosts({ limit = 6, tag }: Props) {
   const url = `/api/blog-posts?${searchParams.toString()}`;
 
   const swrResult = useSWR(url, fetcher);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   const { data, isLoading } = swrResult;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const error = swrResult.error;
 
   const blogPosts = useMemo(() => {
     if (isLoading || !data) return null;
+
     return data.posts;
   }, [isLoading, data]);
 
   const pageInfo: unknown = data?.pageInfo ?? null;
+
   return {
     blogPosts,
     isLoading,

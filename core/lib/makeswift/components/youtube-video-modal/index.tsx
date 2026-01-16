@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { clsx } from 'clsx';
 import { Clock, Eye } from 'lucide-react';
+import { useState } from 'react';
 
 import { Modal } from '~/components/modal';
 import { YouTubeVideo } from '~/lib/youtube/utils';
@@ -18,13 +18,8 @@ export function YouTubeVideoModal({ video, trigger, className }: YouTubeVideoMod
   const { title, description, publishedAt, viewCount, href } = video;
 
   // Extract video ID from href
-  const patterns = [
-    /[?&]v=([^&]+)/,
-    /youtu\.be\/([^?]+)/,
-  ];
-  const match = patterns
-    .map((pattern) => pattern.exec(href))
-    .find((result) => result?.[1]);
+  const patterns = [/[?&]v=([^&]+)/, /youtu\.be\/([^?]+)/];
+  const match = patterns.map((pattern) => pattern.exec(href)).find((result) => result?.[1]);
   const videoId = match?.[1];
 
   if (!videoId) {
@@ -48,17 +43,19 @@ export function YouTubeVideoModal({ video, trigger, className }: YouTubeVideoMod
         {/* Video Embed */}
         <div className="aspect-video w-full min-w-0 max-w-full overflow-hidden rounded-xl bg-black">
           <iframe
-            src={embedUrl}
-            title={title}
-            className="h-full min-h-0 w-full min-w-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            className="h-full min-h-0 w-full min-w-0"
+            src={embedUrl}
+            title={title}
           />
         </div>
 
         {/* Video Info */}
         <div className="space-y-3">
-          {description ? <p className="text-contrast-600 line-clamp-3 text-sm">{description}</p> : null}
+          {description ? (
+            <p className="text-contrast-600 line-clamp-3 text-sm">{description}</p>
+          ) : null}
 
           <div className="flex items-center gap-4 text-sm text-contrast-500">
             <div className="flex items-center gap-1">

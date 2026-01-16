@@ -41,11 +41,7 @@ function normalizeFontFamily(value: string | undefined): string {
   };
 
   // Extract font name from old format (e.g., "futura-pt", sans-serif -> futura-pt)
-  const fontName = value
-    .replace(/['"]/g, '')
-    .split(',')[0]
-    ?.trim()
-    .toLowerCase() ?? '';
+  const fontName = value.replace(/['"]/g, '').split(',')[0]?.trim().toLowerCase() ?? '';
 
   // Check if we have a mapping
   if (fontMapping[fontName]) {
@@ -70,15 +66,13 @@ function normalizeFontTokens(tokens: FontFamilyTokens | undefined): FontFamilyTo
     };
   }
 
-  return Object.entries(tokens).reduce<FontFamilyTokens>(
-    (acc, [key, value]) => {
-      acc[key] = {
-        fontFamily: normalizeFontFamily(value.fontFamily),
-      };
-      return acc;
-    },
-    {},
-  );
+  return Object.entries(tokens).reduce<FontFamilyTokens>((acc, [key, value]) => {
+    acc[key] = {
+      fontFamily: normalizeFontFamily(value.fontFamily),
+    };
+
+    return acc;
+  }, {});
 }
 
 export const SiteTheme = ({ fontTokens, ...theme }: TokensProps & ThemeProps) => (
@@ -101,10 +95,7 @@ type Props = {
   components?: ThemeProps & { header?: ThemeProps };
 };
 
-export const MakeswiftSiteTheme = ({
-  fontTokens,
-  components,
-}: Props) => {
+export const MakeswiftSiteTheme = ({ fontTokens, components }: Props) => {
   // Normalize font tokens to handle old format values or validation failures
   const normalizedFontTokens = normalizeFontTokens(fontTokens);
 
@@ -114,5 +105,8 @@ export const MakeswiftSiteTheme = ({
   }
 
   const { header, ...restComponents } = components;
-  return <SiteTheme {...{ fontTokens: normalizedFontTokens, ...(header ?? {}), ...restComponents }} />;
+
+  return (
+    <SiteTheme {...{ fontTokens: normalizedFontTokens, ...(header ?? {}), ...restComponents }} />
+  );
 };
