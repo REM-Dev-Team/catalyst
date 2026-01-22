@@ -161,12 +161,25 @@ export function Reviews({
               <Stream value={streamablePaginationInfo}>
                 {(paginationInfo) =>
                   paginationInfo && (
-                    <CursorPagination
-                      info={paginationInfo}
-                      nextLabel={nextLabel}
-                      previousLabel={previousLabel}
-                      scroll={false}
-                    />
+                    <>
+                      {nextLabel && previousLabel ? (
+                        <Stream
+                          fallback={null}
+                          value={Streamable.all([nextLabel, previousLabel])}
+                        >
+                          {([resolvedNextLabel, resolvedPreviousLabel]) => (
+                            <CursorPagination
+                              info={paginationInfo}
+                              nextLabel={resolvedNextLabel}
+                              previousLabel={resolvedPreviousLabel}
+                              scroll={false}
+                            />
+                          )}
+                        </Stream>
+                      ) : (
+                        <CursorPagination info={paginationInfo} scroll={false} />
+                      )}
+                    </>
                   )
                 }
               </Stream>

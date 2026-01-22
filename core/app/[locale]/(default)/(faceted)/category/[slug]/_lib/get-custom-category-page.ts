@@ -85,16 +85,15 @@ export const getCustomCategoryPage = cache(
 
       // Try matching without leading/trailing slashes or with partial matches
       const pathWithoutSlashes = normalizedPath.replace(/^\/|\/$/g, '');
-      const matchingPath = Object.entries(customCategoryPagesByPath).find(
-        ([registeredPath]) => {
-          const registeredPathWithoutSlashes = registeredPath.replace(/^\/|\/$/g, '');
-          return (
-            pathWithoutSlashes === registeredPathWithoutSlashes ||
-            pathWithoutSlashes.endsWith(`/${registeredPathWithoutSlashes}`) ||
-            registeredPathWithoutSlashes.endsWith(`/${pathWithoutSlashes}`)
-          );
-        },
-      );
+      const matchingPath = Object.entries(customCategoryPagesByPath).find(([registeredPath]) => {
+        const registeredPathWithoutSlashes = registeredPath.replace(/^\/|\/$/g, '');
+
+        return (
+          pathWithoutSlashes === registeredPathWithoutSlashes ||
+          pathWithoutSlashes.endsWith(`/${registeredPathWithoutSlashes}`) ||
+          registeredPathWithoutSlashes.endsWith(`/${pathWithoutSlashes}`)
+        );
+      });
 
       if (matchingPath) {
         return matchingPath[1];

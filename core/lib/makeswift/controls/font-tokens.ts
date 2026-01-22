@@ -43,7 +43,12 @@ export const FontFamily = ({
 }) =>
   Select({
     label,
-    options: [fontFamilyOption('heading'), fontFamilyOption('body'), fontFamilyOption('accent'), futuraPtOption],
+    options: [
+      fontFamilyOption('heading'),
+      fontFamilyOption('body'),
+      fontFamilyOption('accent'),
+      futuraPtOption,
+    ],
     defaultValue,
   });
 

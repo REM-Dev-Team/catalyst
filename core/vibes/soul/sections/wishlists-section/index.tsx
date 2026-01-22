@@ -1,4 +1,4 @@
-import { Streamable } from '@/vibes/soul/lib/streamable';
+import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { CursorPagination, CursorPaginationInfo } from '@/vibes/soul/primitives/cursor-pagination';
 import { Wishlist } from '@/vibes/soul/sections/wishlist-details';
 import { WishlistList } from '@/vibes/soul/sections/wishlist-list';
@@ -60,7 +60,11 @@ export const WishlistsSection = ({
         wishlists={wishlists}
       />
 
-      {paginationInfo && <CursorPagination info={paginationInfo} />}
+      {paginationInfo && (
+        <Stream fallback={null} value={paginationInfo}>
+          {(info) => <CursorPagination info={info} />}
+        </Stream>
+      )}
     </section>
   );
 };

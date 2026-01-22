@@ -1,4 +1,4 @@
-import { Streamable } from '@/vibes/soul/lib/streamable';
+import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { BlogPostCardBlogPost } from '@/vibes/soul/primitives/blog-post-card';
 import { CursorPagination, CursorPaginationInfo } from '@/vibes/soul/primitives/cursor-pagination';
 import { BlogPostList } from '@/vibes/soul/sections/blog-post-list';
@@ -47,7 +47,11 @@ export function FeaturedBlogPostList({
           posts={posts}
         />
 
-        {paginationInfo && <CursorPagination info={paginationInfo} />}
+        {paginationInfo && (
+          <Stream fallback={null} value={paginationInfo}>
+            {(info) => <CursorPagination info={info} />}
+          </Stream>
+        )}
       </div>
     </SectionLayout>
   );

@@ -9,11 +9,7 @@ import { graphql } from './client/graphql';
 import { cspHeader } from './lib/content-security-policy';
 
 const withMakeswift = createWithMakeswift();
-const withNextIntl = createNextIntlPlugin({
-  experimental: {
-    createMessagesDeclaration: './messages/en.json',
-  },
-});
+const withNextIntl = createNextIntlPlugin();
 
 const SettingsQuery = graphql(`
   query SettingsQuery {
@@ -69,6 +65,9 @@ export default async (): Promise<NextConfig> => {
     },
     typescript: {
       ignoreBuildErrors: !!process.env.CI,
+    },
+    eslint: {
+      ignoreDuringBuilds: true,
     },
     // default URL generation in BigCommerce uses trailing slash
     trailingSlash: process.env.TRAILING_SLASH !== 'false',

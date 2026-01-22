@@ -136,7 +136,11 @@ export function OrderList({
           );
         }}
       </Stream>
-      {paginationInfo && <CursorPagination info={paginationInfo} />}
+      {paginationInfo && (
+        <Stream fallback={null} value={paginationInfo}>
+          {(info) => <CursorPagination info={info} />}
+        </Stream>
+      )}
     </section>
   );
 }
