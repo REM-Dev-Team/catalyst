@@ -121,6 +121,33 @@ html, body {
   box-sizing: border-box;
   border: 2px solid transparent;
   border-radius: 0.75rem;
+  /* Horizontal layout: image and content side by side */
+  flex-direction: row !important;
+  gap: 1rem !important;
+}
+
+/* Inner wrapper in horizontal layout */
+[class*="group/products-list-section"] article[class*="group"] > div[class*="relative"] {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 1rem !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+/* Image container in horizontal layout - landscape aspect ratio (4:3) */
+[class*="group/products-list-section"] article[class*="group"] > div[class*="relative"] > div:first-child {
+  flex-shrink: 0 !important;
+  width: 200px !important;
+  height: 150px !important;
+  aspect-ratio: 4/3 !important;
+}
+
+/* Content container in horizontal layout */
+[class*="group/products-list-section"] article[class*="group"] > div[class*="relative"] > div[class*="mt-2"] {
+  flex: 1 !important;
+  min-width: 0 !important;
+  margin-top: 0 !important;
 }
 
 [class*="group/products-list-section"] article[class*="group"]:hover {

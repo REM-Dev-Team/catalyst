@@ -21,21 +21,6 @@ import { getPreferredCurrencyCode } from '~/lib/currency';
 import { SiteFooter as FooterSection } from '~/lib/makeswift/components/site-footer';
 
 import { FooterFragment, FooterSectionsFragment } from './fragment';
-import { AmazonIcon } from './payment-icons/amazon';
-import { AmericanExpressIcon } from './payment-icons/american-express';
-import { ApplePayIcon } from './payment-icons/apple-pay';
-import { MastercardIcon } from './payment-icons/mastercard';
-import { PayPalIcon } from './payment-icons/paypal';
-import { VisaIcon } from './payment-icons/visa';
-
-const paymentIcons = [
-  <AmazonIcon key="amazon" />,
-  <AmericanExpressIcon key="americanExpress" />,
-  <ApplePayIcon key="apple" />,
-  <MastercardIcon key="mastercard" />,
-  <PayPalIcon key="paypal" />,
-  <VisaIcon key="visa" />,
-];
 
 const socialIcons: Record<string, { icon: JSX.Element }> = {
   Facebook: { icon: <SiFacebook title="Facebook" /> },
@@ -107,13 +92,6 @@ export const Footer = async () => {
         })),
       },
       {
-        title: t('brands'),
-        links: removeEdgesAndNodes(sectionsData.brands).map((brand) => ({
-          label: brand.name,
-          href: brand.path,
-        })),
-      },
-      {
         title: t('navigate'),
         links: [
           ...(sectionsData.settings?.giftCertificates?.isEnabled
@@ -141,7 +119,6 @@ export const Footer = async () => {
       logo={logo}
       logoHref="/"
       logoLabel={t('home')}
-      paymentIcons={paymentIcons}
       sections={streamableSections}
       socialMediaLinks={socialMediaLinks}
     />

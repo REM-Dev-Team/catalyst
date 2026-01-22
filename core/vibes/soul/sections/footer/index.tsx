@@ -89,45 +89,12 @@ export const Footer = ({
         'group/footer border-b-4 border-t border-b-[var(--footer-border-bottom,hsl(var(--primary)))] border-t-[var(--footer-border-top,hsl(var(--contrast-100)))] bg-[var(--footer-background,hsl(var(--background)))] @container',
         className,
       )}
+      style={{ fontFamily: 'var(--font-family-futura, "futura-pt", sans-serif)' }}
     >
       <div className="mx-auto max-w-screen-2xl px-4 py-6 @xl:px-6 @xl:py-10 @4xl:px-8 @4xl:py-12">
-        <div className="flex flex-col justify-between gap-x-16 gap-y-12 @3xl:flex-row">
-          <div className="flex flex-col gap-4 @3xl:w-1/3 @3xl:gap-6">
-            {/* Logo Information */}
-            <div className="flex items-center justify-start self-stretch">
-              <Logo
-                className="flex"
-                height={logoHeight}
-                href={logoHref}
-                label={logoLabel}
-                logo={logo}
-                width={logoWidth}
-              />
-            </div>
-
-            {/* Contact Information */}
-            <Stream fallback={<FooterContactSkeleton />} value={streamableContactInformation}>
-              {(contactInformation) => {
-                if (contactInformation?.address != null || contactInformation?.phone != null) {
-                  return (
-                    <div className="mb-4 text-lg font-medium @lg:text-xl">
-                      <h3 className="text-[var(--footer-contact-title,hsl(var(--contrast-500)))]">
-                        {contactTitle}
-                      </h3>
-                      <div className="text-[var(--footer-contact-text,hsl(var(--foreground)))]">
-                        {contactInformation.address != null &&
-                          contactInformation.address !== '' && <p>{contactInformation.address}</p>}
-                        {contactInformation.phone != null && contactInformation.phone !== '' && (
-                          <p>{contactInformation.phone}</p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                }
-              }}
-            </Stream>
-
-            {/* Social Media Links */}
+        <div className="grid grid-cols-1 gap-x-8 gap-y-12 @sm:grid-cols-2 @xl:grid-cols-4 @xl:gap-x-12">
+          {/* Column 1: Social Media Links */}
+          <div className="flex flex-col gap-4">
             <Stream fallback={<SocialMediaLinksSkeleton />} value={streamableSocialMediaLinks}>
               {(socialMediaLinks) => {
                 if (socialMediaLinks != null) {
@@ -151,16 +118,12 @@ export const Footer = ({
             </Stream>
           </div>
 
-          {/* Footer Columns of Links */}
+          {/* Columns 2-3: Footer Sections (Categories, Navigate) */}
           <Stream fallback={<FooterColumnsSkeleton />} value={streamableSections}>
             {(sections) => {
               if (sections.length > 0) {
                 return (
-                  <div
-                    className={clsx(
-                      'grid max-w-5xl grid-cols-1 gap-y-8 @sm:grid-cols-2 @xl:gap-y-10 @2xl:grid-cols-3 @6xl:[grid-template-columns:_repeat(auto-fill,_minmax(220px,_1fr))]',
-                    )}
-                  >
+                  <>
                     {sections.map(({ title, links }, i) => (
                       <div className="pr-8" key={i}>
                         {title != null && (
@@ -187,11 +150,49 @@ export const Footer = ({
                         </ul>
                       </div>
                     ))}
-                  </div>
+                  </>
                 );
               }
+              return null;
             }}
           </Stream>
+
+          {/* Column 4: Logo and Contact Information */}
+          <div className="flex flex-col gap-4 @xl:items-end">
+            {/* Logo Information */}
+            <div className="flex items-center justify-start @xl:justify-end">
+              <Logo
+                className="flex"
+                height={logoHeight}
+                href={logoHref}
+                label={logoLabel}
+                logo={logo}
+                width={logoWidth}
+              />
+            </div>
+
+            {/* Contact Information */}
+            <Stream fallback={<FooterContactSkeleton />} value={streamableContactInformation}>
+              {(contactInformation) => {
+                if (contactInformation?.address != null || contactInformation?.phone != null) {
+                  return (
+                    <div className="mb-4 text-lg font-medium text-right @lg:text-xl @3xl:text-right">
+                      <h3 className="text-[var(--footer-contact-title,hsl(var(--contrast-500)))]">
+                        {contactTitle}
+                      </h3>
+                      <div className="text-[var(--footer-contact-text,hsl(var(--foreground)))]">
+                        {contactInformation.address != null &&
+                          contactInformation.address !== '' && <p>{contactInformation.address}</p>}
+                        {contactInformation.phone != null && contactInformation.phone !== '' && (
+                          <p>{contactInformation.phone}</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+              }}
+            </Stream>
+          </div>
         </div>
 
         <div className="flex flex-col-reverse items-start gap-y-8 pt-16 @3xl:flex-row @3xl:items-center @3xl:pt-20">

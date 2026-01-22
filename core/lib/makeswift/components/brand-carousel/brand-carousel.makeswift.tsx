@@ -80,10 +80,10 @@ runtime.registerComponent(
           <div className="p-4 text-center text-lg text-gray-400">Add brands to the carousel</div>
         ) : (
           <Carousel hideOverflow={hideOverflow}>
-            <CarouselContent>
+            <CarouselContent className="-ml-0 @2xl:-ml-0">
               {displayBrands.map((brand, index) => (
                 <CarouselItem
-                  className="basis-1/2 p-0 @md:basis-1/3 @lg:basis-1/4 @2xl:basis-1/6"
+                  className="basis-1/2 p-0 pl-0 @md:basis-1/5 @lg:basis-1/5 @2xl:basis-1/6 @2xl:pl-0"
                   key={index}
                 >
                   <div className="flex items-center justify-center p-0">
