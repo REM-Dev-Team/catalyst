@@ -83,13 +83,33 @@ export const Footer = async () => {
     const currencyCode = await getPreferredCurrencyCode();
     const sectionsData = await getFooterSections(customerAccessToken, currencyCode);
 
+    // Find the "all-products" category and use its children, otherwise use the categoryTree as-is
+    const allProductsCategory = sectionsData.categoryTree.find((category) => {
+      const nameLower = category.name.toLowerCase();
+
+      return (
+        (nameLower === 'all-products' ||
+          nameLower === 'all products' ||
+          nameLower.includes('all-product') ||
+          (nameLower.includes('all') && nameLower.includes('product'))) &&
+        category.children.length > 0
+      );
+    });
+
+    const categoryLinks = allProductsCategory
+      ? allProductsCategory.children.map((category) => ({
+          label: category.name,
+          href: category.path,
+        }))
+      : sectionsData.categoryTree.map((category) => ({
+          label: category.name,
+          href: category.path,
+        }));
+
     return [
       {
         title: t('categories'),
-        links: sectionsData.categoryTree.map((category) => ({
-          label: category.name,
-          href: category.path,
-        })),
+        links: categoryLinks,
       },
       {
         title: t('navigate'),

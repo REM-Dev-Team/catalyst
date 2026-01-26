@@ -73,6 +73,10 @@ export const FooterSectionsFragment = graphql(`
     categoryTree {
       name
       path
+      children {
+        name
+        path
+      }
     }
   }
 `);
