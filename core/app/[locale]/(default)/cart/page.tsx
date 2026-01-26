@@ -6,6 +6,7 @@ import { Cart as CartComponent, CartEmptyState } from '@/vibes/soul/sections/car
 import { CartAnalyticsProvider } from '~/app/[locale]/(default)/cart/_components/cart-analytics-provider';
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
+import { getAllProductsCategoryPath } from '~/lib/get-all-products-category-path';
 import { Slot } from '~/lib/makeswift/slot';
 import { exists } from '~/lib/utils';
 
@@ -67,12 +68,13 @@ export default async function Cart({ params }: Props) {
   const t = await getTranslations('Cart');
   const format = await getFormatter();
   const cartId = await getCartId();
+  const allProductsPath = await getAllProductsCategoryPath();
 
   const emptyState = (
     <>
       <Slot label="Cart top content" snapshotId="cart-top-content" />
       <CartEmptyState
-        cta={{ label: t('Empty.cta'), href: '/shop-all' }}
+        cta={{ label: t('Empty.cta'), href: allProductsPath }}
         subtitle={t('Empty.subtitle')}
         title={t('Empty.title')}
       />
@@ -272,7 +274,7 @@ export default async function Cart({ params }: Props) {
           emptyState={{
             title: t('Empty.title'),
             subtitle: t('Empty.subtitle'),
-            cta: { label: t('Empty.cta'), href: '/shop-all' },
+            cta: { label: t('Empty.cta'), href: allProductsPath },
           }}
           giftCertificate={
             giftCertificatesEnabled

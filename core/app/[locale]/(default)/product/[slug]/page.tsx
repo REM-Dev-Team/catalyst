@@ -11,6 +11,7 @@ import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { productOptionsTransformer } from '~/data-transformers/product-options-transformer';
 import { getPreferredCurrencyCode } from '~/lib/currency';
+import { getAllProductsCategoryPath } from '~/lib/get-all-products-category-path';
 import { ProductDetail } from '~/lib/makeswift/components/product-detail';
 
 import { addToCart } from './_actions/add-to-cart';
@@ -574,7 +575,7 @@ export default async function Product({ params, searchParams }: Props) {
       </ProductAnalyticsProvider>
 
       <FeaturedProductCarousel
-        cta={{ label: t('RelatedProducts.cta'), href: '/shop-all' }}
+        cta={{ label: t('RelatedProducts.cta'), href: await getAllProductsCategoryPath() }}
         emptyStateSubtitle={t('RelatedProducts.browseCatalog')}
         emptyStateTitle={t('RelatedProducts.noRelatedProducts')}
         nextLabel={t('RelatedProducts.nextProducts')}

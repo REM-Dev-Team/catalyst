@@ -6,7 +6,11 @@ import SlideBg01 from './slide-bg-01.jpg';
 import SlideBg02 from './slide-bg-02.jpg';
 import SlideBg03 from './slide-bg-03.jpg';
 
-export function Slideshow() {
+interface SlideshowProps {
+  allProductsPath?: string;
+}
+
+export function Slideshow({ allProductsPath = '/shop-all' }: SlideshowProps) {
   const t = useTranslations('Home.Slideshow');
 
   const slides = [
@@ -19,7 +23,7 @@ export function Slideshow() {
       },
       description: t('Slide01.description'),
       cta: {
-        href: '/shop-all',
+        href: allProductsPath,
         label: t('Slide01.cta'),
       },
     },
@@ -32,7 +36,7 @@ export function Slideshow() {
       },
       description: t('Slide02.description'),
       cta: {
-        href: '/shop-all',
+        href: allProductsPath,
         label: t('Slide02.cta'),
       },
     },
@@ -45,7 +49,7 @@ export function Slideshow() {
       },
       description: t('Slide03.description'),
       cta: {
-        href: '/shop-all',
+        href: allProductsPath,
         label: t('Slide03.cta'),
       },
     },
