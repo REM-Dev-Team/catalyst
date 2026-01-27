@@ -73,7 +73,6 @@
 /* Slideshow Futura outlined text effect */
 .futura-text span:first-child {
   -webkit-text-stroke: 1px #f8f8f2 !important;
-  text-stroke: 1px #f8f8f2 !important;
 }
 
 /* Slideshow content responsive padding */

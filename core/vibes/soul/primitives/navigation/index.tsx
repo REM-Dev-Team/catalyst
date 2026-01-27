@@ -306,6 +306,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
   ref: Ref<HTMLDivElement>,
 ) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [expandedLinkIndex, setExpandedLinkIndex] = useState<number | null>(null);
   const { isSearchOpen, setIsSearchOpen } = useSearch();
 
   const pathname = usePathname();
@@ -313,6 +314,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsSearchOpen(false);
+    setExpandedLinkIndex(null);
   }, [pathname, setIsSearchOpen]);
 
   useEffect(() => {
@@ -374,34 +376,78 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                   }
                   value={streamableLinks}
                 >
-                  {(links) =>
-                    links.map((item, i) => (
+                  {(links) => {
+                    const expandedItem = expandedLinkIndex !== null ? links[expandedLinkIndex] : null;
+
+                    // Show groups if a link is expanded
+                    if (expandedItem && expandedItem.groups && expandedItem.groups.length > 0) {
+                      return (
+                        <div className="flex flex-col p-2 @4xl:p-5">
+                          {/* Back button */}
+                          <button
+                            className="mb-2 flex items-center gap-2 rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+                            onClick={() => setExpandedLinkIndex(null)}
+                            type="button"
+                          >
+                            <ArrowRight className="h-4 w-4 rotate-180" />
+                            {expandedItem.label}
+                          </button>
+                          {/* Group links */}
+                          {expandedItem.groups.map((group, groupIndex) => (
+                            <ul className="flex flex-col @4xl:gap-2" key={groupIndex}>
+                              {group.label && group.href && (
+                                <li>
+                                  <Link
+                                    className="block rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+                                    href={group.href}
+                                  >
+                                    {group.label}
+                                  </Link>
+                                </li>
+                              )}
+                              {group.links.map((link, linkIndex) => (
+                                <li key={linkIndex}>
+                                  <Link
+                                    className="block rounded-lg bg-[var(--nav-mobile-sub-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-mobile-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+                                    href={link.href}
+                                  >
+                                    {link.label}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          ))}
+                        </div>
+                      );
+                    }
+
+                    // Show main links
+                    return links.map((item, i) => (
                       <ul className="flex flex-col p-2 @4xl:gap-2 @4xl:p-5" key={i}>
                         {item.label !== '' && (
                           <li>
-                            <Link
-                              className="block rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
-                              href={item.href}
-                            >
-                              {item.label}
-                            </Link>
+                            {item.groups && item.groups.length > 0 ? (
+                              <button
+                                className="flex w-full items-center justify-between rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+                                onClick={() => setExpandedLinkIndex(i)}
+                                type="button"
+                              >
+                                <span>{item.label}</span>
+                                <ArrowRight className="h-4 w-4" />
+                              </button>
+                            ) : (
+                              <Link
+                                className="block rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
+                                href={item.href}
+                              >
+                                {item.label}
+                              </Link>
+                            )}
                           </li>
                         )}
-                        {item.groups
-                          ?.flatMap((group) => group.links)
-                          .map((link, j) => (
-                            <li key={j}>
-                              <Link
-                                className="block rounded-lg bg-[var(--nav-mobile-sub-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-mobile-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
-                                href={link.href}
-                              >
-                                {link.label}
-                              </Link>
-                            </li>
-                          ))}
                       </ul>
-                    ))
-                  }
+                    ));
+                  }}
                 </Stream>
                 {/* Mobile Locale / Currency Dropdown */}
                 {locales && locales.length > 1 && streamableCurrencies && (
