@@ -278,6 +278,7 @@ export default async function IronSightsCategoryPage(props: Props) {
       </section>
 
       <ProductsListSection
+        aspectRatio="4:3"
         breadcrumbs={breadcrumbs}
         compareLabel={t('Compare.compare')}
         compareProducts={streamableCompareProducts}

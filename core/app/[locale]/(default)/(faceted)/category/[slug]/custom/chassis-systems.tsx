@@ -279,6 +279,7 @@ export default async function ChassisSystemsCategoryPage(props: Props) {
       </section>
 
       <ProductsListSection
+        aspectRatio="4:3"
         breadcrumbs={breadcrumbs}
         compareLabel={t('Compare.compare')}
         compareProducts={streamableCompareProducts}

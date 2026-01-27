@@ -43,6 +43,7 @@ interface Props {
   removeLabel?: Streamable<string>;
   maxItems?: number;
   maxCompareLimitMessage?: Streamable<string>;
+  aspectRatio?: '5:6' | '3:4' | '1:1' | '4:3';
 }
 
 export function ProductsListSection({
@@ -73,6 +74,7 @@ export function ProductsListSection({
   removeLabel,
   maxItems,
   maxCompareLimitMessage,
+  aspectRatio = '5:6',
 }: Props) {
   return (
     <div className="group/products-list-section @container">
@@ -162,6 +164,7 @@ export function ProductsListSection({
 
           <div className="group-has-data-pending/products-list-section:animate-pulse flex-1">
             <ProductList
+              aspectRatio={aspectRatio}
               compareHref={compareHref}
               compareLabel={compareLabel}
               compareParamName={compareParamName}

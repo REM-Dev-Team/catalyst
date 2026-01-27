@@ -109,45 +109,11 @@ html, body {
   overflow-x: hidden !important;
 }
 
-/* Custom category pages - filters panel and product card styling */
+/* Custom category pages - filters panel styling */
 [class*="group/products-list-section"] aside {
   background-color: #d9d8d6 !important;
   padding: 1rem;
   border-radius: 0.5rem;
-}
-
-[class*="group/products-list-section"] article[class*="group"] {
-  padding: 0.5rem;
-  box-sizing: border-box;
-  border: 2px solid transparent;
-  border-radius: 0.75rem;
-  /* Horizontal layout: image and content side by side */
-  flex-direction: row !important;
-  gap: 1rem !important;
-}
-
-/* Inner wrapper in horizontal layout */
-[class*="group/products-list-section"] article[class*="group"] > div[class*="relative"] {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 1rem !important;
-  flex: 1 !important;
-  min-width: 0 !important;
-}
-
-/* Image container in horizontal layout - landscape aspect ratio (4:3) */
-[class*="group/products-list-section"] article[class*="group"] > div[class*="relative"] > div:first-child {
-  flex-shrink: 0 !important;
-  width: 200px !important;
-  height: 150px !important;
-  aspect-ratio: 4/3 !important;
-}
-
-/* Content container in horizontal layout */
-[class*="group/products-list-section"] article[class*="group"] > div[class*="relative"] > div[class*="mt-2"] {
-  flex: 1 !important;
-  min-width: 0 !important;
-  margin-top: 0 !important;
 }
 
 [class*="group/products-list-section"] article[class*="group"]:hover {
@@ -163,22 +129,7 @@ html, body {
   display: none !important;
 }
 
-/* Mobile: Swap colors - product cards grey (50% opacity), page white, image container white */
-@media (max-width: 1279px) {
-  [class*="group/products-list-section"] article[class*="group"] {
-    background-color: rgba(217, 216, 214, 0.5) !important;
-  }
-  [class*="group/products-list-section"] article[class*="group"] > div > div[class*="relative"] {
-    background-color: white !important;
-  }
-  [class*="group/products-list-section"] {
-    background-color: white !important;
-  }
-}
-
-/* Desktop: Product cards white, page/default background */
-@media (min-width: 1280px) {
-  [class*="group/products-list-section"] article[class*="group"] {
-    background-color: white !important;
-  }
+/* Product cards styling - consistent across mobile and desktop */
+[class*="group/products-list-section"] article[class*="group"] {
+  background-color: white !important;
 }

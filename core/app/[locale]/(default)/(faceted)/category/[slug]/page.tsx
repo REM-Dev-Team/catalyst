@@ -261,6 +261,7 @@ export default async function Category(props: Props) {
         snapshotId={`category-${categoryId}-top-content`}
       />
       <ProductsListSection
+        aspectRatio="4:3"
         breadcrumbs={breadcrumbs}
         compareLabel={t('Compare.compare')}
         compareProducts={streamableCompareProducts}
