@@ -94,7 +94,7 @@ export const Footer = ({
       <div className="mx-auto max-w-screen-2xl px-4 py-6 @xl:px-6 @xl:py-10 @4xl:px-8 @4xl:py-12">
         <div className="grid grid-cols-1 gap-x-8 gap-y-12 @sm:grid-cols-2 @xl:grid-cols-4 @xl:gap-x-12">
           {/* Column 1: Social Media Links */}
-          <div className="order-3 flex flex-col gap-4 sm:order-3 @xl:order-1">
+          <div className="order-3 flex flex-col gap-4 sm:order-3 lg:order-1 @xl:order-1">
             <Stream fallback={<SocialMediaLinksSkeleton />} value={streamableSocialMediaLinks}>
               {(socialMediaLinks) => {
                 if (socialMediaLinks != null) {
@@ -128,8 +128,8 @@ export const Footer = ({
                       <div
                         className={clsx(
                           'pr-8',
-                          i === 0 && 'sm:order-1 @xl:order-2',
-                          i === 1 && 'sm:order-2 @xl:order-3',
+                          i === 0 && 'sm:order-1 lg:order-2 @xl:order-2',
+                          i === 1 && 'sm:order-2 lg:order-3 @xl:order-3',
                         )}
                         key={i}
                       >
@@ -165,7 +165,7 @@ export const Footer = ({
           </Stream>
 
           {/* Column 4: Logo and Contact Information */}
-          <div className="order-4 flex flex-col gap-4 sm:order-4 @xl:order-4 @xl:items-end">
+          <div className="order-4 flex flex-col gap-4 sm:order-4 lg:order-4 @xl:order-4 @xl:items-end">
             {/* Logo Information */}
             <div className="flex items-center justify-start @xl:justify-end">
               <Logo
