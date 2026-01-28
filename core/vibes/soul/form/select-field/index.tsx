@@ -49,6 +49,7 @@ export function SelectField({
       <Select
         colorScheme={colorScheme}
         errors={errors}
+        hideLabel={true}
         id={id}
         label={label}
         name={`${name}_display`} // Temp `_display` to avoid conflicts with the hidden input

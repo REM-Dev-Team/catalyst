@@ -62,13 +62,30 @@ export const SwatchRadioGroup = React.forwardRef<
     ref,
   ) => {
     const id = React.useId();
+    const selectedOption = options.find((option) => option.value === rest.value);
+    const selectedLabel = selectedOption?.label;
 
     return (
       <div className={clsx('space-y-2', className)}>
         {label !== undefined && label !== '' && (
-          <Label colorScheme={colorScheme} id={id}>
-            {label}
-          </Label>
+          <div>
+            <Label colorScheme={colorScheme} id={id}>
+              {label}
+            </Label>
+            {selectedLabel && (
+              <p
+                className={clsx(
+                  'mt-1 text-sm font-medium',
+                  {
+                    light: 'text-[var(--label-light-text,hsl(var(--contrast-500)))]',
+                    dark: 'text-[var(--label-dark-text,hsl(var(--contrast-200)))]',
+                  }[colorScheme],
+                )}
+              >
+                {selectedLabel}
+              </p>
+            )}
+          </div>
         )}
         <RadioGroupPrimitive.Root
           {...rest}
