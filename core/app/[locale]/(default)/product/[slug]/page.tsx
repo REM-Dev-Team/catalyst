@@ -20,6 +20,7 @@ import { ProductAnalyticsProvider } from './_components/product-analytics-provid
 import { ProductSchema } from './_components/product-schema';
 import { ProductViewed } from './_components/product-viewed';
 import { Reviews } from './_components/reviews';
+import { Videos } from './_components/videos';
 import { WishlistButton } from './_components/wishlist-button';
 import { WishlistButtonForm } from './_components/wishlist-button/form';
 import {
@@ -186,6 +187,44 @@ export default async function Product({ params, searchParams }: Props) {
     return product.defaultImage
       ? [{ src: product.defaultImage.url, alt: product.defaultImage.altText }, ...images]
       : images;
+  });
+
+  const streamableVideos = Streamable.from(async () => {
+    const product = await streamableProduct;
+
+    if (!product.videos || !('edges' in product.videos)) {
+      return [];
+    }
+
+    return removeEdgesAndNodes(product.videos)
+      .filter((video) => video.url) // Only include videos with a URL
+      .map((video) => {
+        const videoUrl = video.url || '';
+        
+        // Extract video type and ID from URL
+        let videoType = '';
+        let videoId = '';
+        
+        if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+          videoType = 'youtube';
+          const youtubeRegex =
+            /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
+          const match = youtubeRegex.exec(videoUrl);
+          videoId = match?.[1] || '';
+        } else if (videoUrl.includes('vimeo.com')) {
+          videoType = 'vimeo';
+          const vimeoRegex = /vimeo\.com\/(\d+)/;
+          const match = vimeoRegex.exec(videoUrl);
+          videoId = match?.[1] || '';
+        }
+
+        return {
+          videoUrl,
+          videoId,
+          videoType,
+          title: 'Product video',
+        };
+      });
   });
 
   const streameableCtaLabel = Streamable.from(async () => {
@@ -573,6 +612,16 @@ export default async function Product({ params, searchParams }: Props) {
           user={streamableUser}
         />
       </ProductAnalyticsProvider>
+
+      <Stream fallback={null} value={streamableVideos}>
+        {(videos) =>
+          videos && videos.length > 0 && (
+            <div id="videos">
+              <Videos videos={streamableVideos} title={t('ProductDetails.videos')} />
+            </div>
+          )
+        }
+      </Stream>
 
       <FeaturedProductCarousel
         cta={{ label: t('RelatedProducts.cta'), href: await getAllProductsCategoryPath() }}

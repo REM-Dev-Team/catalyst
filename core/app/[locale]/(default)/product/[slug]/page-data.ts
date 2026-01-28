@@ -288,6 +288,13 @@ const StreamableProductQuery = graphql(
             altText
             url: urlTemplate(lossy: true)
           }
+          videos {
+            edges {
+              node {
+                url
+              }
+            }
+          }
           sku
           weight {
             value

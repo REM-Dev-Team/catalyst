@@ -69,6 +69,18 @@ export default async (): Promise<NextConfig> => {
     eslint: {
       ignoreDuringBuilds: true,
     },
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'img.youtube.com',
+        },
+        {
+          protocol: 'https',
+          hostname: 'i.ytimg.com',
+        },
+      ],
+    },
     // default URL generation in BigCommerce uses trailing slash
     trailingSlash: process.env.TRAILING_SLASH !== 'false',
     // eslint-disable-next-line @typescript-eslint/require-await
