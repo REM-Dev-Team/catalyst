@@ -914,6 +914,7 @@ function SearchResults({
                   {result.products.map((product) => (
                     <li key={product.id}>
                       <ProductCard
+                        aspectRatio="4:3"
                         imageSizes="(min-width: 42rem) 25vw, 50vw"
                         product={{
                           id: product.id,

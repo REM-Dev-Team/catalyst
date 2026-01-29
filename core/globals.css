@@ -3,10 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --primary: 96 100% 68%;
-  --accent: 96 100% 88%;
+  /* Brand primary (red) – used for buttons, focus, underlines, hovers site-wide */
+  --primary: 357 81% 52%;
+  --accent: 357 81% 72%;
   --background: 0 0% 100%;
   --foreground: 0 0% 7%;
+  /* Semantic (form status, badges): success=green, error=red, warning=orange, info=blue */
   --success: 116 78% 65%;
   --error: 0 100% 60%;
   --warning: 40 100% 60%;
@@ -33,10 +35,14 @@
   /* Custom font variables */
   --font-family-futura: "futura-pt", sans-serif;
   
-  /* Fourth-level navigation link colors */
+  /* Fourth-level navigation link colors (on-theme neutrals, no blue) */
   --nav-sub-sub-link-text: #f8f8f2;
-  --nav-sub-sub-link-text-hover: #c5d9e7;
+  --nav-sub-sub-link-text-hover: #e8e6e1;
   --nav-sub-sub-link-font-family: var(--font-family-futura);
+
+  /* Gift certificate card gradient (dark red to match brand) */
+  --gift-certificate-background-gradient-top: #3d1f23;
+  --gift-certificate-background-gradient-bottom: #5c2a30;
 }
 
 /* Slideshow responsive height */
