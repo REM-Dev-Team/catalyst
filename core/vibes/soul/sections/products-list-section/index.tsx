@@ -121,46 +121,58 @@ export function ProductsListSection({
                   />
                 )}
               </Stream>
-              <div className="block @3xl:hidden">
-                <SidePanel.Root>
-                  <SidePanel.Trigger asChild>
-                    <Button size="medium" variant="secondary">
-                      {filterLabel}
-                      <span className="hidden @xl:block">
-                        <Sliders size={20} />
-                      </span>
-                    </Button>
-                  </SidePanel.Trigger>
-                  <Stream value={streamableFiltersPanelTitle}>
-                    {(filtersPanelTitle) => (
-                      <SidePanel.Content title={filtersPanelTitle}>
-                        <FiltersPanel
-                          filters={filters}
-                          paginationInfo={paginationInfo}
-                          rangeFilterApplyLabel={rangeFilterApplyLabel}
-                          resetFiltersLabel={resetFiltersLabel}
-                        />
-                      </SidePanel.Content>
-                    )}
-                  </Stream>
-                </SidePanel.Root>
-              </div>
+              <Stream value={filters}>
+                {(filtersList) =>
+                  (filtersList?.length ?? 0) > 0 ? (
+                    <div className="block @3xl:hidden">
+                      <SidePanel.Root>
+                        <SidePanel.Trigger asChild>
+                          <Button size="medium" variant="secondary">
+                            {filterLabel}
+                            <span className="hidden @xl:block">
+                              <Sliders size={20} />
+                            </span>
+                          </Button>
+                        </SidePanel.Trigger>
+                        <Stream value={streamableFiltersPanelTitle}>
+                          {(filtersPanelTitle) => (
+                            <SidePanel.Content title={filtersPanelTitle}>
+                              <FiltersPanel
+                                filters={filters}
+                                paginationInfo={paginationInfo}
+                                rangeFilterApplyLabel={rangeFilterApplyLabel}
+                                resetFiltersLabel={resetFiltersLabel}
+                              />
+                            </SidePanel.Content>
+                          )}
+                        </Stream>
+                      </SidePanel.Root>
+                    </div>
+                  ) : null
+                }
+              </Stream>
             </div>
           </div>
         </div>
         <div className="flex items-stretch gap-8 @4xl:gap-10">
-          <aside className="hidden w-52 @3xl:block @4xl:w-60">
-            <Stream value={streamableFiltersPanelTitle}>
-              {(filtersPanelTitle) => <h2 className="sr-only">{filtersPanelTitle}</h2>}
-            </Stream>
-            <FiltersPanel
-              className="sticky top-4"
-              filters={filters}
-              paginationInfo={paginationInfo}
-              rangeFilterApplyLabel={rangeFilterApplyLabel}
-              resetFiltersLabel={resetFiltersLabel}
-            />
-          </aside>
+          <Stream value={filters}>
+            {(filtersList) =>
+              (filtersList?.length ?? 0) > 0 ? (
+                <aside className="hidden w-52 @3xl:block @4xl:w-60">
+                  <Stream value={streamableFiltersPanelTitle}>
+                    {(filtersPanelTitle) => <h2 className="sr-only">{filtersPanelTitle}</h2>}
+                  </Stream>
+                  <FiltersPanel
+                    className="sticky top-4"
+                    filters={filters}
+                    paginationInfo={paginationInfo}
+                    rangeFilterApplyLabel={rangeFilterApplyLabel}
+                    resetFiltersLabel={resetFiltersLabel}
+                  />
+                </aside>
+              ) : null
+            }
+          </Stream>
 
           <div className="group-has-data-pending/products-list-section:animate-pulse flex-1">
             <ProductList
