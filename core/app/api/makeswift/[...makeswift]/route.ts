@@ -1,4 +1,5 @@
 import { type Font, MakeswiftApiHandler } from '@makeswift/runtime/next/server';
+import { revalidatePath } from 'next/cache';
 import { strict } from 'assert';
 
 import { runtime } from '~/lib/makeswift/runtime';
@@ -26,6 +27,11 @@ const handler = MakeswiftApiHandler(process.env.MAKESWIFT_SITE_API_KEY, {
   runtime,
   apiOrigin: process.env.NEXT_PUBLIC_MAKESWIFT_API_ORIGIN ?? process.env.MAKESWIFT_API_ORIGIN,
   appOrigin: process.env.NEXT_PUBLIC_MAKESWIFT_APP_ORIGIN ?? process.env.MAKESWIFT_APP_ORIGIN,
+  events: {
+    onPublish: async () => {
+      revalidatePath('/', 'layout');
+    },
+  },
   getFonts() {
     return [
       {
