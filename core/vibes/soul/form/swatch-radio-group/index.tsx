@@ -72,7 +72,7 @@ export const SwatchRadioGroup = React.forwardRef<
             <Label colorScheme={colorScheme} id={id}>
               {label}
             </Label>
-            {selectedLabel && (
+            {selectedLabel ? (
               <p
                 className={clsx(
                   'mt-1 text-sm font-medium',
@@ -84,7 +84,7 @@ export const SwatchRadioGroup = React.forwardRef<
               >
                 {selectedLabel}
               </p>
-            )}
+            ) : null}
           </div>
         )}
         <RadioGroupPrimitive.Root

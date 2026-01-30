@@ -159,29 +159,27 @@ export function Reviews({
               })}
 
               <Stream value={streamablePaginationInfo}>
-                {(paginationInfo) =>
-                  paginationInfo && (
-                    <>
-                      {nextLabel && previousLabel ? (
-                        <Stream
-                          fallback={null}
-                          value={Streamable.all([nextLabel, previousLabel])}
-                        >
-                          {([resolvedNextLabel, resolvedPreviousLabel]) => (
-                            <CursorPagination
-                              info={paginationInfo}
-                              nextLabel={resolvedNextLabel}
-                              previousLabel={resolvedPreviousLabel}
-                              scroll={false}
-                            />
-                          )}
-                        </Stream>
-                      ) : (
-                        <CursorPagination info={paginationInfo} scroll={false} />
-                      )}
-                    </>
-                  )
-                }
+                {(paginationInfo) => {
+                  if (!paginationInfo) return null;
+                  if (nextLabel && previousLabel) {
+                    return (
+                      <Stream
+                        fallback={null}
+                        value={Streamable.all([nextLabel, previousLabel])}
+                      >
+                        {([resolvedNextLabel, resolvedPreviousLabel]) => (
+                          <CursorPagination
+                            info={paginationInfo}
+                            nextLabel={resolvedNextLabel}
+                            previousLabel={resolvedPreviousLabel}
+                            scroll={false}
+                          />
+                        )}
+                      </Stream>
+                    );
+                  }
+                  return <CursorPagination info={paginationInfo} scroll={false} />;
+                }}
               </Stream>
             </div>
           </StickySidebarLayout>

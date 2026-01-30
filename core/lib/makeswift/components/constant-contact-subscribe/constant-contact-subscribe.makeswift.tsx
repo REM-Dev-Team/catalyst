@@ -18,6 +18,8 @@ interface MakeswiftSubscribeProps {
  * Constant Contact: pop-up only (no inline widget).
  * Loads the CC script and sets _ctct_m so pop-up forms (e.g. exit-intent) work.
  * Renders a button linking to your newsletter page (no widget form).
+ *
+ * @returns {JSX.Element}
  */
 function MakeswiftSubscribe({ className, ctctM, link, buttonText }: MakeswiftSubscribeProps) {
   const scriptLoadedRef = useRef(false);

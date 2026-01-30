@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable no-nested-ternary, complexity, @typescript-eslint/consistent-type-assertions -- slideshow layout uses ternary chains for positioning */
+
 import { clsx } from 'clsx';
 import { EmblaCarouselType } from 'embla-carousel';
 import Autoplay from 'embla-carousel-autoplay';

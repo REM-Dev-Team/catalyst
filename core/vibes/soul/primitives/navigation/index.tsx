@@ -380,7 +380,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                     const expandedItem = expandedLinkIndex !== null ? links[expandedLinkIndex] : null;
 
                     // Show groups if a link is expanded
-                    if (expandedItem && expandedItem.groups && expandedItem.groups.length > 0) {
+                    if (expandedItem?.groups && expandedItem.groups.length > 0) {
                       return (
                         <div className="flex flex-col p-2 @4xl:p-5">
                           {/* Back button */}
@@ -395,7 +395,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                           {/* Group links */}
                           {expandedItem.groups.map((group, groupIndex) => (
                             <ul className="flex flex-col @4xl:gap-2" key={groupIndex}>
-                              {group.label && group.href && (
+                              {group.label && group.href ? (
                                 <li>
                                   <Link
                                     className="block rounded-lg bg-[var(--nav-mobile-link-background,transparent)] px-3 py-2 font-[family-name:var(--nav-mobile-link-font-family,var(--font-family-body))] font-semibold text-[var(--nav-mobile-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-mobile-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-mobile-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:py-4"
@@ -404,7 +404,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                                     {group.label}
                                   </Link>
                                 </li>
-                              )}
+                              ) : null}
                               {group.links.map((link, linkIndex) => (
                                 <li key={linkIndex}>
                                   <Link

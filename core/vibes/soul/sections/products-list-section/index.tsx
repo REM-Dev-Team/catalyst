@@ -123,7 +123,7 @@ export function ProductsListSection({
               </Stream>
               <Stream value={filters}>
                 {(filtersList) =>
-                  (filtersList?.length ?? 0) > 0 ? (
+                  Array.isArray(filtersList) && filtersList.length > 0 ? (
                     <div className="block @3xl:hidden">
                       <SidePanel.Root>
                         <SidePanel.Trigger asChild>
@@ -157,7 +157,7 @@ export function ProductsListSection({
         <div className="flex items-stretch gap-8 @4xl:gap-10">
           <Stream value={filters}>
             {(filtersList) =>
-              (filtersList?.length ?? 0) > 0 ? (
+              Array.isArray(filtersList) && filtersList.length > 0 ? (
                 <aside className="hidden w-52 @3xl:block @4xl:w-60">
                   <Stream value={streamableFiltersPanelTitle}>
                     {(filtersPanelTitle) => <h2 className="sr-only">{filtersPanelTitle}</h2>}

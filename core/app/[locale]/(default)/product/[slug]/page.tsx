@@ -192,6 +192,7 @@ export default async function Product({ params, searchParams }: Props) {
   const streamableVideos = Streamable.from(async () => {
     const product = await streamableProduct;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- product.videos can be missing at runtime
     if (!product.videos || !('edges' in product.videos)) {
       return [];
     }
@@ -456,29 +457,15 @@ export default async function Product({ params, searchParams }: Props) {
   const streameableAccordions = Streamable.from(async () => {
     const product = await streamableProduct;
 
-    const customFields = removeEdgesAndNodes(product.customFields);
-
-    const specifications = [
-      {
-        name: t('ProductDetails.Accordions.sku'),
-        value: product.sku,
-      },
-      {
-        name: t('ProductDetails.Accordions.weight'),
-        value: `${product.weight?.value} ${product.weight?.unit}`,
-      },
-      {
-        name: t('ProductDetails.Accordions.condition'),
-        value: product.condition,
-      },
-      ...customFields.map((field) => ({
-        name: field.name,
-        value: field.value,
-      })),
-    ];
-
+    // const customFields = removeEdgesAndNodes(product.customFields);
+    // Specifications section disabled - uncomment block and variable to re-enable
+    // const specifications = [
+    //   { name: t('ProductDetails.Accordions.sku'), value: product.sku },
+    //   { name: t('ProductDetails.Accordions.weight'), value: `${product.weight?.value} ${product.weight?.unit}` },
+    //   { name: t('ProductDetails.Accordions.condition'), value: product.condition },
+    //   ...customFields.map((field) => ({ name: field.name, value: field.value })),
+    // ];
     return [
-      // Specifications section disabled - uncomment to re-enable
       // ...(specifications.length
       //   ? [
       //       {
@@ -615,13 +602,15 @@ export default async function Product({ params, searchParams }: Props) {
       </ProductAnalyticsProvider>
 
       <Stream fallback={null} value={streamableVideos}>
-        {(videos) =>
-          videos && videos.length > 0 && (
+        {(videos) => {
+          // Stream callback type says defined; runtime can still be undefined
+          const hasVideos = (videos?.length ?? 0) > 0; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+          return hasVideos ? (
             <div id="videos">
               <Videos videos={streamableVideos} title={t('ProductDetails.videos')} />
             </div>
-          )
-        }
+          ) : null;
+        }}
       </Stream>
 
       <FeaturedProductCarousel

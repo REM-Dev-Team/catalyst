@@ -52,7 +52,7 @@ export const Videos = ({ videos: streamableVideos, title = 'Videos' }: Props) =>
     <SectionLayout containerSize="2xl">
       <Stream fallback={null} value={streamableVideos}>
         {(videos) => {
-          if (!videos || videos.length === 0) {
+          if (videos.length === 0) {
             return null;
           }
 
@@ -110,7 +110,7 @@ function VideoCard({ video }: { video: Video }) {
       role="button"
       tabIndex={0}
     >
-      {thumbnailUrl && (
+      {thumbnailUrl ? (
         <Image
           alt={video.title}
           className="h-full w-full object-cover"
@@ -118,7 +118,7 @@ function VideoCard({ video }: { video: Video }) {
           sizes="(min-width: 42rem) 33vw, (min-width: 28rem) 50vw, 100vw"
           src={thumbnailUrl}
         />
-      )}
+      ) : null}
       <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/40">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-600/90 shadow-lg transition-transform group-hover:scale-110 group-hover:bg-red-600">
           <Play className="ml-1 h-10 w-10 text-white" fill="white" />

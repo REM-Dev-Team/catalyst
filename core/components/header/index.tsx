@@ -95,9 +95,7 @@ export const Header = async () => {
     : [];
 
   // Only show links configured in Makeswift, not preloaded category links
-  const streamableLinks = Streamable.from(async () => {
-    return [];
-  });
+  const streamableLinks = Streamable.from(() => Promise.resolve([]));
 
   const streamableGiftCertificatesEnabled = Streamable.from(async () => {
     const [customerAccessToken, currencyCode] = await Promise.all([
