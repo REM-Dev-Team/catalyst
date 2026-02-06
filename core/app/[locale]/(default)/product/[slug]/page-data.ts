@@ -268,6 +268,7 @@ const StreamableProductQuery = graphql(
       $entityId: Int!
       $optionValueIds: [OptionValueId!]
       $useDefaultOptionSelections: Boolean
+      $metafieldsNamespace: String!
     ) {
       site {
         product(
@@ -306,6 +307,15 @@ const StreamableProductQuery = graphql(
               node {
                 entityId
                 name
+                value
+              }
+            }
+          }
+          metafields(first: 50, namespace: $metafieldsNamespace) {
+            edges {
+              node {
+                id
+                key
                 value
               }
             }
@@ -352,6 +362,48 @@ export const getStreamableProduct = cache(
   },
 );
 
+const ProductMetafieldsQuery = graphql(`
+  query ProductMetafieldsQuery($entityId: Int!, $namespace: String!, $keys: [String!]) {
+    site {
+      product(entityId: $entityId) {
+        metafields(first: 50, namespace: $namespace, keys: $keys) {
+          edges {
+            node {
+              id
+              key
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+`);
+
+const LIKELY_METAFIELD_KEYS = ['Info', 'info', 'product_specifications', 'specifications', 'specs'];
+
+export const getProductMetafields = cache(
+  async (
+    entityId: number,
+    namespace: string,
+    customerAccessToken?: string,
+    keys?: string[] | null,
+  ): Promise<Array<{ id: string; key: string; value: string }>> => {
+    const keysToRequest = keys !== undefined ? keys : LIKELY_METAFIELD_KEYS;
+    const { data } = await client.fetch({
+      document: ProductMetafieldsQuery,
+      variables: { entityId, namespace, keys: keysToRequest },
+      customerAccessToken,
+      fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
+    });
+    const edges = data.site.product?.metafields?.edges;
+    if (!edges) return [];
+    return edges
+      .filter((e): e is NonNullable<typeof e> => e != null)
+      .map((e) => e.node);
+  },
+);
+
 // Fields that require currencyCode as a query variable
 // Separated from the rest to cache separately
 const ProductPricingAndRelatedProductsQuery = graphql(
@@ -383,8 +435,10 @@ const ProductPricingAndRelatedProductsQuery = graphql(
   [PricingFragment, FeaturedProductsCarouselFragment],
 );
 
+type PricingVariables = VariablesOf<typeof ProductPricingAndRelatedProductsQuery>;
+
 export const getProductPricingAndRelatedProducts = cache(
-  async (variables: Variables, customerAccessToken?: string) => {
+  async (variables: PricingVariables, customerAccessToken?: string) => {
     const { data } = await client.fetch({
       document: ProductPricingAndRelatedProductsQuery,
       variables,

@@ -458,6 +458,7 @@
       },
       "Accordions": {
         "specifications": "Specifications",
+        "productSpecifications": "Product Specifications",
         "warranty": "Warranty",
         "sku": "SKU",
         "weight": "Weight",

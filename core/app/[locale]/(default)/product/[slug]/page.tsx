@@ -1,5 +1,7 @@
 import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
+import DOMPurify from 'isomorphic-dompurify';
 import { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { SearchParams } from 'nuqs/server';
@@ -25,6 +27,7 @@ import { WishlistButton } from './_components/wishlist-button';
 import { WishlistButtonForm } from './_components/wishlist-button/form';
 import {
   getProduct,
+  getProductMetafields,
   getProductPageMetadata,
   getProductPricingAndRelatedProducts,
   getStreamableInventorySettingsQuery,
@@ -106,6 +109,7 @@ export default async function Product({ params, searchParams }: Props) {
       entityId: Number(productId),
       optionValueIds,
       useDefaultOptionSelections: true,
+      metafieldsNamespace: process.env.NEXT_PUBLIC_METAFIELDS_NAMESPACE ?? 'Info',
     };
 
     const product = await getStreamableProduct(variables, customerAccessToken);
@@ -457,36 +461,48 @@ export default async function Product({ params, searchParams }: Props) {
   const streameableAccordions = Streamable.from(async () => {
     const product = await streamableProduct;
 
-    // const customFields = removeEdgesAndNodes(product.customFields);
-    // Specifications section disabled - uncomment block and variable to re-enable
-    // const specifications = [
-    //   { name: t('ProductDetails.Accordions.sku'), value: product.sku },
-    //   { name: t('ProductDetails.Accordions.weight'), value: `${product.weight?.value} ${product.weight?.unit}` },
-    //   { name: t('ProductDetails.Accordions.condition'), value: product.condition },
-    //   ...customFields.map((field) => ({ name: field.name, value: field.value })),
-    // ];
+    const fromProduct =
+      'metafields' in product && product.metafields?.edges
+        ? removeEdgesAndNodes(product.metafields)
+        : [];
+    const extraMetafields = await getProductMetafields(
+      productId,
+      'Info',
+      customerAccessToken,
+    );
+    const seenKeys = new Set(fromProduct.map((n) => n.key));
+    const dedupedExtra = extraMetafields.filter((n) => {
+      if (seenKeys.has(n.key)) return false;
+      seenKeys.add(n.key);
+      return true;
+    });
+    const metafields = [...fromProduct, ...dedupedExtra];
+    const infoMetafields = metafields.filter(
+      (n) => n.key === 'Info' || n.key === 'info',
+    );
+
+    const accordions: Array<{ title: string; content: ReactNode }> = [];
+
+    if (infoMetafields.length > 0) {
+      accordions.push({
+        title: t('ProductDetails.Accordions.productSpecifications'),
+        content: (
+          <div className="prose @container">
+            {infoMetafields.map((node, index) => (
+              <div
+                key={`${node.id}-${index}`}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(node.value),
+                }}
+              />
+            ))}
+          </div>
+        ),
+      });
+    }
+
     return [
-      // ...(specifications.length
-      //   ? [
-      //       {
-      //         title: t('ProductDetails.Accordions.specifications'),
-      //         content: (
-      //           <div className="prose @container">
-      //             <dl className="flex flex-col gap-4">
-      //               {specifications.map((field, index) => (
-      //                 <div className="grid grid-cols-1 gap-2 @lg:grid-cols-2" key={index}>
-      //                   <dt>
-      //                     <strong>{field.name}</strong>
-      //                   </dt>
-      //                   <dd>{field.value}</dd>
-      //                 </div>
-      //               ))}
-      //             </dl>
-      //           </div>
-      //         ),
-      //       },
-      //     ]
-      //   : []),
+      ...accordions,
       ...(product.warranty
         ? [
             {
