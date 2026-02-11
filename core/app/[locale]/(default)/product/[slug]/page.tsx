@@ -465,20 +465,23 @@ export default async function Product({ params, searchParams }: Props) {
       'metafields' in product && product.metafields?.edges
         ? removeEdgesAndNodes(product.metafields)
         : [];
-    const extraMetafields = await getProductMetafields(
-      productId,
-      'Info',
-      customerAccessToken,
-    );
+    const [infoMetafieldsExtra, compatMetafieldsExtra] = await Promise.all([
+      getProductMetafields(productId, 'Info', customerAccessToken),
+      getProductMetafields(productId, 'Compat', customerAccessToken),
+    ]);
     const seenKeys = new Set(fromProduct.map((n) => n.key));
-    const dedupedExtra = extraMetafields.filter((n) => {
-      if (seenKeys.has(n.key)) return false;
-      seenKeys.add(n.key);
-      return true;
-    });
-    const metafields = [...fromProduct, ...dedupedExtra];
+    const dedupe = (arr: Array<{ id: string; key: string; value: string }>) =>
+      arr.filter((n) => {
+        if (seenKeys.has(n.key)) return false;
+        seenKeys.add(n.key);
+        return true;
+      });
+    const metafields = [...fromProduct, ...dedupe(infoMetafieldsExtra), ...dedupe(compatMetafieldsExtra)];
     const infoMetafields = metafields.filter(
       (n) => n.key === 'Info' || n.key === 'info',
+    );
+    const compatMetafields = metafields.filter(
+      (n) => n.key === 'compat' || n.key === 'Compat',
     );
 
     const accordions: Array<{ title: string; content: ReactNode }> = [];
@@ -489,6 +492,24 @@ export default async function Product({ params, searchParams }: Props) {
         content: (
           <div className="prose @container">
             {infoMetafields.map((node, index) => (
+              <div
+                key={`${node.id}-${index}`}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(node.value),
+                }}
+              />
+            ))}
+          </div>
+        ),
+      });
+    }
+
+    if (compatMetafields.length > 0) {
+      accordions.push({
+        title: t('ProductDetails.Accordions.compat'),
+        content: (
+          <div className="prose @container">
+            {compatMetafields.map((node, index) => (
               <div
                 key={`${node.id}-${index}`}
                 dangerouslySetInnerHTML={{

@@ -380,7 +380,7 @@ const ProductMetafieldsQuery = graphql(`
   }
 `);
 
-const LIKELY_METAFIELD_KEYS = ['Info', 'info', 'product_specifications', 'specifications', 'specs'];
+const LIKELY_METAFIELD_KEYS = ['Info', 'info', 'compat', 'Compat', 'product_specifications', 'specifications', 'specs'];
 
 export const getProductMetafields = cache(
   async (
