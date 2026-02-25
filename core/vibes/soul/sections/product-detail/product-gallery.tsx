@@ -12,6 +12,7 @@ export interface ProductGalleryProps {
   thumbnailLabel?: string;
   aspectRatio?:
     | '1:1'
+    | '2:1'
     | '4:5'
     | '5:4'
     | '3:4'
@@ -43,8 +44,8 @@ export function ProductGallery({
   images,
   className,
   thumbnailLabel = 'View image number',
-  aspectRatio = '1:1',
-  fit = 'contain',
+  aspectRatio = '3:2',
+  fit = 'cover',
 }: ProductGalleryProps) {
   const [previewImage, setPreviewImage] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel();
@@ -83,6 +84,7 @@ export function ProductGallery({
                   '4:5': 'aspect-[4/5]',
                   '3:2': 'aspect-[3/2]',
                   '2:3': 'aspect-[2/3]',
+                  '2:1': 'aspect-[2/1]',
                   '16:9': 'aspect-[16/9]',
                   '9:16': 'aspect-[9/16]',
                   '6:5': 'aspect-[6/5]',
@@ -104,7 +106,7 @@ export function ProductGallery({
                 )}
                 fill
                 priority={idx === 0}
-                sizes="(min-width: 42rem) 50vw, 100vw"
+                sizes="(min-width: 42rem) 62vw, 100vw"
                 src={image.src}
               />
             </div>

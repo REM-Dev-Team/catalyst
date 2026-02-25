@@ -121,7 +121,7 @@ export function ProductDetail<F extends Field>({
         <Stream fallback={<ProductDetailSkeleton />} value={streamableProduct}>
           {(product) =>
             product && (
-              <div className="grid grid-cols-1 items-stretch gap-x-8 gap-y-8 @2xl:grid-cols-2 @5xl:gap-x-12">
+              <div className="grid grid-cols-1 items-stretch gap-x-8 gap-y-8 @2xl:grid-cols-[1.25fr_0.75fr] @5xl:gap-x-12">
                 <div className="group/product-gallery hidden @2xl:block">
                   <Stream fallback={<ProductGallerySkeleton />} value={product.images}>
                     {(images) => <ProductGallery images={images} />}
@@ -411,7 +411,7 @@ function ProductAccordionsSkeleton() {
 export function ProductDetailSkeleton() {
   return (
     <Skeleton.Root
-      className="grid grid-cols-1 items-stretch gap-x-6 gap-y-8 group-has-[[data-pending]]/product-detail:animate-pulse @2xl:grid-cols-2 @5xl:gap-x-12"
+      className="grid grid-cols-1 items-stretch gap-x-6 gap-y-8 group-has-[[data-pending]]/product-detail:animate-pulse @2xl:grid-cols-[1.25fr_0.75fr] @5xl:gap-x-12"
       pending
     >
       <div className="hidden @2xl:block">
