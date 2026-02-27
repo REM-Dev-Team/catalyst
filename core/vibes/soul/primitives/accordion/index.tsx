@@ -91,15 +91,7 @@ function AccordionItem({
           isMounted && 'data-[state=closed]:animate-collapse data-[state=open]:animate-expand',
         )}
       >
-        <div
-          className={clsx(
-            'py-3 font-[family-name:var(--accordion-content-font-family,var(--font-family-body))] text-base font-light leading-normal',
-            {
-              light: 'text-[var(--accordion-light-content-text,hsl(var(--foreground)))]',
-              dark: 'text-[var(--accordion-dark-content-text,hsl(var(--background)))]',
-            }[colorScheme],
-          )}
-        >
+        <div className="prose prose-sm max-w-none py-3 font-normal text-[hsl(var(--foreground))] [&_ul]:text-[hsl(var(--foreground))] [&_ol]:text-[hsl(var(--foreground))] [&_p]:font-normal [&_ul]:font-normal [&_ol]:font-normal [&_li]:font-normal [&>div>*:first-child]:mt-0 [&>div>*:last-child]:mb-0">
           {children}
         </div>
       </AccordionPrimitive.Content>

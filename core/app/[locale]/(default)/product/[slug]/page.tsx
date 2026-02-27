@@ -490,7 +490,7 @@ export default async function Product({ params, searchParams }: Props) {
       accordions.push({
         title: t('ProductDetails.Accordions.productSpecifications'),
         content: (
-          <div className="prose @container">
+          <div>
             {infoMetafields.map((node, index) => (
               <div
                 key={`${node.id}-${index}`}
@@ -508,7 +508,7 @@ export default async function Product({ params, searchParams }: Props) {
       accordions.push({
         title: t('ProductDetails.Accordions.compat'),
         content: (
-          <div className="prose @container">
+          <div>
             {compatMetafields.map((node, index) => (
               <div
                 key={`${node.id}-${index}`}
@@ -528,9 +528,7 @@ export default async function Product({ params, searchParams }: Props) {
         ? [
             {
               title: t('ProductDetails.Accordions.warranty'),
-              content: (
-                <div className="prose" dangerouslySetInnerHTML={{ __html: product.warranty }} />
-              ),
+              content: <div dangerouslySetInnerHTML={{ __html: product.warranty }} />,
             },
           ]
         : []),
