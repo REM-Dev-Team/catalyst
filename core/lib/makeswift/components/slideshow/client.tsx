@@ -7,6 +7,13 @@ interface Slide {
   showDescription: boolean;
   imageSrc?: string;
   imageAlt: string;
+  /**
+   * When true, the red accent bar is hidden. Prefer this over legacy `showDivider` so “hide”
+   * persists as `true` (Makeswift often omits `false` from saved props).
+   */
+  hideAccentLine?: boolean;
+  /** Legacy Makeswift `showDivider: false` on saved pages; prefer `hideAccentLine`. */
+  showDivider?: boolean;
   showButton: boolean;
   buttonLink?: { href?: string; target?: string };
   buttonText: string;
@@ -50,6 +57,8 @@ export function MSSlideshow({
           imageSrc,
           imageAlt,
           imageHoldSeconds,
+          hideAccentLine,
+          showDivider: legacyShowDivider,
           showButton,
           buttonLink,
           buttonText,
@@ -69,6 +78,7 @@ export function MSSlideshow({
             image: imageSrc ? { alt: imageAlt, src: imageSrc } : undefined,
             holdDurationMs:
               (imageHoldSeconds ?? 0) > 0 ? Math.round((imageHoldSeconds ?? 0) * 1000) : undefined,
+            showDivider: !(hideAccentLine === true || legacyShowDivider === false),
             showCta: showButton,
             cta: { label: buttonText, href: buttonLink?.href ?? '#', variant: buttonColor },
             showSecondCta: showSecondButton,

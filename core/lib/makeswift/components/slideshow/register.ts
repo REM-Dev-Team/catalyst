@@ -36,7 +36,11 @@ runtime.registerComponent(MSSlideshow, {
             defaultValue: 0,
             suffix: 's',
           }),
-          showButton: Checkbox({ label: 'Show button', defaultValue: true }),
+          hideAccentLine: Checkbox({
+            label: 'Hide accent line above buttons',
+            defaultValue: false,
+          }),
+          showButton: Checkbox({ label: 'Show primary button', defaultValue: true }),
           buttonText: TextInput({ label: 'Button text', defaultValue: 'Shop all' }),
           buttonLink: Link({ label: 'Button link' }),
           buttonColor: Select({

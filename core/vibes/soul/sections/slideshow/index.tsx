@@ -39,6 +39,8 @@ interface Slide {
     shape?: ButtonLinkProps['shape'];
   };
   showSecondCta?: boolean;
+  /** Red accent bar above the CTA row. Independent of primary/secondary buttons. */
+  showDivider?: boolean;
   contentAlignment?: 'left' | 'center' | 'right';
   verticalAlignment?: 'top' | 'center' | 'bottom';
 }
@@ -147,32 +149,37 @@ const VIDEO_SLIDE_AUTOPLAY_PLACEHOLDER_MS = 24 * 60 * 60 * 1000;
 function SlideButtons({
   showCta,
   showSecondCta,
+  showDivider,
   cta,
   secondCta,
   contentAlignment,
 }: {
   showCta: boolean;
   showSecondCta: boolean;
+  showDivider: boolean;
   cta?: Slide['cta'];
   secondCta?: Slide['secondCta'];
   contentAlignment?: 'left' | 'center' | 'right';
 }) {
-  if (!showCta && !showSecondCta) return null;
+  if (!showCta && !showSecondCta && !showDivider) return null;
 
   return (
     <>
-      <div
-        className={clsx(
-          'mt-0',
-          contentAlignment === 'center' ? 'mx-auto' : contentAlignment === 'right' ? 'ml-auto' : '',
-        )}
-        style={{
-          width: '170px',
-          height: '2px',
-          backgroundColor: '#ed1c24',
-        }}
-      />
-      <div className="mt-6 flex flex-wrap gap-3 @xl:mt-8">
+      {showDivider ? (
+        <div
+          className={clsx(
+            'mt-0',
+            contentAlignment === 'center' ? 'mx-auto' : contentAlignment === 'right' ? 'ml-auto' : '',
+          )}
+          style={{
+            width: '170px',
+            height: '2px',
+            backgroundColor: '#ed1c24',
+          }}
+        />
+      ) : null}
+      {showCta || showSecondCta ? (
+        <div className="mt-6 flex flex-wrap gap-3 @xl:mt-8">
         {showCta && (
           <ButtonLink
             href={cta?.href ?? '#'}
@@ -193,7 +200,8 @@ function SlideButtons({
             {secondCta?.label ?? 'Learn more'}
           </ButtonLink>
         )}
-      </div>
+        </div>
+      ) : null}
     </>
   );
 }
@@ -517,6 +525,7 @@ export function Slideshow({
                 showCta = true,
                 secondCta,
                 showSecondCta = false,
+                showDivider = true,
                 contentAlignment = 'left',
                 verticalAlignment = 'center',
               },
@@ -652,6 +661,7 @@ export function Slideshow({
                             cta={cta}
                             secondCta={secondCta}
                             showCta={showCta}
+                            showDivider={showDivider}
                             showSecondCta={showSecondCta}
                           />
                         </div>
