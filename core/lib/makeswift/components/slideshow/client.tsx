@@ -1,4 +1,4 @@
-import { Slideshow } from '@/vibes/soul/sections/slideshow';
+import { Slideshow, type SlideshowMobileAspectRatio } from '@/vibes/soul/sections/slideshow';
 
 interface Slide {
   title: string;
@@ -17,6 +17,7 @@ interface Slide {
   secondButtonColor: 'primary' | 'secondary' | 'tertiary' | 'ghost';
   contentAlignment: 'left' | 'center' | 'right';
   verticalAlignment: 'top' | 'center' | 'bottom';
+  imageHoldSeconds?: number;
 }
 
 interface MSAccordionsProps {
@@ -24,13 +25,21 @@ interface MSAccordionsProps {
   slides: Slide[];
   autoplay: boolean;
   interval: number;
+  mobileAspectRatio: SlideshowMobileAspectRatio;
 }
 
-export function MSSlideshow({ className, slides, autoplay, interval }: MSAccordionsProps) {
+export function MSSlideshow({
+  className,
+  slides,
+  autoplay,
+  interval,
+  mobileAspectRatio,
+}: MSAccordionsProps) {
   return (
     <Slideshow
       className={className}
       interval={interval * 1000}
+      mobileAspectRatio={mobileAspectRatio}
       playOnInit={autoplay}
       slides={slides.map(
         ({
@@ -40,6 +49,7 @@ export function MSSlideshow({ className, slides, autoplay, interval }: MSAccordi
           showDescription,
           imageSrc,
           imageAlt,
+          imageHoldSeconds,
           showButton,
           buttonLink,
           buttonText,
@@ -57,6 +67,8 @@ export function MSSlideshow({ className, slides, autoplay, interval }: MSAccordi
             description,
             showDescription,
             image: imageSrc ? { alt: imageAlt, src: imageSrc } : undefined,
+            holdDurationMs:
+              (imageHoldSeconds ?? 0) > 0 ? Math.round((imageHoldSeconds ?? 0) * 1000) : undefined,
             showCta: showButton,
             cta: { label: buttonText, href: buttonLink?.href ?? '#', variant: buttonColor },
             showSecondCta: showSecondButton,

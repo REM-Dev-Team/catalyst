@@ -462,7 +462,7 @@ export default async function Product({ params, searchParams }: Props) {
     const product = await streamableProduct;
 
     const fromProduct =
-      'metafields' in product && product.metafields?.edges
+      'metafields' in product && product.metafields.edges
         ? removeEdgesAndNodes(product.metafields)
         : [];
     const [infoMetafieldsExtra, compatMetafieldsExtra] = await Promise.all([

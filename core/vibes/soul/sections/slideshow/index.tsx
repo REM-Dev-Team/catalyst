@@ -8,7 +8,7 @@ import Autoplay from 'embla-carousel-autoplay';
 import Fade from 'embla-carousel-fade';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Pause, Play } from 'lucide-react';
-import { ComponentPropsWithoutRef, useCallback, useEffect, useState } from 'react';
+import { ComponentPropsWithoutRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import { Image } from '~/components/image';
@@ -21,6 +21,8 @@ interface Slide {
   description?: string;
   showDescription?: boolean;
   image?: { alt: string; blurDataUrl?: string; src: string };
+  /** Milliseconds to show this slide when it is not a video. Defaults to slideshow `interval`. */
+  holdDurationMs?: number;
   cta?: {
     label: string;
     href: string;
@@ -41,11 +43,48 @@ interface Slide {
   verticalAlignment?: 'top' | 'center' | 'bottom';
 }
 
+/** Applied below `lg`; large screens use fixed hero height instead. */
+export type SlideshowMobileAspectRatio = '16:9' | '5:4' | '3:2' | '1:1' | '2:1' | '4:5' | '9:16';
+
+const MOBILE_ASPECT_RATIO_CLASSES = {
+  '16:9': 'aspect-video',
+  '5:4': 'aspect-[5/4]',
+  '3:2': 'aspect-[3/2]',
+  '1:1': 'aspect-square',
+  '2:1': 'aspect-[2/1]',
+  '4:5': 'aspect-[4/5]',
+  '9:16': 'aspect-[9/16]',
+} as const satisfies Record<SlideshowMobileAspectRatio, string>;
+
+function mobileAspectRatioClass(ratio: SlideshowMobileAspectRatio): string {
+  return MOBILE_ASPECT_RATIO_CLASSES[ratio];
+}
+
+/**
+ * Below `lg`, `max-h-[100dvh]` can bind before width shrinks, which makes tall ratios look landscape; cap width from height.
+ * @param {SlideshowMobileAspectRatio} ratio Mobile aspect ratio option
+ * @returns {string|undefined} Tailwind classes, or `undefined` when no extra cap is needed
+ */
+function mobileAspectRatioPortraitCapClass(ratio: SlideshowMobileAspectRatio): string | undefined {
+  switch (ratio) {
+    case '9:16':
+      return 'max-lg:mx-auto max-lg:max-w-[min(100%,calc(100dvh*9/16))] lg:max-w-none';
+
+    case '4:5':
+      return 'max-lg:mx-auto max-lg:max-w-[min(100%,calc(100dvh*4/5))] lg:max-w-none';
+
+    default:
+      return undefined;
+  }
+}
+
 interface Props {
   slides: Slide[];
   playOnInit?: boolean;
   interval?: number;
   className?: string;
+  /** Aspect ratio of the slideshow on viewports below `lg` (width : height). */
+  mobileAspectRatio?: SlideshowMobileAspectRatio;
 }
 
 interface UseProgressButtonType {
@@ -102,6 +141,9 @@ function isVideoFile(src: string): boolean {
   return videoExtensions.some((ext) => lowerSrc.includes(ext));
 }
 
+/** Autoplay timer for video slides; real advance happens on `ended`. */
+const VIDEO_SLIDE_AUTOPLAY_PLACEHOLDER_MS = 24 * 60 * 60 * 1000;
+
 function SlideButtons({
   showCta,
   showSecondCta,
@@ -156,19 +198,102 @@ function SlideButtons({
   );
 }
 
-function SlideImage({ image, idx }: { image?: Slide['image']; idx: number }) {
+function SlideImage({
+  image,
+  idx,
+  isActive,
+  slideCount,
+  autoplayPlaying,
+  onVideoEnded,
+  registerActiveVideo,
+  onSingleVideoLoop,
+}: {
+  image?: Slide['image'];
+  idx: number;
+  isActive: boolean;
+  slideCount: number;
+  /** Slideshow play/pause control — must pause/resume video with Embla autoplay. */
+  autoplayPlaying: boolean;
+  onVideoEnded: (slideIndex: number) => void;
+  registerActiveVideo: (element: HTMLVideoElement | null) => void;
+  onSingleVideoLoop: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const wasActiveRef = useRef(false);
+  const src = image?.src ?? '';
+  const isVideo = src !== '' && isVideoFile(src);
+
+  useEffect(() => {
+    if (!isVideo) return;
+
+    const el = videoRef.current;
+
+    if (!el) return;
+
+    if (!isActive) {
+      el.pause();
+      wasActiveRef.current = false;
+
+      return;
+    }
+
+    if (!wasActiveRef.current) {
+      el.currentTime = 0;
+      wasActiveRef.current = true;
+    }
+
+    if (autoplayPlaying) {
+      void el.play().catch(() => undefined);
+    } else {
+      el.pause();
+    }
+  }, [isActive, isVideo, autoplayPlaying]);
+
+  useEffect(() => {
+    if (!isVideo) return;
+
+    const el = videoRef.current;
+
+    if (!el) return;
+
+    if (isActive) {
+      registerActiveVideo(el);
+
+      return () => registerActiveVideo(null);
+    }
+
+    return undefined;
+  }, [isActive, isVideo, registerActiveVideo]);
+
   if (!image?.src || image.src === '') return null;
 
   // Check if the uploaded file is a video
-  if (isVideoFile(image.src)) {
+  if (isVideo) {
     return (
       <div className="relative h-full w-full">
         <video
-          autoPlay
           className="absolute inset-0 h-full w-full object-cover"
-          loop
           muted
+          onEnded={() => {
+            if (!isActive || !autoplayPlaying) return;
+
+            if (slideCount <= 1) {
+              const el = videoRef.current;
+
+              if (el) {
+                el.currentTime = 0;
+                void el.play().catch(() => undefined);
+              }
+
+              onSingleVideoLoop();
+
+              return;
+            }
+
+            onVideoEnded(idx);
+          }}
           playsInline
+          ref={videoRef}
         >
           <source src={image.src} type="video/mp4" />
           <source src={image.src} type="video/webm" />
@@ -229,14 +354,108 @@ function SlideImage({ image, idx }: { image?: Slide['image']; idx: number }) {
  * }
  * ```
  */
-export function Slideshow({ slides, playOnInit = true, interval = 5000, className }: Props) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 20 }, [
-    Autoplay({ delay: interval, playOnInit }),
-    Fade(),
-  ]);
+export function Slideshow({
+  slides,
+  playOnInit = true,
+  interval = 5000,
+  className,
+  mobileAspectRatio = '16:9',
+}: Props) {
+  const plugins = useMemo(
+    () => [
+      Autoplay({
+        delay: (snapIndices) =>
+          snapIndices.map((_, i) => {
+            const slide = slides[i];
+
+            if (!slide) return interval;
+
+            const slideSrc = slide.image?.src ?? '';
+
+            if (slideSrc !== '' && isVideoFile(slideSrc)) {
+              return VIDEO_SLIDE_AUTOPLAY_PLACEHOLDER_MS;
+            }
+
+            return slide.holdDurationMs ?? interval;
+          }),
+        playOnInit,
+      }),
+      Fade(),
+    ],
+    [slides, interval, playOnInit],
+  );
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 20 }, plugins);
   const { selectedIndex, scrollSnaps, onProgressButtonClick } = useProgressButton(emblaApi);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playCount, setPlayCount] = useState(0);
+  const [activeSlideDurationMs, setActiveSlideDurationMs] = useState(interval);
+
+  const activeSlideSrc = slides[selectedIndex]?.image?.src ?? '';
+  const activeSlideIsVideo = activeSlideSrc !== '' && isVideoFile(activeSlideSrc);
+
+  const activeVideoElRef = useRef<HTMLVideoElement | null>(null);
+  const videoProgressBarElRef = useRef<HTMLDivElement | null>(null);
+
+  const registerActiveVideo = useCallback((element: HTMLVideoElement | null) => {
+    activeVideoElRef.current = element;
+  }, []);
+
+  useEffect(() => {
+    if (!activeSlideIsVideo) return;
+
+    const segmentW = 150 / slides.length;
+    let rafId = 0;
+    const tick = () => {
+      const video = activeVideoElRef.current;
+      const bar = videoProgressBarElRef.current;
+
+      if (video && bar && Number.isFinite(video.duration) && video.duration > 0) {
+        bar.style.width = `${segmentW * (video.currentTime / video.duration)}px`;
+      }
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
+  }, [activeSlideIsVideo, selectedIndex, slides.length]);
+
+  useEffect(() => {
+    const slide = slides[selectedIndex];
+    const slideSrc = slide?.image?.src ?? '';
+
+    if (!slide || !slideSrc) {
+      setActiveSlideDurationMs(interval);
+
+      return;
+    }
+
+    if (isVideoFile(slideSrc)) {
+      return;
+    }
+
+    setActiveSlideDurationMs(slide.holdDurationMs ?? interval);
+  }, [selectedIndex, slides, interval]);
+
+  const handleVideoEnded = useCallback(
+    (slideIndex: number) => {
+      if (!emblaApi) return;
+      if (slideIndex !== emblaApi.selectedScrollSnap()) return;
+      emblaApi.scrollNext();
+      emblaApi.plugins().autoplay.reset();
+    },
+    [emblaApi],
+  );
+
+  const handleSingleVideoLoop = useCallback(() => {
+    if (!emblaApi) return;
+    emblaApi.plugins().autoplay.reset();
+    setPlayCount((c) => c + 1);
+  }, [emblaApi]);
 
   const toggleAutoplay = useCallback(() => {
     const autoplay = emblaApi?.plugins().autoplay;
@@ -278,7 +497,9 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
   return (
     <section
       className={clsx(
-        'relative h-[80vh] bg-[var(--slideshow-background,color-mix(in_oklab,hsl(var(--primary)),black_75%))] @container',
+        'relative max-h-[100dvh] w-full bg-[var(--slideshow-background,color-mix(in_oklab,hsl(var(--primary)),black_75%))] @container lg:aspect-auto lg:h-[80vh] lg:max-h-none',
+        mobileAspectRatioClass(mobileAspectRatio),
+        mobileAspectRatioPortraitCapClass(mobileAspectRatio),
         className,
       )}
     >
@@ -306,7 +527,16 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
                   className="relative h-full w-full min-w-0 shrink-0 grow-0 basis-full"
                   key={idx}
                 >
-                  <SlideImage idx={idx} image={image} />
+                  <SlideImage
+                    autoplayPlaying={isPlaying}
+                    idx={idx}
+                    image={image}
+                    isActive={idx === selectedIndex}
+                    onSingleVideoLoop={handleSingleVideoLoop}
+                    onVideoEnded={handleVideoEnded}
+                    registerActiveVideo={registerActiveVideo}
+                    slideCount={slides.length}
+                  />
                   <div className="absolute inset-0 z-10">
                     <div
                       className="slideshow-content-responsive w-full text-balance"
@@ -439,6 +669,9 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
       <div className="absolute bottom-4 left-1/2 flex w-full max-w-screen-2xl -translate-x-1/2 flex-wrap items-center px-4 @xl:bottom-6 @xl:px-6 @4xl:px-8">
         {/* Progress Buttons */}
         {scrollSnaps.map((_: number, index: number) => {
+          const segmentW = 150 / slides.length;
+          const useVideoProgress = index === selectedIndex && activeSlideIsVideo;
+
           return (
             <button
               aria-label={`View image number ${index + 1}`}
@@ -450,26 +683,33 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
               }}
             >
               <div className="relative overflow-hidden">
-                {/* White Bar - Current Index Indicator / Progress Bar */}
-                <div
-                  className={clsx(
-                    'absolute h-0.5 bg-[var(--slideshow-pagination,hsl(var(--background)))]',
-                    'opacity-0 fill-mode-forwards',
-                    isPlaying ? 'running' : 'paused',
-                    index === selectedIndex
-                      ? 'opacity-100 ease-linear animate-in slide-in-from-left'
-                      : 'ease-out animate-out fade-out',
-                  )}
-                  key={`progress-${playCount}`} // Force the animation to restart when pressing "Play", to match animation with embla's autoplay timer
-                  style={{
-                    animationDuration: index === selectedIndex ? `${interval}ms` : '200ms',
-                    width: `${150 / slides.length}px`,
-                  }}
-                />
-                {/* Grey Bar BG */}
+                {useVideoProgress ? (
+                  <div
+                    className="absolute left-0 top-0 z-[1] h-0.5 bg-[var(--slideshow-pagination,hsl(var(--background)))]"
+                    ref={videoProgressBarElRef}
+                    style={{ width: '0px' }}
+                  />
+                ) : (
+                  <div
+                    className={clsx(
+                      'absolute h-0.5 bg-[var(--slideshow-pagination,hsl(var(--background)))]',
+                      'opacity-0 fill-mode-forwards',
+                      isPlaying ? 'running' : 'paused',
+                      index === selectedIndex
+                        ? 'opacity-100 ease-linear animate-in slide-in-from-left'
+                        : 'ease-out animate-out fade-out',
+                    )}
+                    key={`progress-${selectedIndex}-${playCount}`}
+                    style={{
+                      animationDuration:
+                        index === selectedIndex ? `${activeSlideDurationMs}ms` : '200ms',
+                      width: `${segmentW}px`,
+                    }}
+                  />
+                )}
                 <div
                   className="h-0.5 bg-[var(--slideshow-pagination,hsl(var(--background)))] opacity-30"
-                  style={{ width: `${150 / slides.length}px` }}
+                  style={{ width: `${segmentW}px` }}
                 />
               </div>
             </button>

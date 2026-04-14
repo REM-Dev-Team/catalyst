@@ -18,7 +18,7 @@ interface Props {
 function getFields(
   giftCertificateSettings: ResultOf<typeof GiftCertificateSettingsFragment>,
   expiresAt: string | undefined,
-  t: ExistingResultType<typeof getTranslations>,
+  t: ExistingResultType<typeof getTranslations<'GiftCertificates'>>,
 ): Array<Field | FieldGroup<Field>> {
   const baseFields: Array<Field | FieldGroup<Field>> = [
     [

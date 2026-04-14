@@ -396,11 +396,12 @@ export const getProductMetafields = cache(
       customerAccessToken,
       fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
     });
-    const edges = data.site.product?.metafields?.edges;
+    const product = data.site.product;
+    if (!product) return [];
+    const edges = product.metafields.edges;
     if (!edges) return [];
-    return edges
-      .filter((e): e is NonNullable<typeof e> => e != null)
-      .map((e) => e.node);
+
+    return edges.map((e) => e.node);
   },
 );
 

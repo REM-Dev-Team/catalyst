@@ -31,6 +31,11 @@ runtime.registerComponent(MSSlideshow, {
           description: TextArea({ label: 'Description', defaultValue: 'Slide description' }),
           imageSrc: Image(),
           imageAlt: TextInput({ label: 'Image alt', defaultValue: 'Slide image' }),
+          imageHoldSeconds: Number({
+            label: 'Image duration (seconds, 0 = use slideshow default)',
+            defaultValue: 0,
+            suffix: 's',
+          }),
           showButton: Checkbox({ label: 'Show button', defaultValue: true }),
           buttonText: TextInput({ label: 'Button text', defaultValue: 'Shop all' }),
           buttonLink: Link({ label: 'Button link' }),
@@ -83,5 +88,18 @@ runtime.registerComponent(MSSlideshow, {
     }),
     autoplay: Checkbox({ label: 'Autoplay', defaultValue: true }),
     interval: Number({ label: 'Duration', defaultValue: 5, suffix: 's' }),
+    mobileAspectRatio: Select({
+      label: 'Mobile aspect ratio (below large screens)',
+      options: [
+        { value: '16:9', label: '16:9 (wide)' },
+        { value: '2:1', label: '2:1 (extra wide)' },
+        { value: '3:2', label: '3:2' },
+        { value: '5:4', label: '5:4' },
+        { value: '1:1', label: '1:1 (square)' },
+        { value: '4:5', label: '4:5 (portrait)' },
+        { value: '9:16', label: '9:16 (very tall portrait)' },
+      ],
+      defaultValue: '16:9',
+    }),
   },
 });
