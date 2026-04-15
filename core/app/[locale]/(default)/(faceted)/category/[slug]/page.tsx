@@ -270,6 +270,7 @@ export default async function Category(props: Props) {
         filterLabel={t('FacetedSearch.filters')}
         filters={streamableFilters}
         filtersPanelTitle={t('FacetedSearch.filters')}
+        filtersPanelApplyLabel={t('FacetedSearch.applyFilters')}
         maxCompareLimitMessage={t('Compare.maxCompareLimit')}
         maxItems={MAX_COMPARE_LIMIT}
         paginationInfo={streamablePagination}

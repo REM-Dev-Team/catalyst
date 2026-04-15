@@ -10,9 +10,11 @@ import { Button } from '../button';
 interface Props {
   title: React.ReactNode;
   children: React.ReactNode;
+  /** Sticky footer button label; closes the panel when tapped (e.g. mobile filters). */
+  applyLabel?: React.ReactNode;
 }
 
-function Content({ title, children }: Props) {
+function Content({ title, children, applyLabel }: Props) {
   return (
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-30 bg-foreground/50 @container">
@@ -33,7 +35,17 @@ function Content({ title, children }: Props) {
             </Dialog.Close>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 pb-6 @md:px-8 @md:pb-8">{children}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6 @md:px-8 @md:pb-8">{children}</div>
+
+          {applyLabel != null && applyLabel !== '' ? (
+            <div className="shrink-0 border-t border-contrast-100 bg-background px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] @md:px-8">
+              <Dialog.Close asChild>
+                <Button className="w-full" size="medium" variant="primary">
+                  {applyLabel}
+                </Button>
+              </Dialog.Close>
+            </div>
+          ) : null}
         </Dialog.Content>
       </Dialog.Overlay>
     </Dialog.Portal>

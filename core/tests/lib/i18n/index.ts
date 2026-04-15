@@ -1,5 +1,5 @@
 import deepmerge from 'deepmerge';
-import { createTranslator, Messages, NamespaceKeys, NestedKeyOf } from 'next-intl';
+import type { Messages, NamespaceKeys, NestedKeyOf } from 'next-intl';
 
 import { testEnv } from '~/tests/environment';
 
@@ -23,7 +23,9 @@ async function loadMessages(): Promise<Messages> {
 
 export async function getTranslations<
   NestedKey extends NamespaceKeys<Messages, NestedKeyOf<Messages>> = never,
->(namespace?: NestedKey): Promise<ReturnType<typeof createTranslator<Messages, NestedKey>>> {
+>(namespace?: NestedKey) {
+  const { createTranslator } = await import('next-intl');
+
   return createTranslator<Messages, NestedKey>({
     namespace,
     messages: await loadMessages(),

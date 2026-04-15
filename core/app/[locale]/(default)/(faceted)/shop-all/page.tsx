@@ -218,6 +218,12 @@ async function getFiltersPanelTitle(locale: string): Promise<string> {
   return t('FacetedSearch.filters');
 }
 
+async function getFiltersPanelApplyLabel(locale: string): Promise<string> {
+  const t = await getTranslations({ locale, namespace: 'Faceted' });
+
+  return t('FacetedSearch.applyFilters');
+}
+
 async function getRangeFilterApplyLabel(locale: string): Promise<string> {
   const t = await getTranslations({ locale, namespace: 'Faceted' });
 
@@ -270,6 +276,7 @@ export default async function ShopAll(props: Props) {
       filterLabel={await getFilterLabel(locale)}
       filters={Streamable.from(() => getFilters(props))}
       filtersPanelTitle={Streamable.from(() => getFiltersPanelTitle(locale))}
+      filtersPanelApplyLabel={Streamable.from(() => getFiltersPanelApplyLabel(locale))}
       maxCompareLimitMessage={Streamable.from(() => getMaxCompareLimitMessage(locale))}
       maxItems={MAX_COMPARE_LIMIT}
       paginationInfo={Streamable.from(() => getPaginationInfo(props))}

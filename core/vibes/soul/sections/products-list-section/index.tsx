@@ -29,6 +29,8 @@ interface Props {
   showCompare?: Streamable<boolean>;
   filterLabel?: string;
   filtersPanelTitle?: Streamable<string>;
+  /** Label for the sticky “apply” control on the mobile filters panel (closes the panel). */
+  filtersPanelApplyLabel?: Streamable<string>;
   resetFiltersLabel?: Streamable<string>;
   showRating?: boolean;
   rangeFilterApplyLabel?: Streamable<string>;
@@ -62,6 +64,7 @@ export function ProductsListSection({
   paginationInfo,
   filterLabel = 'Filters',
   filtersPanelTitle: streamableFiltersPanelTitle = 'Filters',
+  filtersPanelApplyLabel: streamableFiltersPanelApplyLabel,
   resetFiltersLabel,
   rangeFilterApplyLabel,
   sortLabel: streamableSortLabel,
@@ -134,9 +137,17 @@ export function ProductsListSection({
                             </span>
                           </Button>
                         </SidePanel.Trigger>
-                        <Stream value={streamableFiltersPanelTitle}>
-                          {(filtersPanelTitle) => (
-                            <SidePanel.Content title={filtersPanelTitle}>
+                        <Stream
+                          value={Streamable.all([
+                            streamableFiltersPanelTitle,
+                            streamableFiltersPanelApplyLabel,
+                          ])}
+                        >
+                          {([filtersPanelTitle, filtersPanelApplyLabel]) => (
+                            <SidePanel.Content
+                              applyLabel={filtersPanelApplyLabel ?? undefined}
+                              title={filtersPanelTitle}
+                            >
                               <FiltersPanel
                                 filters={filters}
                                 paginationInfo={paginationInfo}

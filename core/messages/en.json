@@ -110,6 +110,7 @@
     "FacetedSearch": {
       "filters": "Filters",
       "resetFilters": "Reset filters",
+      "applyFilters": "Apply filters",
       "Range": {
         "apply": "Apply"
       },
