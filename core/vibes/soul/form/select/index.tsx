@@ -43,7 +43,7 @@ export type Props = {
  *    --select-light-content-border: color-mix(in oklab, var(--foreground) 10%, transparent);
  *    --select-light-item-background-hover: var(--contrast-100);
  *    --select-light-item-background-focus: var(--contrast-100);
- *    --select-light-item-text: var(--contrast-400);
+ *    --select-light-item-text: var(--foreground);
  *    --select-light-item-text-hover: var(--foreground);
  *    --select-light-item-text-focus: var(--foreground);
  *    --select-light-item-checked-text-focus: var(--foreground);
@@ -58,7 +58,7 @@ export type Props = {
  *    --select-dark-content-border: color-mix(in oklab, var(--background) 10%, transparent);
  *    --select-dark-item-background-hover: var(--contrast-500);
  *    --select-dark-item-background-focus: var(--contrast-500);
- *    --select-dark-item-text: var(--contrast-200);
+ *    --select-dark-item-text: var(--background);
  *    --select-dark-item-text-hover: var(--background);
  *    --select-dark-item-text-focus: var(--background);
  *    --select-dark-item-checked-text-focus: var(--background);
@@ -166,8 +166,8 @@ export function Select({
                     'w-full cursor-default select-none rounded-xl px-3 py-2 text-sm font-medium outline-none transition-colors @4xl:text-base',
                     {
                       light:
-                        'text-[var(--select-light-item-text,hsl(var(--contrast-400)))] hover:bg-[var(--select-light-item-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--select-light-item-text-hover,hsl(var(--foreground)))] focus-visible:bg-[var(--select-light-item-background-focus,hsl(var(--contrast-100)))] focus-visible:text-[var(--select-light-item-text-focus,hsl(var(--foreground)))] data-[state=checked]:text-[var(--select-light-item-checked-text-focus,hsl(var(--foreground)))]',
-                      dark: 'text-[var(--select-dark-item-text,hsl(var(--contrast-200)))] hover:bg-[var(--select-dark-item-background-hover,hsl(var(--contrast-500)))] hover:text-[var(--select-dark-item-text-hover,hsl(var(--background)))] focus-visible:bg-[var(--select-dark-item-background-focus,hsl(var(--contrast-500)))] focus-visible:text-[var(--select-dark-item-text-focus,hsl(var(--background)))] data-[state=checked]:text-[var(--select-dark-item-checked-text-focus,hsl(var(--background)))]',
+                        'text-[var(--select-light-item-text,hsl(var(--foreground)))] hover:bg-[var(--select-light-item-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--select-light-item-text-hover,hsl(var(--foreground)))] focus-visible:bg-[var(--select-light-item-background-focus,hsl(var(--contrast-100)))] focus-visible:text-[var(--select-light-item-text-focus,hsl(var(--foreground)))] data-[state=checked]:text-[var(--select-light-item-checked-text-focus,hsl(var(--foreground)))]',
+                      dark: 'text-[var(--select-dark-item-text,hsl(var(--background)))] hover:bg-[var(--select-dark-item-background-hover,hsl(var(--contrast-500)))] hover:text-[var(--select-dark-item-text-hover,hsl(var(--background)))] focus-visible:bg-[var(--select-dark-item-background-focus,hsl(var(--contrast-500)))] focus-visible:text-[var(--select-dark-item-text-focus,hsl(var(--background)))] data-[state=checked]:text-[var(--select-dark-item-checked-text-focus,hsl(var(--background)))]',
                     }[colorScheme],
                   )}
                   key={option.value}
