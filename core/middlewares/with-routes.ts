@@ -225,6 +225,15 @@ const clearLocaleFromPath = (path: string, locale: string) => {
   return path;
 };
 
+/** Old storefront URLs used `/product/:slug`; vanity URLs are `/:slug`. */
+const applyLocalePrefix = (pathname: string, locale: string, pathWithoutLocalePrefix: string) => {
+  if (locale && pathname.startsWith(`/${locale}/`)) {
+    return `/${locale}${pathWithoutLocalePrefix}`;
+  }
+
+  return pathWithoutLocalePrefix;
+};
+
 function normalizeForCompare(url: URL): string {
   if (trailingSlashDisabled && url.pathname !== '/' && url.pathname.endsWith('/')) {
     return `${url.pathname.replace(/\/+$/, '')}${url.search}`;
@@ -289,6 +298,30 @@ export const withRoutes: MiddlewareFactory = () => {
   // eslint-disable-next-line complexity
   return async (request, event) => {
     const locale = request.headers.get('x-bc-locale') ?? '';
+
+    const pathForMatch = clearLocaleFromPath(request.nextUrl.pathname, locale);
+
+    if (pathForMatch.startsWith('/product/')) {
+      const afterProduct = pathForMatch.slice('/product/'.length);
+
+      if (afterProduct.length > 0) {
+        const newPathname = applyLocalePrefix(
+          request.nextUrl.pathname,
+          locale,
+          `/${afterProduct}`,
+        );
+        const redirectUrl = new URL(newPathname + request.nextUrl.search, request.url);
+
+        if (!sameInternalUrl(request.nextUrl, redirectUrl)) {
+          return NextResponse.redirect(redirectUrl, {
+            status: 301,
+            nextConfig: {
+              trailingSlash: process.env.TRAILING_SLASH !== 'false',
+            },
+          });
+        }
+      }
+    }
 
     const { route, status } = await getRouteInfo(request, event);
 
