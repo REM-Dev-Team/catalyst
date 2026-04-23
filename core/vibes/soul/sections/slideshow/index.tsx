@@ -146,6 +146,14 @@ function isVideoFile(src: string): boolean {
 /** Autoplay timer for video slides; real advance happens on `ended`. */
 const VIDEO_SLIDE_AUTOPLAY_PLACEHOLDER_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * When content is bottom-aligned, the slide overlay and the bottom carousel (progress, count,
+ * play) share the same vertical space; a plain `--slideshow-bottom` ~40–80px often still overlaps
+ * the control bar (incl. flex-wrap to two rows on narrow widths). This minimum clears that band.
+ */
+const SLIDESHOW_BOTTOM_CONTROLS_CLEARANCE =
+  'max(calc(6.75rem + env(safe-area-inset-bottom, 0px)), var(--slideshow-bottom, 2.5rem))';
+
 function SlideButtons({
   showCta,
   showSecondCta,
@@ -153,6 +161,7 @@ function SlideButtons({
   cta,
   secondCta,
   contentAlignment,
+  verticalAlignment,
 }: {
   showCta: boolean;
   showSecondCta: boolean;
@@ -160,8 +169,14 @@ function SlideButtons({
   cta?: Slide['cta'];
   secondCta?: Slide['secondCta'];
   contentAlignment?: 'left' | 'center' | 'right';
+  verticalAlignment?: Slide['verticalAlignment'];
 }) {
   if (!showCta && !showSecondCta && !showDivider) return null;
+
+  const ctaBlockMargin =
+    verticalAlignment === 'bottom'
+      ? 'mt-7 flex flex-wrap gap-3 @xl:mt-9'
+      : 'mt-6 flex flex-wrap gap-3 @xl:mt-8';
 
   return (
     <>
@@ -169,7 +184,11 @@ function SlideButtons({
         <div
           className={clsx(
             'mt-0',
-            contentAlignment === 'center' ? 'mx-auto' : contentAlignment === 'right' ? 'ml-auto' : '',
+            contentAlignment === 'center'
+              ? 'mx-auto'
+              : contentAlignment === 'right'
+                ? 'ml-auto'
+                : '',
           )}
           style={{
             width: '170px',
@@ -179,27 +198,27 @@ function SlideButtons({
         />
       ) : null}
       {showCta || showSecondCta ? (
-        <div className="mt-6 flex flex-wrap gap-3 @xl:mt-8">
-        {showCta && (
-          <ButtonLink
-            href={cta?.href ?? '#'}
-            shape={cta?.shape ?? 'rounded'}
-            size={cta?.size ?? 'x-small'}
-            variant={cta?.variant ?? 'tertiary'}
-          >
-            {cta?.label ?? 'Learn more'}
-          </ButtonLink>
-        )}
-        {showSecondCta && (
-          <ButtonLink
-            href={secondCta?.href ?? '#'}
-            shape={secondCta?.shape ?? 'rounded'}
-            size={secondCta?.size ?? 'x-small'}
-            variant={secondCta?.variant ?? 'secondary'}
-          >
-            {secondCta?.label ?? 'Learn more'}
-          </ButtonLink>
-        )}
+        <div className={ctaBlockMargin}>
+          {showCta && (
+            <ButtonLink
+              href={cta?.href ?? '#'}
+              shape={cta?.shape ?? 'rounded'}
+              size={cta?.size ?? 'x-small'}
+              variant={cta?.variant ?? 'tertiary'}
+            >
+              {cta?.label ?? 'Learn more'}
+            </ButtonLink>
+          )}
+          {showSecondCta && (
+            <ButtonLink
+              href={secondCta?.href ?? '#'}
+              shape={secondCta?.shape ?? 'rounded'}
+              size={secondCta?.size ?? 'x-small'}
+              variant={secondCta?.variant ?? 'secondary'}
+            >
+              {secondCta?.label ?? 'Learn more'}
+            </ButtonLink>
+          )}
         </div>
       ) : null}
     </>
@@ -560,7 +579,7 @@ export function Slideshow({
                                 : '50%',
                           bottom:
                             verticalAlignment === 'bottom'
-                              ? 'var(--slideshow-bottom, 30px)'
+                              ? SLIDESHOW_BOTTOM_CONTROLS_CLEARANCE
                               : 'auto',
                           left:
                             contentAlignment === 'left'
@@ -635,12 +654,13 @@ export function Slideshow({
                         {showDescription ? (
                           <p
                             className={clsx(
-                              'slideshow-description mb-6 mt-2 w-full font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] font-medium leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))]',
+                              'slideshow-description mt-2 w-full font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] font-medium leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))]',
                               contentAlignment === 'center'
                                 ? 'text-center'
                                 : contentAlignment === 'right'
                                   ? 'text-right'
                                   : 'text-left',
+                              verticalAlignment === 'bottom' ? 'mb-7 @xl:mb-8' : 'mb-6',
                             )}
                             style={{ fontSize: '14px' }}
                           >
@@ -663,6 +683,7 @@ export function Slideshow({
                             showCta={showCta}
                             showDivider={showDivider}
                             showSecondCta={showSecondCta}
+                            verticalAlignment={verticalAlignment}
                           />
                         </div>
                       </div>
