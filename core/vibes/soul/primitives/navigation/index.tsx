@@ -377,7 +377,8 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                   value={streamableLinks}
                 >
                   {(links) => {
-                    const expandedItem = expandedLinkIndex !== null ? links[expandedLinkIndex] : null;
+                    const expandedItem =
+                      expandedLinkIndex !== null ? links[expandedLinkIndex] : null;
 
                     // Show groups if a link is expanded
                     if (expandedItem?.groups && expandedItem.groups.length > 0) {
@@ -487,12 +488,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
         </Popover.Root>
 
         {/* Logo */}
-        <div
-          className={clsx(
-            'flex items-center justify-start self-stretch',
-            linksPosition === 'center' ? 'flex-1' : 'flex-1 @4xl:flex-none',
-          )}
-        >
+        <div className="flex min-w-0 flex-1 items-center justify-start self-stretch @4xl:flex-none @4xl:shrink-0">
           <Logo
             className={clsx(streamableMobileLogo != null ? 'hidden @4xl:flex' : 'flex')}
             height={logoHeight}
@@ -513,94 +509,85 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
           )}
         </div>
 
-        {/* Top Level Nav Links */}
-        <ul
-          className={clsx(
-            'hidden gap-1 @4xl:flex @4xl:flex-1',
-            {
-              left: '@4xl:justify-start',
-              center: '@4xl:justify-center',
-              right: '@4xl:justify-end',
-            }[linksPosition],
-          )}
-        >
-          <Stream
-            fallback={
-              <ul className="flex min-h-[41px] animate-pulse flex-row items-center @4xl:gap-6 @4xl:p-2.5">
-                <li>
-                  <span className="block h-4 w-10 rounded-md bg-contrast-100" />
-                </li>
-                <li>
-                  <span className="block h-4 w-14 rounded-md bg-contrast-100" />
-                </li>
-                <li>
-                  <span className="block h-4 w-24 rounded-md bg-contrast-100" />
-                </li>
-                <li>
-                  <span className="block h-4 w-16 rounded-md bg-contrast-100" />
-                </li>
-              </ul>
-            }
-            value={streamableLinks}
+        {/* Top-level nav (desktop) */}
+        <div className="hidden min-w-0 flex-1 @4xl:block">
+          <ul
+            className={clsx(
+              'flex min-h-0 w-full min-w-0 flex-wrap gap-1',
+              {
+                left: 'justify-start',
+                center: 'justify-center',
+                right: 'justify-end',
+              }[linksPosition],
+            )}
           >
-            {(links) =>
-              links.map((item, i) => (
-                <NavigationMenu.Item key={i} value={i.toString()}>
-                  <NavigationMenu.Trigger asChild>
-                    <Link
-                      className="hidden items-center whitespace-nowrap rounded-xl bg-[var(--nav-link-background,transparent)] p-2.5 font-[family-name:var(--nav-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors duration-200 hover:bg-[var(--nav-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:inline-flex"
-                      href={item.href}
-                    >
-                      {item.label}
-                    </Link>
-                  </NavigationMenu.Trigger>
-                  {item.groups != null && item.groups.length > 0 && (
-                    <NavigationMenu.Content className="rounded-2xl bg-[var(--nav-menu-background,hsl(var(--background)))] shadow-xl ring-1 ring-[var(--nav-menu-border,hsl(var(--foreground)/5%))]">
-                      <div className="m-auto grid w-full max-w-screen-lg grid-cols-5 justify-center gap-5 px-5 pb-8 pt-5">
-                        {item.groups.map((group, columnIndex) => (
-                          <ul className="flex flex-col" key={columnIndex}>
-                            {/* Second Level Links */}
-                            {group.label != null && group.label !== '' && (
-                              <li>
-                                {group.href != null && group.href !== '' ? (
-                                  <Link className={navGroupClassName} href={group.href}>
-                                    {group.label}
+            <Stream
+              fallback={
+                <li className="min-h-[41px] w-full list-none p-2.5">
+                  <div className="flex items-center gap-6">
+                    <span className="block h-4 w-10 animate-pulse rounded-md bg-contrast-100" />
+                    <span className="block h-4 w-14 animate-pulse rounded-md bg-contrast-100" />
+                    <span className="block h-4 w-24 animate-pulse rounded-md bg-contrast-100" />
+                    <span className="block h-4 w-16 animate-pulse rounded-md bg-contrast-100" />
+                  </div>
+                </li>
+              }
+              value={streamableLinks}
+            >
+              {(links) =>
+                links.map((item, i) => (
+                  <NavigationMenu.Item key={i} value={i.toString()}>
+                    <NavigationMenu.Trigger asChild>
+                      <Link
+                        className="inline-flex items-center whitespace-nowrap rounded-xl bg-[var(--nav-link-background,transparent)] p-2.5 font-[family-name:var(--nav-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors duration-200 hover:bg-[var(--nav-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
+                        href={item.href}
+                      >
+                        {item.label}
+                      </Link>
+                    </NavigationMenu.Trigger>
+                    {item.groups != null && item.groups.length > 0 && (
+                      <NavigationMenu.Content className="rounded-2xl bg-[var(--nav-menu-background,hsl(var(--background)))] shadow-xl ring-1 ring-[var(--nav-menu-border,hsl(var(--foreground)/5%))]">
+                        <div className="m-auto grid w-full max-w-screen-lg grid-cols-5 justify-center gap-5 px-5 pb-8 pt-5">
+                          {item.groups.map((group, columnIndex) => (
+                            <ul className="flex flex-col" key={columnIndex}>
+                              {/* Second level links */}
+                              {group.label != null && group.label !== '' && (
+                                <li>
+                                  {group.href != null && group.href !== '' ? (
+                                    <Link className={navGroupClassName} href={group.href}>
+                                      {group.label}
+                                    </Link>
+                                  ) : (
+                                    <span className={navGroupClassName}>{group.label}</span>
+                                  )}
+                                </li>
+                              )}
+
+                              {group.links.map((link, idx) => (
+                                // Third level links
+                                <li key={idx}>
+                                  <Link
+                                    className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
+                                    href={link.href}
+                                  >
+                                    {link.label}
                                   </Link>
-                                ) : (
-                                  <span className={navGroupClassName}>{group.label}</span>
-                                )}
-                              </li>
-                            )}
+                                </li>
+                              ))}
+                            </ul>
+                          ))}
+                        </div>
+                      </NavigationMenu.Content>
+                    )}
+                  </NavigationMenu.Item>
+                ))
+              }
+            </Stream>
+          </ul>
+        </div>
 
-                            {group.links.map((link, idx) => (
-                              // Third Level Links
-                              <li key={idx}>
-                                <Link
-                                  className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
-                                  href={link.href}
-                                >
-                                  {link.label}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        ))}
-                      </div>
-                    </NavigationMenu.Content>
-                  )}
-                </NavigationMenu.Item>
-              ))
-            }
-          </Stream>
-        </ul>
-
-        {/* Icon Buttons */}
-        <div
-          className={clsx(
-            'flex items-center justify-end gap-0.5 transition-colors duration-300',
-            linksPosition === 'center' ? 'flex-1' : 'flex-1 @4xl:flex-none',
-          )}
-        >
+        {/* Icon buttons */}
+        <div className="flex flex-1 items-center justify-end gap-0.5 transition-colors duration-300 @4xl:flex-none @4xl:shrink-0">
           {searchAction ? (
             <Popover.Root onOpenChange={setIsSearchOpen} open={isSearchOpen}>
               <Popover.Anchor className="absolute left-0 right-0 top-full" />
