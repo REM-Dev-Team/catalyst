@@ -12,7 +12,7 @@ import {
   GiftIcon,
   Search,
   SearchIcon,
-  ShoppingBag,
+  ShoppingCart,
   User,
 } from 'lucide-react';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -626,7 +626,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
             <User size={20} strokeWidth={1} />
           </Link>
           <Link aria-label={cartLabel} className={navButtonClassName} href={cartHref}>
-            <ShoppingBag size={20} strokeWidth={1} />
+            <ShoppingCart size={20} strokeWidth={1} />
             <Stream
               fallback={
                 <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 animate-pulse items-center justify-center rounded-full bg-contrast-100 text-xs text-background" />
